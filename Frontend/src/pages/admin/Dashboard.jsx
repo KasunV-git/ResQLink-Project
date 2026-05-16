@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FiAlertTriangle, FiUsers, FiBox, FiCheckCircle } from 'react-icons/fi';
-import StatCard from '../../components/dashboard/StatCard';
+import StatCard from '../../components/common/StatCard';
 import DashboardChartCard from '../../components/dashboard/DashboardChartCard';
 import DashboardMapCard from '../../components/dashboard/DashboardMapCard';
 
