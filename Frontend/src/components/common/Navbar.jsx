@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 const Navbar = ({ toggleSidebar, toggleMobileSidebar, isCollapsed }) => {
   return (
     <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 sticky top-0 z-30 transition-colors duration-300">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-1">
         {/* Mobile menu button */}
         <button 
           onClick={toggleMobileSidebar}
@@ -24,19 +24,19 @@ const Navbar = ({ toggleSidebar, toggleMobileSidebar, isCollapsed }) => {
         >
           <FiMenu size={20} />
         </button>
-
-        {/* Search */}
-        <div className="hidden md:flex items-center relative">
-          <FiSearch className="absolute left-3 text-foreground/50" size={16} />
-          <input 
-            type="text" 
-            placeholder="Search..." 
-            className="pl-9 pr-4 py-2 bg-background border border-border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 w-64 transition-all"
-          />
-        </div>
       </div>
 
-      <div className="flex items-center gap-3 md:gap-4">
+      {/* Search - Centered */}
+      <div className="hidden md:flex items-center justify-center relative">
+        <FiSearch className="absolute left-3 text-foreground/50" size={16} />
+        <input 
+          type="text" 
+          placeholder="Search..." 
+          className="pl-9 pr-4 py-2 bg-background border border-border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 w-96 transition-all"
+        />
+      </div>
+
+      <div className="flex items-center justify-end gap-3 md:gap-4 flex-1">
         <ThemeToggle />
         
         {/* Notifications */}

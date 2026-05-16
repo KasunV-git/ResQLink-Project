@@ -14,10 +14,10 @@ import {
 
 const menuItems = [
   { path: '/admin', icon: FiHome, label: 'Dashboard', exact: true },
-  { path: '/admin/disasters', icon: FiAlertTriangle, label: 'Disaster Reports' },
-  { path: '/admin/volunteers', icon: FiUsers, label: 'Volunteer Mgmt' },
-  { path: '/admin/resources', icon: FiBox, label: 'Resource Mgmt' },
-  { path: '/admin/alerts', icon: FiBell, label: 'Alerts Mgmt' },
+  { path: '/admin/disasters', icon: FiAlertTriangle, label: 'Disaster Management' },
+  { path: '/admin/volunteers', icon: FiUsers, label: 'Volunteer Management' },
+  { path: '/admin/resources', icon: FiBox, label: 'Resource Management' },
+  { path: '/admin/alerts', icon: FiBell, label: 'Alert Management' },
   { path: '/admin/ai-analysis', icon: FiActivity, label: 'AI Analysis' },
   { path: '/admin/reports', icon: FiBarChart2, label: 'Reports & Analytics' },
   { path: '/admin/profile', icon: FiUser, label: 'Profile' },
