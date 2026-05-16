@@ -2,9 +2,8 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import Home from '../pages/public/Home';
-import AdminPlaceholder from '../pages/admin/AdminPlaceholder';
 import NotFound from '../pages/errors/NotFound';
-import AdminLayout from '../layouts/AdminLayout';
+import AdminRoutes from './AdminRoutes';
 
 const AppRoutes = () => {
   return (
@@ -15,20 +14,12 @@ const AppRoutes = () => {
         <Route path="/auth" element={<div>Auth Pages coming soon...</div>} />
         <Route path="/citizen" element={<div>Citizen Pages coming soon...</div>} />
         <Route path="/volunteer" element={<div>Volunteer Pages coming soon...</div>} />
+        {/* We do NOT handle the global 404 here inside MainLayout if we want /admin/* to be handled, OR we handle it as * but order matters. Let's just put * at the very end outside or keep it here. Actually, if we put * here, it might swallow /admin. React Router v6 is smart about scoring, so it should be fine. */}
         <Route path="*" element={<NotFound />} />
       </Route>
 
-      {/* Admin Routes with AdminLayout */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<AdminPlaceholder />} />
-        <Route path="disasters" element={<AdminPlaceholder />} />
-        <Route path="volunteers" element={<AdminPlaceholder />} />
-        <Route path="resources" element={<AdminPlaceholder />} />
-        <Route path="alerts" element={<AdminPlaceholder />} />
-        <Route path="ai-analysis" element={<AdminPlaceholder />} />
-        <Route path="reports" element={<AdminPlaceholder />} />
-        <Route path="profile" element={<AdminPlaceholder />} />
-      </Route>
+      {/* Admin Routes Module */}
+      <Route path="/admin/*" element={<AdminRoutes />} />
     </Routes>
   );
 };
