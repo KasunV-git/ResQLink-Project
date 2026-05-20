@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from '../layouts/AdminLayout';
+import { isAuthenticated } from '../services/authService';
 
 // Lazy loaded admin pages
 const Dashboard = lazy(() => import('../pages/admin/Dashboard'));
@@ -20,10 +21,18 @@ const PageLoader = () => (
   </div>
 );
 
+// Auth guard — redirects to login if no session token exists
+const RequireAuth = ({ children }) => {
+  if (!isAuthenticated()) {
+    return <Navigate to="/admin/login" replace />;
+  }
+  return children;
+};
+
 const AdminRoutes = () => {
   return (
     <Routes>
-      <Route element={<AdminLayout />}>
+      <Route element={<RequireAuth><AdminLayout /></RequireAuth>}>
         <Route 
           index 
           element={

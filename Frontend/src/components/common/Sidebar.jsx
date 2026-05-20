@@ -37,6 +37,7 @@ const Sidebar = ({ isCollapsed }) => {
       <nav className="flex-1 overflow-y-auto py-6 px-3 flex flex-col gap-2">
         {menuItems.map((item) => {
           const Icon = item.icon;
+      
           return (
             <NavLink
               key={item.path}
