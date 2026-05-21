@@ -74,12 +74,7 @@ const Sidebar = ({ isCollapsed }) => {
                     </motion.span>
                   )}
                   
-                  {/* Tooltip for collapsed state */}
-                  {isCollapsed && (
-                    <div className="absolute left-14 bg-card border border-border shadow-md px-2 py-1 rounded text-sm text-foreground opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 whitespace-nowrap">
-                      {item.label}
-                    </div>
-                  )}
+                  {/* Tooltip for collapsed state disabled as requested */}
                 </>
               )}
             </NavLink>

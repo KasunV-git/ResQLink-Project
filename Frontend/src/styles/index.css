@@ -21,11 +21,11 @@
 
 @layer base {
   :root {
-    --bg-color: #ffffff;
-    --text-color: #0f172a;
-    --card-bg: #ffffff;
-    --card-text: #1e293b;
-    --border-color: #e2e8f0;
+    --bg-color: #f8fafc; /* Slate 50 - Soft premium background */
+    --text-color: #0f172a; /* Slate 900 - Elegant high contrast typography */
+    --card-bg: #ffffff; /* Pure White - Cards and Nav components pop off the background */
+    --card-text: #334155; /* Slate 700 - Highly readable card text */
+    --border-color: #e2e8f0; /* Slate 200 - Clean, precise structural borders */
   }
 
   .dark {
