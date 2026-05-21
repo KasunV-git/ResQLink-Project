@@ -125,16 +125,36 @@ const DashboardChartCard = ({ title, type, data, delay = 0 }) => {
           {/* Dynamic Center Text for Donut Chart */}
           {type === 'pie' && (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none z-10 mt-[-10px]">
-              <span className="text-[10px] font-bold tracking-widest text-foreground/40 uppercase">
-                {hoveredSegment ? hoveredSegment.name : "Total Allocation"}
-              </span>
-              <span className="text-3xl font-extrabold text-foreground tracking-tight mt-0.5">
-                {hoveredSegment ? hoveredSegment.value.toLocaleString() : totalValue.toLocaleString()}
-              </span>
-              {hoveredSegment && (
-                <span className="text-[10px] font-bold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-500/10 px-2 py-0.5 rounded-full mt-1.5 animate-in slide-in-from-bottom-2 duration-300">
-                  {((hoveredSegment.value / totalValue) * 100).toFixed(1)}%
-                </span>
+              {hoveredSegment ? (
+                <div className="flex flex-col items-center animate-in fade-in duration-300">
+                  <span className="text-[9px] font-bold tracking-widest text-foreground/30 uppercase">
+                    Hovered Segment
+                  </span>
+                  <span className="text-lg font-bold text-foreground mt-0.5 leading-none max-w-[120px] truncate">
+                    {hoveredSegment.name}
+                  </span>
+                  <span className="text-2xl font-black text-primary-500 dark:text-primary-400 mt-1 leading-none">
+                    {hoveredSegment.value.toLocaleString()}
+                  </span>
+                  <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-0.5 rounded-full mt-1.5">
+                    {((hoveredSegment.value / totalValue) * 100).toFixed(1)}%
+                  </span>
+                  <span className="text-[9px] font-semibold text-foreground/40 mt-1">
+                    of {totalValue.toLocaleString()} Total
+                  </span>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center animate-in fade-in duration-300">
+                  <span className="text-[10px] font-bold tracking-widest text-foreground/40 uppercase">
+                    Total Allocation
+                  </span>
+                  <span className="text-3xl font-extrabold text-foreground tracking-tight mt-0.5">
+                    {totalValue.toLocaleString()}
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 dark:text-slate-400 px-2.5 py-0.5 rounded-full mt-1.5">
+                    All Categories
+                  </span>
+                </div>
               )}
             </div>
           )}
