@@ -1,9 +1,37 @@
-import React from 'react';
-import { FiMenu, FiBell, FiSearch, FiChevronDown } from 'react-icons/fi';
+import React, { useState, useRef, useEffect } from 'react';
+import { FiMenu, FiBell, FiSearch, FiChevronDown, FiUser, FiLogOut } from 'react-icons/fi';
 import ThemeToggle from './ThemeToggle';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '../../services/authService';
 
 const Navbar = ({ toggleSidebar, toggleMobileSidebar, isCollapsed }) => {
+  const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleProfileClick = () => {
+    setIsDropdownOpen(false);
+    navigate('/admin/profile');
+  };
+
+  const handleLogoutClick = () => {
+    setIsDropdownOpen(false);
+    logout();
+    navigate('/admin/login');
+  };
+
   return (
     <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 sticky top-0 z-30 transition-colors duration-300">
       <div className="flex items-center gap-4 flex-1">
@@ -45,16 +73,57 @@ const Navbar = ({ toggleSidebar, toggleMobileSidebar, isCollapsed }) => {
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-card"></span>
         </button>
 
-        {/* Profile Dropdown (simplified) */}
-        <div className="flex items-center gap-2 pl-2 border-l border-border cursor-pointer hover:bg-border/30 p-1.5 rounded-lg transition-colors">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary-500 to-indigo-500 flex items-center justify-center text-white text-sm font-bold shadow-sm">
-            A
+        {/* Profile Dropdown Container */}
+        <div className="relative" ref={dropdownRef}>
+          <div 
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="flex items-center gap-2 pl-2 border-l border-border cursor-pointer hover:bg-border/30 p-1.5 rounded-lg transition-colors select-none"
+          >
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary-500 to-indigo-500 flex items-center justify-center text-white text-sm font-bold shadow-sm">
+              A
+            </div>
+            <div className="hidden md:block text-sm">
+              <p className="font-medium text-foreground leading-none">Admin User</p>
+              <p className="text-xs text-foreground/60 mt-1">Super Admin</p>
+            </div>
+            <FiChevronDown 
+              size={16} 
+              className={`text-foreground/50 hidden md:block transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} 
+            />
           </div>
-          <div className="hidden md:block text-sm">
-            <p className="font-medium text-foreground leading-none">Admin User</p>
-            <p className="text-xs text-foreground/60 mt-1">Super Admin</p>
-          </div>
-          <FiChevronDown size={16} className="text-foreground/50 hidden md:block" />
+
+          <AnimatePresence>
+            {isDropdownOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                transition={{ duration: 0.15 }}
+                className="absolute right-0 mt-2 w-56 rounded-xl bg-card border border-border shadow-xl py-2 z-50 origin-top-right backdrop-blur-md bg-card/95"
+              >
+                <div className="px-4 py-2 border-b border-border">
+                  <p className="text-sm font-semibold text-foreground">Admin User</p>
+                  <p className="text-xs text-foreground/60">admin@resqlink.org</p>
+                </div>
+                <div className="p-1">
+                  <button
+                    onClick={handleProfileClick}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-border/50 rounded-lg transition-colors text-left"
+                  >
+                    <FiUser size={16} className="text-foreground/50" />
+                    <span>Profile Section</span>
+                  </button>
+                  <button
+                    onClick={handleLogoutClick}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-sm text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors text-left font-medium"
+                  >
+                    <FiLogOut size={16} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </header>
@@ -62,3 +131,4 @@ const Navbar = ({ toggleSidebar, toggleMobileSidebar, isCollapsed }) => {
 };
 
 export default Navbar;
+
