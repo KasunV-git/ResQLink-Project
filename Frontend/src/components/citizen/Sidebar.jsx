@@ -1,34 +1,69 @@
-import { LayoutDashboard, Bell, Map, Flag } from "lucide-react";
+import {
+    LayoutDashboard,
+    Bell,
+    Map,
+    Flag,
+} from "lucide-react";
+
+import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
+    const linkStyle =
+        "flex items-center gap-3 p-4 rounded-xl w-full transition-all duration-200";
+
+    const activeStyle =
+        "bg-blue-100 text-blue-900 font-semibold";
+
     return (
-        <div className="w-64 bg-white min-h-screen p-6 border-r">
-            <h1 className="text-3xl font-bold text-blue-900 mb-1">ResQLink</h1>
+        <div className="w-64 bg-white min-h-screen p-6 border-r shadow-sm">
+            <h1 className="text-4xl font-bold text-blue-900 mb-1">
+                ResQLink
+            </h1>
 
             <p className="text-gray-500 mb-10 tracking-widest">
                 CITIZEN PORTAL
             </p>
 
-            <div className="space-y-4">
-                <button className="flex items-center gap-3 bg-gray-100 p-4 rounded-xl w-full">
-                    <LayoutDashboard size={20} />
+            <div className="space-y-3">
+                <NavLink
+                    to="/"
+                    className={({ isActive }) =>
+                        `${linkStyle} ${isActive ? activeStyle : "hover:bg-gray-100"}`
+                    }
+                >
+                    <LayoutDashboard size={22} />
                     Dashboard
-                </button>
+                </NavLink>
 
-                <button className="flex items-center gap-3 p-4 rounded-xl w-full">
-                    <Flag size={20} />
+                <NavLink
+                    to="/report"
+                    className={({ isActive }) =>
+                        `${linkStyle} ${isActive ? activeStyle : "hover:bg-gray-100"}`
+                    }
+                >
+                    <Flag size={22} />
                     Report
-                </button>
+                </NavLink>
 
-                <button className="flex items-center gap-3 p-4 rounded-xl w-full">
-                    <Bell size={20} />
+                <NavLink
+                    to="/alerts"
+                    className={({ isActive }) =>
+                        `${linkStyle} ${isActive ? activeStyle : "hover:bg-gray-100"}`
+                    }
+                >
+                    <Bell size={22} />
                     Alerts
-                </button>
+                </NavLink>
 
-                <button className="flex items-center gap-3 p-4 rounded-xl w-full">
-                    <Map size={20} />
+                <NavLink
+                    to="/map"
+                    className={({ isActive }) =>
+                        `${linkStyle} ${isActive ? activeStyle : "hover:bg-gray-100"}`
+                    }
+                >
+                    <Map size={22} />
                     Map
-                </button>
+                </NavLink>
             </div>
         </div>
     );
