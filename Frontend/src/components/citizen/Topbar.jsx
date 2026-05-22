@@ -1,17 +1,53 @@
-const Topbar = () => {
-    return (
-        <div className="bg-white h-20 border-b flex items-center justify-between px-10">
-            <div className="flex gap-10 text-gray-600">
-                <button className="font-bold border-b-2 border-blue-900">
-                    Dashboard
-                </button>
+import { NavLink } from "react-router-dom";
 
-                <button>Report</button>
-                <button>Alerts</button>
-                <button>Map</button>
+const Topbar = () => {
+    const navStyle =
+        "pb-1 transition-all duration-200 hover:text-blue-900";
+
+    const activeStyle =
+        "border-b-2 border-blue-900 font-bold text-blue-900";
+
+    return (
+        <div className="bg-white h-20 border-b flex items-center justify-between px-10 shadow-sm">
+            <div className="flex gap-10 text-gray-600 text-lg">
+                <NavLink
+                    to="/"
+                    className={({ isActive }) =>
+                        `${navStyle} ${isActive ? activeStyle : ""}`
+                    }
+                >
+                    Dashboard
+                </NavLink>
+
+                <NavLink
+                    to="/report"
+                    className={({ isActive }) =>
+                        `${navStyle} ${isActive ? activeStyle : ""}`
+                    }
+                >
+                    Report
+                </NavLink>
+
+                <NavLink
+                    to="/alerts"
+                    className={({ isActive }) =>
+                        `${navStyle} ${isActive ? activeStyle : ""}`
+                    }
+                >
+                    Alerts
+                </NavLink>
+
+                <NavLink
+                    to="/map"
+                    className={({ isActive }) =>
+                        `${navStyle} ${isActive ? activeStyle : ""}`
+                    }
+                >
+                    Map
+                </NavLink>
             </div>
 
-            <div className="w-10 h-10 rounded-full bg-blue-900"></div>
+            <div className="w-12 h-12 rounded-full bg-blue-900 cursor-pointer hover:scale-105 transition-all"></div>
         </div>
     );
 };
