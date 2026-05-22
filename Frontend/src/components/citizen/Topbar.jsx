@@ -8,8 +8,11 @@ const Topbar = () => {
         "border-b-2 border-blue-900 font-bold text-blue-900";
 
     return (
-        <div className="bg-white h-20 border-b flex items-center justify-between px-10 shadow-sm">
-            <div className="flex gap-10 text-gray-600 text-lg">
+        <div className="w-full bg-white h-20 border-b shadow-sm flex items-center justify-center relative">
+
+            {/* CENTER NAVIGATION */}
+            <div className="flex gap-12 text-lg text-gray-600">
+
                 <NavLink
                     to="/"
                     className={({ isActive }) =>
@@ -45,9 +48,11 @@ const Topbar = () => {
                 >
                     Map
                 </NavLink>
+
             </div>
 
-            <div className="w-12 h-12 rounded-full bg-blue-900 cursor-pointer hover:scale-105 transition-all"></div>
+            {/* PROFILE ICON */}
+            <div className="absolute right-8 w-12 h-12 rounded-full bg-blue-900 cursor-pointer hover:scale-105 transition-all duration-300"></div>
         </div>
     );
 };
