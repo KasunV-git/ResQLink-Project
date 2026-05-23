@@ -9,14 +9,14 @@ import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
     const linkStyle =
-        "flex items-center gap-3 p-4 rounded-xl w-full transition-all duration-200";
+        "flex items-center gap-3 p-3 rounded-l w-full transition-all duration-200";
 
     const activeStyle =
         "bg-blue-100 text-blue-900 font-semibold";
 
     return (
         <div className="w-64 bg-white min-h-screen p-6 border-r shadow-sm">
-            <h1 className="text-4xl font-bold text-blue-900 mb-1">
+            <h1 className="text-xl font-bold text-blue-900 mb-1">
                 ResQLink
             </h1>
 
