@@ -33,11 +33,16 @@ const Dashboard = () => {
     ];
 
     return (
-        <div className="flex bg-gray-100 min-h-screen">
-            <Sidebar />
+        <div className="bg-gray-100 min-h-screen">
 
-            <div className="flex-1">
-                <Topbar />
+            <Topbar />
+
+            <div className="flex">
+                <Sidebar />
+
+                <div className="flex-1"></div>
+
+
 
                 <div className="p-8">
                     <h1 className="text-5xl font-bold mb-3">

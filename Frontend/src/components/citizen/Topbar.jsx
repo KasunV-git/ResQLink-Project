@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { User } from "lucide-react";
 
 const Topbar = () => {
     const navStyle =
@@ -11,7 +12,7 @@ const Topbar = () => {
         <div className="w-full bg-white h-20 border-b shadow-sm flex items-center justify-center relative">
 
             {/* CENTER NAVIGATION */}
-            <div className="flex gap-12 text-lg text-gray-600">
+            <div className="flex gap-12 text-sm text-gray-600">
 
                 <NavLink
                     to="/"
@@ -52,7 +53,8 @@ const Topbar = () => {
             </div>
 
             {/* PROFILE ICON */}
-            <div className="absolute right-8 w-12 h-12 rounded-full bg-blue-900 cursor-pointer hover:scale-105 transition-all duration-300"></div>
+            <div className="absolute right-8 w-12 h-12 rounded-full bg-white flex items-center justify-center cursor-pointer hover:scale-105 transition-all duration-300 shadow-md">
+                <User size={24} className="text-blue-900" /></div>
         </div>
     );
 };
