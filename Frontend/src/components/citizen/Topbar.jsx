@@ -9,7 +9,7 @@ const Topbar = () => {
         "border-b-2 border-blue-900 font-bold text-blue-900";
 
     return (
-        <div className="w-full bg-white h-20 border-b shadow-sm flex items-center justify-center relative">
+        <div className="w-full bg-blue-50 h-20 flex items-center justify-center relative">
 
             {/* CENTER NAVIGATION */}
             <div className="flex gap-12 text-sm text-gray-600">
