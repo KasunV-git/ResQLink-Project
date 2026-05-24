@@ -10,29 +10,29 @@ import { NavLink } from "react-router-dom";
 const Sidebar = () => {
 
     const linkStyle =
-        "flex items-center gap-5 px-6 py-4 rounded-lg transition-all duration-200 text-[17px] w-[90%]";
+        "flex items-center gap-5 px-5 py-4 rounded-xl text-[17px] transition-all duration-200 mx-5";
 
     const activeStyle =
         "bg-blue-100 text-blue-900 font-semibold";
 
     return (
-        <div className="w-56 bg-white min-h-screen pt-10 pl-10 pr-6">
+        <div className="w-72 bg-white min-h-screen py-8">
 
-            {/* LOGO SECTION */}
-            <div className="mb-16">
+            {/* LOGO */}
+            <div className="px-10 mb-14">
 
-                <h1 className="text-xl font-bold text-blue-900 tracking-wide mb-3 ">
+                <h1 className="text-4xl font-bold text-blue-900 mb-2">
                     ResQLink
                 </h1>
 
-                <p className="text-gray-500 text-xs tracking-[0.1em] leading-normal">
+                <p className="text-gray-500 text-sm tracking-[0.2em]">
                     CITIZEN PORTAL
                 </p>
 
             </div>
 
             {/* NAVIGATION */}
-            <div className="flex flex-col gap-3 pl-3">
+            <div className="flex flex-col gap-4">
 
                 <NavLink
                     to="/"
@@ -43,11 +43,9 @@ const Sidebar = () => {
                         }`
                     }
                 >
-                    <LayoutDashboard size={24} />
+                    <LayoutDashboard size={22} />
 
-                    <span className="leading-10">
-                        Dashboard
-                    </span>
+                    <span>Dashboard</span>
                 </NavLink>
 
                 <NavLink
@@ -59,11 +57,9 @@ const Sidebar = () => {
                         }`
                     }
                 >
-                    <Flag size={24} />
+                    <Flag size={22} />
 
-                    <span className="leading-8">
-                        Report
-                    </span>
+                    <span>Report</span>
                 </NavLink>
 
                 <NavLink
@@ -75,11 +71,9 @@ const Sidebar = () => {
                         }`
                     }
                 >
-                    <Bell size={24} />
+                    <Bell size={22} />
 
-                    <span className="leading-8">
-                        Alerts
-                    </span>
+                    <span>Alerts</span>
                 </NavLink>
 
                 <NavLink
@@ -91,11 +85,9 @@ const Sidebar = () => {
                         }`
                     }
                 >
-                    <Map size={24} />
+                    <Map size={22} />
 
-                    <span className="leading-8">
-                        Map
-                    </span>
+                    <span>Map</span>
                 </NavLink>
 
             </div>
