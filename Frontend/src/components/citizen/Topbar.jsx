@@ -3,13 +3,13 @@ import { User } from "lucide-react";
 
 const Topbar = () => {
     const navStyle =
-        "pb-1 transition-all duration-200 hover:text-blue-900";
+        "pb-1 transition-all duration-200 text-gray-500 hover:text-blue-900 font-medium";
 
     const activeStyle =
-        "border-b-2 border-blue-900 font-bold text-blue-900";
+        "border-b-2 border-blue-900 font-semibold text-blue-900";
 
     return (
-        <div className="w-full bg-blue-100 h-20 flex items-center justify-center relative">
+        <div className="w-full bg-white border-b border-gray-200 h-20 flex items-center justify-center relative">
 
             {/* CENTER NAVIGATION */}
             <div className="flex gap-12 text-sm text-gray-600">

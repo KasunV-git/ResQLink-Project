@@ -11,19 +11,14 @@ import {
 
 const Report = () => {
     return (
-        <div className="flex bg-[#f5f7fb] min-h-screen">
-
-            {/* SIDEBAR */}
+        <div className="flex bg-gray-100 min-h-screen">
             <Sidebar />
 
-            {/* MAIN */}
-            <div className="flex-1">
-
-                {/* TOPBAR */}
+            <div className="flex-1 flex flex-col">
                 <Topbar />
 
                 {/* CONTENT */}
-                <div className="px-16 py-12">
+                <div className="px-16 py-12 flex-1">
 
                     {/* TITLE */}
                     <div className="text-center mb-14">
