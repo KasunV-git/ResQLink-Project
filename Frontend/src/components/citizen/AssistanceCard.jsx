@@ -1,18 +1,24 @@
+import { Asterisk } from "lucide-react";
+
 const AssistanceCard = () => {
     return (
-        <div className="bg-white rounded-2xl p-8 flex justify-between items-center shadow-sm">
+        <div className="bg-white rounded-2xl p-8 flex justify-between items-center shadow-sm border border-gray-100">
             <div>
-                <h2 className="text-3xl font-bold mb-3">
+                <h2 className="text-3xl font-bold mb-2 text-slate-800">
                     Immediate Assistance
                 </h2>
 
-                <p className="text-gray-600 text-lg">
+                <p className="text-gray-500 text-lg">
                     Spotted a hazard or emergency? Inform the network instantly.
                 </p>
             </div>
 
-            <button className="bg-teal-600 text-white px-10 py-6 rounded-2xl text-2xl font-bold">
-                Report Disaster
+            <button className="bg-teal-700 hover:bg-teal-800 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-4 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer">
+                <Asterisk size={32} className="text-teal-200" />
+                <div className="flex flex-col text-left leading-tight">
+                    <span className="text-sm font-medium opacity-90">Report</span>
+                    <span className="text-xl font-bold tracking-wide">Disaster</span>
+                </div>
             </button>
         </div>
     );

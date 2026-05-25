@@ -2,7 +2,7 @@ import {
     LayoutDashboard,
     Bell,
     Map,
-    Flag,
+    Megaphone,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -16,7 +16,7 @@ const Sidebar = () => {
         "bg-blue-100 text-blue-900 font-semibold";
 
     return (
-        <div className="w-72 bg-white min-h-screen py-8">
+        <div className="w-72 bg-white border-r border-gray-200 min-h-screen py-8">
 
             {/* LOGO */}
             <div className="px-10 mb-14">
@@ -57,7 +57,7 @@ const Sidebar = () => {
                         }`
                     }
                 >
-                    <Flag size={22} />
+                    <Megaphone size={22} />
 
                     <span>Report</span>
                 </NavLink>
