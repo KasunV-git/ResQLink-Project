@@ -5,23 +5,15 @@ import AuthLayout from '../../components/auth/AuthLayout';
 import LoginForm from '../../components/auth/LoginForm';
 import '../../styles/auth.css';
 
-// ── Theme toggle (same localStorage key as existing admin pages) ────────────
-const ThemeToggle = () => {
-  const [isDark, setIsDark] = React.useState(
-    document.documentElement.classList.contains('dark')
-  );
+import { useTheme } from '../../context/ThemeContext';
 
-  const toggle = () => {
-    const root = document.documentElement;
-    const goingDark = !root.classList.contains('dark');
-    root.classList.toggle('dark', goingDark);
-    localStorage.setItem('theme', goingDark ? 'dark' : 'light');
-    setIsDark(goingDark);
-  };
+// ── Theme toggle (integrated with global ThemeContext) ──────────────────────
+const ThemeToggle = () => {
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <button
-      onClick={toggle}
+      onClick={toggleTheme}
       aria-label="Toggle theme"
       className="absolute top-4 right-4 z-50 p-2.5 rounded-full
         bg-white/10 backdrop-blur border border-white/20 
@@ -29,7 +21,7 @@ const ThemeToggle = () => {
         focus:outline-none focus:ring-2 focus:ring-white/50
         text-white dark:text-gray-200"
     >
-      {isDark ? <FiSun size={18} /> : <FiMoon size={18} />}
+      {theme === 'dark' ? <FiSun size={18} /> : <FiMoon size={18} />}
     </button>
   );
 };

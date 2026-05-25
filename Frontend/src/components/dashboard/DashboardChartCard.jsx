@@ -128,7 +128,7 @@ const DashboardChartCard = ({ title, type, data, delay = 0 }) => {
               {hoveredSegment ? (
                 <div className="flex flex-col items-center animate-in fade-in duration-300">
                   <span className="text-[9px] font-bold tracking-widest text-foreground/30 uppercase">
-                    Hovered Segment
+                    Resource Type
                   </span>
                   <span className="text-lg font-bold text-foreground mt-0.5 leading-none max-w-[120px] truncate">
                     {hoveredSegment.name}
