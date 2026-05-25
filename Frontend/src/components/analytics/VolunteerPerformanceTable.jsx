@@ -1,6 +1,7 @@
 import React from 'react';
 import Table from '../common/Table';
-import { FiStar, FiClock, FiCheckSquare } from 'react-icons/fi';
+import { FiStar, FiClock, FiCheckSquare, FiArrowRight } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 
 const data = [
   { id: 1, name: 'Kasun Perera', completed: 12, rating: 4.8, time: '22m' },
@@ -11,6 +12,8 @@ const data = [
 ];
 
 const VolunteerPerformanceTable = () => {
+  const navigate = useNavigate();
+
   const columns = [
     { 
       key: 'name', 
@@ -50,12 +53,21 @@ const VolunteerPerformanceTable = () => {
   ];
 
   return (
-    <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+    <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden flex flex-col h-full">
       <div className="px-6 py-4 border-b border-border bg-card/50">
         <h3 className="text-lg font-bold text-foreground">Top Volunteer Performance</h3>
       </div>
-      <div className="p-0">
+      <div className="p-0 flex-1 overflow-x-auto">
         <Table columns={columns} data={data} keyField="id" />
+      </div>
+      <div className="p-4 border-t border-border bg-card/30 flex justify-center">
+        <button
+          onClick={() => navigate('/admin/volunteers')}
+          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-semibold text-primary-600 hover:text-primary-700 hover:bg-primary-50/50 dark:text-primary-400 dark:hover:text-primary-300 dark:hover:bg-primary-950/20 border border-transparent rounded-lg transition-all duration-200 cursor-pointer"
+        >
+          <span>See All Volunteer Performance</span>
+          <FiArrowRight size={16} />
+        </button>
       </div>
     </div>
   );
