@@ -13,7 +13,7 @@ const AssistanceCard = () => {
                 </p>
             </div>
 
-            <button className="bg-teal-700 hover:bg-teal-800 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-4 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer">
+            <button className="bg-teal-700 hover:bg-teal-800 text-white border-2 border-teal-950 px-12 py-5 rounded-none font-bold flex items-center justify-center gap-4 transition-all duration-200 shadow-md w-80 cursor-pointer">
                 <Asterisk size={32} className="text-teal-200" />
                 <div className="flex flex-col text-left leading-tight">
                     <span className="text-sm font-medium opacity-90">Report</span>
