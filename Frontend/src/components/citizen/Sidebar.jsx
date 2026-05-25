@@ -10,16 +10,16 @@ import { NavLink } from "react-router-dom";
 const Sidebar = () => {
 
     const linkStyle =
-        "flex items-center gap-5 px-5 py-4 rounded-xl text-[17px] transition-all duration-200 mx-5";
+        "flex items-center gap-5 px-8 py-3.5 rounded-lg text-[17px] transition-all duration-200 mx-4 border border-transparent";
 
     const activeStyle =
         "bg-blue-100 text-blue-900 font-semibold";
 
     return (
-        <div className="w-72 bg-white border-r border-gray-200 min-h-screen py-8">
+        <div className="w-72 bg-white border-r border-gray-200 py-8">
 
             {/* LOGO */}
-            <div className="px-10 mb-14">
+            <div className="px-10 mb-20 text-center">
 
                 <h1 className="text-4xl font-bold text-blue-900 mb-2">
                     ResQLink
@@ -32,7 +32,7 @@ const Sidebar = () => {
             </div>
 
             {/* NAVIGATION */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-5">
 
                 <NavLink
                     to="/"
