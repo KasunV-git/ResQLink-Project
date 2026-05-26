@@ -1,288 +1,334 @@
-import Sidebar from "../../components/citizen/Sidebar";
-import Topbar from "../../components/citizen/Topbar";
+import { useState } from 'react';
+import { Link } from 'react-router';
+import { Shield, AlertCircle, MapPin, Bell, Home, FileText, HelpCircle, Menu, X, Upload, Navigation } from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardHeader } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { Input } from '../components/ui/input';
+import { Textarea } from '../components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Label } from '../components/ui/label';
+import { mockAlerts, mockResources } from '../data/mockData';
+import { toast } from 'sonner';
+import DisasterMap from '../components/DisasterMap';
+import { mockDisasters } from '../data/mockData';
 
-import {
-    Bell,
-    Clock3,
-    TriangleAlert,
-    MapPinned,
-    ShieldAlert,
-    CheckCircle2,
-} from "lucide-react";
+export default function Alerts() {
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState('home');
+    const [reportForm, setReportForm] = useState({
+        type: '',
+        location: '',
+        description: '',
+    });
 
-const Alerts = () => {
+    const handleSubmitReport = (e) => {
+        e.preventDefault();
+        toast.success('Disaster report submitted successfully! Authorities have been notified.', {
+            description: 'You will receive updates via notifications.',
+        });
+        setReportForm({ type: '', location: '', description: '' });
+        setActiveTab('home');
+    };
 
-    const alerts = [
-        {
-            title: "Flash Flood Warning",
-            level: "CRITICAL",
-            time: "2 mins ago",
-            message:
-                "Heavy rainfall has caused water levels to rise rapidly near coastal areas.",
-            instructions: [
-                "Move immediately to higher ground.",
-                "Avoid bridges and flooded roads.",
-                "Follow evacuation notices from authorities.",
-            ],
-            color: "border-red-500",
-            badge: "bg-red-100 text-red-700",
-            button: "Acknowledge Alert",
-            buttonColor: "bg-red-600 hover:bg-red-700",
-        },
-
-        {
-            title: "High Wind Advisory",
-            level: "MODERATE",
-            time: "18 mins ago",
-            message:
-                "Strong winds expected between 2PM and 8PM in western districts.",
-            instructions: [
-                "Secure outdoor belongings.",
-                "Avoid unnecessary travel.",
-            ],
-            color: "border-yellow-400",
-            badge: "bg-yellow-100 text-yellow-700",
-            button: "Mark Safe",
-            buttonColor: "bg-yellow-500 hover:bg-yellow-600",
-        },
-
-        {
-            title: "Road Clearance Update",
-            level: "INFORMATION",
-            time: "1 hour ago",
-            message:
-                "Main highway access has been restored for emergency transportation.",
-            instructions: [
-                "Use approved travel routes only.",
-            ],
-            color: "border-blue-500",
-            badge: "bg-blue-100 text-blue-700",
-            button: "Archive Alert",
-            buttonColor: "bg-blue-600 hover:bg-blue-700",
-        },
-    ];
+    const getSeverityColor = (severity) => {
+        switch (severity) {
+            case 'Emergency':
+                return 'destructive';
+            case 'Warning':
+                return 'default';
+            default:
+                return 'secondary';
+        }
+    };
 
     return (
-        <div className="flex bg-[#f5f7fb] min-h-screen">
-
-            {/* SIDEBAR */}
-            <Sidebar />
-
-            {/* MAIN */}
-            <div className="flex-1">
-
-                {/* TOPBAR */}
-                <Topbar />
-
-                {/* CONTENT */}
-                <div className="px-12 py-10">
-
-                    {/* PAGE HEADER */}
-                    <div className="flex justify-between items-center mb-12">
-
-                        <div>
-
-                            <div className="flex items-center gap-4 mb-4">
-
-                                <h1 className="text-5xl font-bold text-blue-950">
-                                    Citizen Alerts
-                                </h1>
-
-                                <div className="bg-red-100 text-red-700 px-4 py-2 rounded-full text-sm font-semibold">
-                                    2 Critical
-                                </div>
-
-                                <div className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold">
-                                    4 Active
-                                </div>
-
-                            </div>
-
-                            <p className="text-gray-600 text-lg leading-9 max-w-3xl">
-                                Stay updated with emergency broadcasts, weather warnings,
-                                evacuation notices, and important community safety updates.
-                            </p>
-
-                        </div>
-
-                        {/* FILTER BUTTON */}
-                        <button className="bg-white hover:bg-gray-100 transition-all duration-300 px-8 py-4 rounded-2xl shadow-sm font-semibold text-blue-950">
-
-                            Filter Alerts
-
-                        </button>
-
+        <div className="min-h-screen bg-background">
+            {/* Mobile Header */}
+            <header className="sticky top-0 z-50 bg-primary text-white shadow-lg lg:hidden">
+                <div className="flex items-center justify-between p-4">
+                    <div className="flex items-center gap-2">
+                        <Shield className="w-6 h-6" />
+                        <span className="text-lg">ResQLink</span>
                     </div>
-
-                    {/* ALERT CARDS */}
-                    <div className="space-y-8">
-
-                        {alerts.map((alert, index) => (
-
-                            <div
-                                key={index}
-                                className={`bg-white rounded-3xl shadow-sm border-l-4 ${alert.color} p-10 flex justify-between gap-10`}
-                            >
-
-                                {/* LEFT */}
-                                <div className="flex-1">
-
-                                    {/* TOP */}
-                                    <div className="flex items-center gap-4 mb-5">
-
-                                        <div className={`px-4 py-2 rounded-full text-xs font-bold tracking-wider ${alert.badge}`}>
-                                            {alert.level}
-                                        </div>
-
-                                        <div className="flex items-center text-gray-400 text-sm">
-
-                                            <Clock3 size={16} className="mr-2" />
-
-                                            {alert.time}
-
-                                        </div>
-
-                                    </div>
-
-                                    {/* TITLE */}
-                                    <h2 className="text-4xl font-bold text-gray-900 mb-5">
-                                        {alert.title}
-                                    </h2>
-
-                                    {/* MESSAGE */}
-                                    <p className="text-gray-600 text-lg leading-9 mb-8">
-                                        {alert.message}
-                                    </p>
-
-                                    {/* INSTRUCTIONS */}
-                                    <div>
-
-                                        <p className="uppercase text-sm tracking-[0.3em] text-gray-400 mb-5">
-                                            Safety Instructions
-                                        </p>
-
-                                        <div className="space-y-4">
-
-                                            {alert.instructions.map((item, i) => (
-
-                                                <div
-                                                    key={i}
-                                                    className="flex items-start gap-4"
-                                                >
-
-                                                    <div className="bg-gray-100 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold">
-                                                        {i + 1}
-                                                    </div>
-
-                                                    <p className="text-gray-700 text-lg">
-                                                        {item}
-                                                    </p>
-
-                                                </div>
-
-                                            ))}
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                                {/* RIGHT */}
-                                <div className="w-72 flex flex-col justify-between border-l pl-10">
-
-                                    <div>
-
-                                        <p className="uppercase text-sm tracking-[0.3em] text-gray-400 mb-4">
-                                            Source
-                                        </p>
-
-                                        <div className="flex items-center gap-4">
-
-                                            <div className="bg-blue-100 p-3 rounded-xl">
-                                                <Bell className="text-blue-900" />
-                                            </div>
-
-                                            <p className="font-semibold text-xl">
-                                                ResQLink HQ
-                                            </p>
-
-                                        </div>
-
-                                    </div>
-
-                                    {/* BUTTON */}
-                                    <button
-                                        className={`${alert.buttonColor} transition-all duration-300 text-white py-4 rounded-xl font-semibold text-lg mt-10`}
-                                    >
-
-                                        {alert.button}
-
-                                    </button>
-
-                                </div>
-
-                            </div>
-
-                        ))}
-
-                    </div>
-
-                    {/* BOTTOM CARDS */}
-                    <div className="grid grid-cols-3 gap-8 mt-14">
-
-                        {/* SAFE ZONES */}
-                        <button className="bg-white rounded-2xl p-8 text-left hover:shadow-lg transition-all duration-300">
-
-                            <MapPinned className="text-blue-900 mb-5" size={32} />
-
-                            <h3 className="font-bold text-2xl mb-3">
-                                Safe Zones
-                            </h3>
-
-                            <p className="text-gray-600 leading-8">
-                                Locate evacuation centers and nearby shelters instantly.
-                            </p>
-
-                        </button>
-
-                        {/* LIVE STATUS */}
-                        <button className="bg-white rounded-2xl p-8 text-left hover:shadow-lg transition-all duration-300">
-
-                            <ShieldAlert className="text-blue-900 mb-5" size={32} />
-
-                            <h3 className="font-bold text-2xl mb-3">
-                                Emergency Status
-                            </h3>
-
-                            <p className="text-gray-600 leading-8">
-                                Track live emergency conditions and rescue coordination.
-                            </p>
-
-                        </button>
-
-                        {/* COMMUNITY */}
-                        <button className="bg-white rounded-2xl p-8 text-left hover:shadow-lg transition-all duration-300">
-
-                            <CheckCircle2 className="text-blue-900 mb-5" size={32} />
-
-                            <h3 className="font-bold text-2xl mb-3">
-                                Community Updates
-                            </h3>
-
-                            <p className="text-gray-600 leading-8">
-                                Stay informed about verified reports and public announcements.
-                            </p>
-
-                        </button>
-
-                    </div>
-
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-white hover:bg-white/10"
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    >
+                        {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                    </Button>
                 </div>
 
+                {/* Mobile Menu */}
+                {mobileMenuOpen && (
+                    <nav className="border-t border-white/10 p-4 space-y-2">
+                        <Link to="/">
+                            <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/10">
+                                Back to Home
+                            </Button>
+                        </Link>
+                    </nav>
+                )}
+            </header>
+
+            {/* Desktop Header */}
+            <header className="hidden lg:block sticky top-0 z-50 bg-primary text-white shadow-lg">
+                <div className="max-w-7xl mx-auto px-6 py-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Shield className="w-8 h-8" />
+                            <span className="text-xl">ResQLink</span>
+                            <Badge variant="secondary" className="ml-2">Citizen Portal</Badge>
+                        </div>
+                        <Link to="/">
+                            <Button variant="ghost" className="text-white hover:bg-white/10">
+                                Back to Home
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
+            </header>
+
+            <div className="max-w-7xl mx-auto p-4 lg:p-6">
+                {/* Emergency Report Button - Always Visible */}
+                <div className="mb-6">
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button size="lg" className="w-full bg-destructive hover:bg-destructive/90 text-lg h-14 shadow-lg">
+                                <AlertCircle className="w-6 h-6 mr-2 animate-pulse" />
+                                🚨 Report Emergency
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                            <DialogHeader>
+                                <DialogTitle className="text-2xl text-destructive">Report Disaster</DialogTitle>
+                            </DialogHeader>
+                            <form onSubmit={handleSubmitReport} className="space-y-4">
+                                <div>
+                                    <Label>Incident Type</Label>
+                                    <Select value={reportForm.type} onValueChange={(val) => setReportForm({ ...reportForm, type: val })}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select disaster type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="flood">Flood</SelectItem>
+                                            <SelectItem value="fire">Fire</SelectItem>
+                                            <SelectItem value="earthquake">Earthquake</SelectItem>
+                                            <SelectItem value="building_collapse">Building Collapse</SelectItem>
+                                            <SelectItem value="gas_leak">Gas Leak</SelectItem>
+                                            <SelectItem value="landslide">Landslide</SelectItem>
+                                            <SelectItem value="other">Other</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div>
+                                    <Label>Location</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            placeholder="Enter location or address"
+                                            value={reportForm.location}
+                                            onChange={(e) => setReportForm({ ...reportForm, location: e.target.value })}
+                                            required
+                                        />
+                                        <Button type="button" variant="outline" size="icon">
+                                            <Navigation className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground mt-1">Click GPS icon to use current location</p>
+                                </div>
+
+                                <div>
+                                    <Label>Description</Label>
+                                    <Textarea
+                                        placeholder="Describe the situation in detail..."
+                                        rows={4}
+                                        value={reportForm.description}
+                                        onChange={(e) => setReportForm({ ...reportForm, description: e.target.value })}
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <Label>Upload Images/Videos (Optional)</Label>
+                                    <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
+                                        <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                                        <p className="text-sm text-muted-foreground">Click to upload or drag and drop</p>
+                                        <p className="text-xs text-muted-foreground mt-1">PNG, JPG, MP4 up to 10MB</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-3">
+                                    <Button type="submit" className="flex-1 bg-destructive hover:bg-destructive/90">
+                                        Submit Report
+                                    </Button>
+                                    <DialogTrigger asChild>
+                                        <Button type="button" variant="outline" className="flex-1">
+                                            Cancel
+                                        </Button>
+                                    </DialogTrigger>
+                                </div>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+
+                {/* Main Content Grid */}
+                <div className="grid lg:grid-cols-3 gap-6">
+                    {/* Left Column - Alerts & Resources */}
+                    <div className="lg:col-span-2 space-y-6">
+                        {/* Active Alerts */}
+                        <Card className="border-l-4 border-l-destructive">
+                            <CardHeader>
+                                <div className="flex items-center justify-between">
+                                    <h2 className="flex items-center gap-2 text-primary">
+                                        <Bell className="w-5 h-5" />
+                                        Active Alerts
+                                    </h2>
+                                    <Badge variant="destructive" className="animate-pulse">
+                                        {mockAlerts.length} Active
+                                    </Badge>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                {mockAlerts.map((alert) => (
+                                    <div
+                                        key={alert.id}
+                                        className="p-4 rounded-lg border border-border hover:shadow-md transition-shadow bg-card"
+                                    >
+                                        <div className="flex items-start justify-between mb-2">
+                                            <div className="flex items-center gap-2">
+                                                <AlertCircle className="w-5 h-5 text-destructive" />
+                                                <h4 className="text-primary">{alert.title}</h4>
+                                            </div>
+                                            <Badge variant={getSeverityColor(alert.severity)}>{alert.severity}</Badge>
+                                        </div>
+                                        <p className="text-sm text-muted-foreground mb-2">{alert.message}</p>
+                                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                            <span className="flex items-center gap-1">
+                                                <MapPin className="w-3 h-3" />
+                                                {alert.location}
+                                            </span>
+                                            <span>{new Date(alert.timestamp).toLocaleString()}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+
+                        {/* Live Map */}
+                        <Card>
+                            <CardHeader>
+                                <h2 className="text-primary">Disaster Zones & Safe Areas</h2>
+                            </CardHeader>
+                            <CardContent>
+                                <DisasterMap disasters={mockDisasters} height="400px" />
+                                <div className="mt-4 grid grid-cols-2 gap-3">
+                                    <Button variant="outline" className="w-full">
+                                        <MapPin className="w-4 h-4 mr-2" />
+                                        Find Safe Zones
+                                    </Button>
+                                    <Button variant="outline" className="w-full">
+                                        <Navigation className="w-4 h-4 mr-2" />
+                                        Share Location
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Right Column - Quick Actions & Resources */}
+                    <div className="space-y-6">
+                        {/* Quick Actions */}
+                        <Card className="bg-gradient-to-br from-primary to-accent text-white">
+                            <CardHeader>
+                                <h2>Quick Actions</h2>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <Button className="w-full bg-white text-primary hover:bg-white/90" onClick={() => toast.info('Help request sent to nearby volunteers')}>
+                                    <HelpCircle className="w-4 h-4 mr-2" />
+                                    Request Help
+                                </Button>
+                                <Button className="w-full bg-white/10 hover:bg-white/20 text-white" onClick={() => toast.success('Your location has been shared with emergency services')}>
+                                    <Navigation className="w-4 h-4 mr-2" />
+                                    Share Live Location
+                                </Button>
+                                <Button className="w-full bg-white/10 hover:bg-white/20 text-white">
+                                    <FileText className="w-4 h-4 mr-2" />
+                                    View My Reports
+                                </Button>
+                            </CardContent>
+                        </Card>
+
+                        {/* Safety Instructions */}
+                        <Card>
+                            <CardHeader>
+                                <h3 className="text-primary">Safety Guidelines</h3>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted">
+                                    <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0">
+                                        1
+                                    </div>
+                                    <div>
+                                        <p className="text-sm">Stay calm and assess your surroundings</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted">
+                                    <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0">
+                                        2
+                                    </div>
+                                    <div>
+                                        <p className="text-sm">Move to higher ground if flooding</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted">
+                                    <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0">
+                                        3
+                                    </div>
+                                    <div>
+                                        <p className="text-sm">Call emergency hotline: 911</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted">
+                                    <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0">
+                                        4
+                                    </div>
+                                    <div>
+                                        <p className="text-sm">Follow official evacuation orders</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Resource Availability */}
+                        <Card>
+                            <CardHeader>
+                                <h3 className="text-primary">Resource Centers</h3>
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                {mockResources.slice(0, 4).map((resource) => (
+                                    <div key={resource.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted">
+                                        <div className="flex items-center gap-2">
+                                            <div className={`w-2 h-2 rounded-full ${resource.available ? 'bg-accent' : 'bg-muted-foreground'}`}></div>
+                                            <div>
+                                                <p className="text-sm">{resource.name}</p>
+                                                <p className="text-xs text-muted-foreground">{resource.location}</p>
+                                            </div>
+                                        </div>
+                                        <Badge variant={resource.available ? 'secondary' : 'outline'}>
+                                            {resource.quantity}
+                                        </Badge>
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
             </div>
         </div>
     );
-};
-
-export default Alerts;
+}
