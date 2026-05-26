@@ -29,110 +29,19 @@ const Profile = () => {
     };
 
     return (
-        <div className="flex bg-[#f5f7fb] min-h-screen">
+        <div className="bg-[#f5f7fb] min-h-screen">
 
-            {/* SIDEBAR */}
-            <div className="w-72 bg-white min-h-screen flex flex-col justify-between py-8">
+            {/* TOPBAR */}
+            <Topbar />
 
-                {/* TOP */}
-                <div>
+            {/* BODY */}
+            <div className="flex">
 
-                    {/* LOGO */}
-                    <div className="px-10 mb-16">
+                {/* LEFT SIDEBAR */}
+                <Sidebar />
 
-                        <h1 className="text-4xl font-bold text-blue-950 mb-2">
-                            ResQLink
-                        </h1>
-
-                        <p className="text-gray-400 tracking-[0.25em] text-sm">
-                            COMMAND CENTER
-                        </p>
-
-                    </div>
-
-                    {/* MENU */}
-                    <div className="flex flex-col gap-3">
-
-                        <Link
-                            to="/"
-                            className="mx-5 px-5 py-4 rounded-xl hover:bg-gray-100 text-gray-700 font-medium transition-all duration-300"
-                        >
-                            Dashboard
-                        </Link>
-
-                        <Link
-                            to="/report"
-                            className="mx-5 px-5 py-4 rounded-xl hover:bg-gray-100 text-gray-700 font-medium transition-all duration-300"
-                        >
-                            Reports
-                        </Link>
-
-                        <Link
-                            to="/alerts"
-                            className="mx-5 px-5 py-4 rounded-xl hover:bg-gray-100 text-gray-700 font-medium transition-all duration-300"
-                        >
-                            Alerts
-                        </Link>
-
-                        <Link
-                            to="/map"
-                            className="mx-5 px-5 py-4 rounded-xl hover:bg-gray-100 text-gray-700 font-medium transition-all duration-300"
-                        >
-                            Maps
-                        </Link>
-
-                        {/* ACTIVE PROFILE */}
-                        <Link
-                            to="/profile"
-                            className="mx-5 px-5 py-4 rounded-xl bg-blue-100 text-blue-900 font-semibold"
-                        >
-                            Profile
-                        </Link>
-
-                    </div>
-
-                </div>
-
-                {/* BOTTOM */}
-                <div className="px-5">
-
-                    {/* NEW REPORT */}
-                    <button className="w-full bg-blue-900 hover:bg-blue-950 transition-all duration-300 text-white py-4 rounded-xl font-semibold text-lg mb-8">
-
-                        + New Report
-
-                    </button>
-
-                    {/* SUPPORT */}
-                    <button className="flex items-center gap-4 text-gray-600 hover:text-blue-900 transition-all duration-300 mb-6">
-
-                        <CircleHelp size={22} />
-
-                        Support
-
-                    </button>
-
-                    {/* SIGN OUT */}
-                    <button className="flex items-center gap-4 text-gray-600 hover:text-red-600 transition-all duration-300">
-
-                        <LogOut size={22} />
-
-                        Sign Out
-
-                    </button>
-
-                </div>
-
-            </div>
-
-            {/* MAIN */}
-            <div className="flex-1">
-
-                {/* TOPBAR */}
-                <Topbar />
-
-                {/* CONTENT */}
-                <div className="px-16 py-10">
+                {/* RIGHT CONTENT */}
+                <div className="flex-1 px-16 py-10">
 
                     {/* PROFILE CARD */}
                     <div className="bg-white rounded-[40px] overflow-hidden shadow-sm max-w-5xl mx-auto">
@@ -303,52 +212,11 @@ const Profile = () => {
 
                     </div>
 
-                    {/* STATS */}
-                    <div className="grid grid-cols-3 gap-8 max-w-5xl mx-auto mt-10">
-
-                        <div className="bg-white rounded-3xl p-10 text-center">
-
-                            <h2 className="text-5xl font-bold text-blue-950 mb-3">
-                                12
-                            </h2>
-
-                            <p className="uppercase tracking-[0.25em] text-gray-400">
-                                Reports Filed
-                            </p>
-
-                        </div>
-
-                        <div className="bg-white rounded-3xl p-10 text-center">
-
-                            <h2 className="text-5xl font-bold text-blue-950 mb-3">
-                                03
-                            </h2>
-
-                            <p className="uppercase tracking-[0.25em] text-gray-400">
-                                Active Alerts
-                            </p>
-
-                        </div>
-
-                        <div className="bg-white rounded-3xl p-10 text-center">
-
-                            <h2 className="text-5xl font-bold text-blue-950 mb-3">
-                                84
-                            </h2>
-
-                            <p className="uppercase tracking-[0.25em] text-gray-400">
-                                Trust Score
-                            </p>
-
-                        </div>
-
-                    </div>
-
                 </div>
 
             </div>
+
         </div>
     );
-};
-
+}
 export default Profile;

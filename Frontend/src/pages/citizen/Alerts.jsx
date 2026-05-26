@@ -63,19 +63,15 @@ const Alerts = () => {
     ];
 
     return (
-        <div className="flex bg-[#f5f7fb] min-h-screen">
+        <div className="min-h-screen bg-slate-50 flex flex-col">
+            <Topbar />
 
-            {/* SIDEBAR */}
-            <Sidebar />
-
-            {/* MAIN */}
-            <div className="flex-1">
-
-                {/* TOPBAR */}
-                <Topbar />
+            <div className="flex flex-1">
+                <Sidebar />
 
                 {/* CONTENT */}
-                <div className="px-12 py-10">
+                <div className="px-16 py-12 flex-1">
+
 
                     {/* PAGE HEADER */}
                     <div className="flex justify-between items-center mb-12">
