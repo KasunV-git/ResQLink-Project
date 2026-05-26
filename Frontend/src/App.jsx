@@ -4,6 +4,7 @@ import Dashboard from "./pages/citizen/Dashboard";
 import Report from "./pages/citizen/Report";
 import Alerts from "./pages/citizen/Alerts";
 import MapPage from "./pages/citizen/MapPage";
+import Profile from "./pages/citizen/Profile";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/report" element={<Report />} />
         <Route path="/alerts" element={<Alerts />} />
         <Route path="/map" element={<MapPage />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );
