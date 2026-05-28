@@ -43,20 +43,20 @@ export const simulateLogin = ({ email, password }) => {
 
 // ─── Token helpers ─────────────────────────────────────────────────────────
 export const saveSession = (token, user) => {
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  sessionStorage.setItem(TOKEN_KEY, token);
+  sessionStorage.setItem(USER_KEY, JSON.stringify(user));
 };
 
-export const getToken = () => localStorage.getItem(TOKEN_KEY);
+export const getToken = () => sessionStorage.getItem(TOKEN_KEY);
 
 export const getUser = () => {
-  const raw = localStorage.getItem(USER_KEY);
+  const raw = sessionStorage.getItem(USER_KEY);
   return raw ? JSON.parse(raw) : null;
 };
 
 export const isAuthenticated = () => !!getToken();
 
 export const logout = () => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
+  sessionStorage.removeItem(TOKEN_KEY);
+  sessionStorage.removeItem(USER_KEY);
 };
