@@ -78,13 +78,13 @@ export default function Profile({ user, onUpdateProfile, onLogout }) {
           <div className="flex flex-col gap-2">
             <label className="text-xs font-bold text-slate-800 uppercase tracking-wider">Email Address</label>
             <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="email"
                 value={user?.email || "volunteer@resqlink.com"}
                 disabled
-                className="w-full bg-slate-50/50 border border-transparent rounded-lg py-2 pl-3 pr-10 text-sm font-medium text-slate-400 cursor-not-allowed"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 pl-9 pr-3 text-sm font-medium text-slate-500 cursor-not-allowed"
               />
-              <Mail className="absolute right-3 top-2.5 w-4 h-4 text-slate-300" />
             </div>
             <span className="text-slate-400 text-xs pl-0.5">Email cannot be changed</span>
           </div>
