@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "./components/Header";
@@ -224,3 +225,21 @@ export default function App() {
     </div>
   );
 }
+=======
+import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import AppRoutes from './routes/AppRoutes';
+import { ThemeProvider } from './context/ThemeContext';
+
+const App = () => {
+  return (
+    <ThemeProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </ThemeProvider>
+  );
+};
+
+export default App;
+>>>>>>> f9c18754bc9336f8626a12c9baffd3fbeb0f6887
