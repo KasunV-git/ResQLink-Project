@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-// Logo URL from original design
-const logoUrl = "https://www.figma.com/api/mcp/asset/7608400e-4ebc-43d4-8301-b4d05fa0b059";
 
 export default function LoginPage({ onLoginSuccess }) {
   const [email, setEmail] = useState("");
@@ -42,7 +40,10 @@ export default function LoginPage({ onLoginSuccess }) {
       <div style={styles.card}>
         {/* Logo */}
         <div style={styles.logoRow}>
-          <img src={logoUrl} alt="ResQLink Logo" style={styles.logoImg} />
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 4L6 12V24C6 33.4 14.1 42.2 24 44C33.9 42.2 42 33.4 42 24V12L24 4Z" fill="#15803d"/>
+            <path d="M26 16H22V22H16V26H22V32H26V26H32V22H26V16Z" fill="white"/>
+          </svg>
           <span style={styles.logoText}>ResQLink</span>
         </div>
 
