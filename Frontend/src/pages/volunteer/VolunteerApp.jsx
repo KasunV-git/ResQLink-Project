@@ -124,10 +124,15 @@ export default function VolunteerApp() {
 
   const handleUpdateProfile = async ({ name, phone }) => {
     if (!user) return;
-    const response = await axios.put(`/api/auth/profile/${user.id}`, { name, phone });
-    const updated = response.data;
-    setUser(updated);
-    localStorage.setItem("resqlink_volunteer_user", JSON.stringify(updated));
+    try {
+      const response = await axios.put(`/api/auth/profile/${user.id}`, { name, phone });
+      const updated = response.data;
+      setUser(updated);
+      localStorage.setItem("resqlink_volunteer_user", JSON.stringify(updated));
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      throw error;
+    }
   };
 
   if (!user) {

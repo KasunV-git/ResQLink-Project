@@ -9,11 +9,10 @@ export default function Header({ user, alertsCount, onTabChange }) {
         className="flex items-center gap-3 cursor-pointer"
         onClick={() => onTabChange("dashboard")}
       >
-        <img 
-          src="https://www.figma.com/api/mcp/asset/7608400e-4ebc-43d4-8301-b4d05fa0b059" 
-          alt="ResQLink Logo" 
-          className="h-10 w-auto object-contain"
-        />
+        <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 4L6 12V24C6 33.4 14.1 42.2 24 44C33.9 42.2 42 33.4 42 24V12L24 4Z" fill="#15803d"/>
+          <path d="M26 16H22V22H16V26H22V32H26V26H32V22H26V16Z" fill="white"/>
+        </svg>
         <span className="font-semibold text-xl text-[#0f172a] tracking-tight">ResQLink</span>
       </div>
 
