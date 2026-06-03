@@ -160,7 +160,7 @@ export default function LoginPage({ onLoginSuccess }) {
               </button>
             ))}
           </div>
-          <p style={styles.demoMeta}>Password: any</p>
+          <p style={styles.demoMeta}>Password: demo123</p>
         </div>
       </div>
 
