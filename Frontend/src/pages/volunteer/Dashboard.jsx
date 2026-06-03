@@ -1,4 +1,3 @@
-import React from "react";
 import { AlertCircle, MapPin, ClipboardList, CheckCircle } from "lucide-react";
 
 export default function Dashboard({ 
