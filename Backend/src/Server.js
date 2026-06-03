@@ -1,3 +1,22 @@
+<<<<<<< HEAD
+const express = require("express");
+const sequelize = require("./database/connection");
+
+const app = express();
+
+sequelize
+    .authenticate()
+    .then(() => {
+        console.log("Database connected successfully");
+    })
+    .catch((err) => {
+        console.error("Database connection failed:", err.message);
+    });
+
+app.listen(5000, () => {
+    console.log("Server running on port 5000");
+});
+=======
 const express = require('express');
 const cors = require('cors');
 const authRouter = require('./routes/auth');
@@ -29,3 +48,4 @@ app.use((err, req, res, next) => {
 });
 
 module.exports = app;
+>>>>>>> origin/main
