@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Award, Plus, X } from "lucide-react";
 
 export default function Skills({ currentSkills, suggestedSkills, onAddSkill, onRemoveSkill }) {

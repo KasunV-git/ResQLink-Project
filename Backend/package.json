@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
@@ -27,23 +26,3 @@
     "nodemon": "^3.1.14"
   }
 }
-=======
-  "name": "resqlink-backend",
-  "version": "1.0.0",
-  "description": "ResQLink Emergency Volunteer Coordination Platform Backend API",
-  "main": "src/App.js",
-  "scripts": {
-    "start": "node src/App.js",
-    "dev": "nodemon src/App.js"
-  },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "mysql2": "^3.9.7"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
-  }
-}
->>>>>>> origin/main

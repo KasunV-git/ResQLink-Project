@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 {
     "watch": [
         "src"
@@ -8,6 +8,4 @@
         "node_modules"
     ]
 }
-=======
-{}
->>>>>>> origin/main
+

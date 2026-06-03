@@ -1,4 +1,3 @@
-import React from "react";
 import { Check, MapPin, ClipboardCheck, ClipboardList, CheckCircle } from "lucide-react";
 
 export default function Assignments({ activeAssignments, completedAssignments, onCompleteAssignment }) {
