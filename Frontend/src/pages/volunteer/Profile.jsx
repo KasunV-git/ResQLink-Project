@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { User, Mail, Phone, Shield, LogOut, Check } from "lucide-react";
 
 export default function Profile({ user, onUpdateProfile, onLogout }) {

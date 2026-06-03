@@ -1,4 +1,3 @@
-import React from "react";
 import { LayoutDashboard, ClipboardList, Award, Bell, User } from "lucide-react";
 
 export default function Sidebar({ activeTab, onTabChange }) {
