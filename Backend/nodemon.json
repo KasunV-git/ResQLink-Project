@@ -1,1 +1,13 @@
+<<<<<<< HEAD
+{
+    "watch": [
+        "src"
+    ],
+    "ext": "js",
+    "ignore": [
+        "node_modules"
+    ]
+}
+=======
 {}
+>>>>>>> origin/main
