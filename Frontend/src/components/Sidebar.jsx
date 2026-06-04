@@ -1,36 +1,57 @@
 import React from "react";
 import { LayoutDashboard, ClipboardList, Award, Bell, User } from "lucide-react";
 
+const items = [
+  { id: "dashboard",   label: "Dashboard",      icon: LayoutDashboard },
+  { id: "assignments", label: "My Assignments",  icon: ClipboardList   },
+  { id: "skills",      label: "Skills",          icon: Award           },
+  { id: "alerts",      label: "Alerts",          icon: Bell            },
+  { id: "profile",     label: "Profile",         icon: User            },
+];
+
 export default function Sidebar({ activeTab, onTabChange }) {
-  const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "assignments", label: "My Assignments", icon: ClipboardList },
-    { id: "skills", label: "Skills", icon: Award },
-    { id: "alerts", label: "Alerts", icon: Bell },
-    { id: "profile", label: "Profile", icon: User },
-  ];
-
   return (
-    <div className="bg-white border-[#e5e7eb] border-r-[0.8px] border-solid w-[256px] h-full shrink-0 flex flex-col pt-4 px-4 gap-1 shadow-sm">
-      {menuItems.map((item) => {
-        const Icon = item.icon;
-        const isActive = activeTab === item.id;
-
+    <aside style={{
+      width: 240,
+      minWidth: 240,
+      height: "100%",
+      backgroundColor: "#fff",
+      borderRight: "1px solid #e2e8f0",
+      padding: "16px 12px",
+      display: "flex",
+      flexDirection: "column",
+      gap: 4,
+      overflowY: "auto",
+    }}>
+      {items.map(({ id, label, icon: Icon }) => {
+        const active = activeTab === id;
         return (
           <button
-            key={item.id}
-            onClick={() => onTabChange(item.id)}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm font-medium ${
-              isActive
-                ? "bg-[#15803d]/10 text-[#15803d]"
-                : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
-            }`}
+            key={id}
+            onClick={() => onTabChange(id)}
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              padding: "10px 14px",
+              borderRadius: 10,
+              border: "none",
+              cursor: "pointer",
+              fontFamily: "inherit",
+              fontSize: 14,
+              fontWeight: 500,
+              textAlign: "left",
+              transition: "background 0.15s",
+              backgroundColor: active ? "rgba(21,128,61,0.1)" : "transparent",
+              color: active ? "#15803d" : "#64748b",
+            }}
           >
-            <Icon className={`w-5 h-5 ${isActive ? "text-[#15803d]" : "text-slate-400"}`} />
-            <span>{item.label}</span>
+            <Icon size={18} color={active ? "#15803d" : "#94a3b8"} />
+            {label}
           </button>
         );
       })}
-    </div>
+    </aside>
   );
 }

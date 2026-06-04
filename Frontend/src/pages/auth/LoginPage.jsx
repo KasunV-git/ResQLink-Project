@@ -1,50 +1,45 @@
 import React, { useState } from "react";
 import axios from "axios";
+import RegisterPage from "./RegisterPage";
+import logo from "../../assets/Logo & Name Side-cropped.svg";
 
-
-export default function LoginPage({ onLoginSuccess }) {
+export default function LoginPage({ onLoginSuccess, initialShowRegister = false }) {
+  const [showRegister, setShowRegister] = useState(initialShowRegister);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  if (showRegister) {
+    return (
+      <RegisterPage
+        onLoginSuccess={onLoginSuccess}
+        onBackToLogin={() => setShowRegister(false)}
+      />
+    );
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
     try {
       const response = await axios.post("/api/auth/login", { email, password });
       onLoginSuccess(response.data);
     } catch (err) {
-      console.error("Login error:", err);
-      setError(err.response?.data?.message || "Invalid credentials or server error");
+      setError(err.response?.data?.message || "Invalid email or password");
     } finally {
       setLoading(false);
     }
   };
 
-  const fillDemo = (role) => {
-    const map = {
-      citizen: "citizen@resqlink.com",
-      volunteer: "volunteer@resqlink.com",
-      admin: "admin@resqlink.com",
-    };
-    setEmail(map[role]);
-    setPassword("demo123");
-  };
-
   return (
     <div style={styles.page}>
       <div style={styles.card}>
+
         {/* Logo */}
         <div style={styles.logoRow}>
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M24 4L6 12V24C6 33.4 14.1 42.2 24 44C33.9 42.2 42 33.4 42 24V12L24 4Z" fill="#15803d"/>
-            <path d="M26 16H22V22H16V26H22V32H26V26H32V22H26V16Z" fill="white"/>
-          </svg>
-          <span style={styles.logoText}>ResQLink</span>
+          <img src={logo} alt="ResQLink" style={{ height: 44, width: "auto" }} />
         </div>
 
         {/* Heading */}
@@ -53,12 +48,8 @@ export default function LoginPage({ onLoginSuccess }) {
           <p style={styles.subheading}>Sign in to your account to continue</p>
         </div>
 
-        {/* Error message */}
-        {error && (
-          <div className="mb-4 text-sm text-red-600 bg-red-50 p-2.5 rounded-lg border border-red-200 text-center font-medium">
-            {error}
-          </div>
-        )}
+        {/* Error */}
+        {error && <div style={styles.errorBox}>{error}</div>}
 
         {/* Form */}
         <form onSubmit={handleSubmit} style={styles.form}>
@@ -78,101 +69,53 @@ export default function LoginPage({ onLoginSuccess }) {
 
           <div style={styles.fieldGroup}>
             <label style={styles.label}>Password</label>
-            <div style={{ position: "relative" }}>
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={{ ...styles.input, paddingRight: 40 }}
-                onFocus={(e) => Object.assign(e.target.style, { ...styles.inputFocus, paddingRight: "40px" })}
-                onBlur={(e) => Object.assign(e.target.style, { ...styles.input, paddingRight: "40px" })}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={styles.eyeBtn}
-              >
-                {showPassword ? (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#717182" strokeWidth="2">
-                    <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
-                    <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
-                    <line x1="1" y1="1" x2="23" y2="23"/>
-                  </svg>
-                ) : (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#717182" strokeWidth="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
-                )}
-              </button>
-            </div>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={styles.input}
+              onFocus={(e) => Object.assign(e.target.style, styles.inputFocus)}
+              onBlur={(e) => Object.assign(e.target.style, styles.input)}
+              required
+            />
           </div>
 
           <button
             type="submit"
-            style={{
-              ...styles.signInBtn,
-              ...(loading ? styles.signInBtnLoading : {}),
-            }}
             disabled={loading}
+            style={{ ...styles.btn, ...(loading ? styles.btnDisabled : {}) }}
           >
-            {loading ? (
-              <span style={styles.spinnerWrap}>
-                <span style={styles.spinner} />
-                Signing in…
-              </span>
-            ) : "Sign In"}
+            {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
-        {/* Register */}
-        <p style={styles.registerLine}>
-          <span style={styles.registerGray}>Don't have an account? </span>
-          <a href="#register" style={styles.registerLink}>Register here</a>
+        {/* Links */}
+        <p style={styles.linkLine}>
+          Don't have an account?{" "}
+          <button onClick={() => setShowRegister(true)} style={styles.linkBtn}>
+            Register here
+          </button>
         </p>
-
-        {/* Forgot */}
-        <div style={styles.forgotWrap}>
-          <a href="#forgot" style={styles.forgot}>Forgot password?</a>
-        </div>
+        <p style={styles.forgotLine}>
+          <span style={styles.forgotText}>Forgot password?</span>
+        </p>
 
         {/* Demo Credentials */}
         <div style={styles.demoBox}>
           <p style={styles.demoTitle}>Demo Credentials:</p>
-          <div style={styles.demoGrid}>
-            {[
-              { role: "citizen", label: "Citizen", email: "citizen@resqlink.com" },
-              { role: "volunteer", label: "Volunteer", email: "volunteer@resqlink.com" },
-              { role: "admin", label: "Admin", email: "admin@resqlink.com" },
-            ].map(({ role, label, email: demoEmail }) => (
-              <button
-                key={role}
-                type="button"
-                onClick={() => fillDemo(role)}
-                style={styles.demoRow}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#e2e8f0"}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-              >
-                <span style={styles.demoLabel}>{label}:</span>
-                <span style={styles.demoEmail}>{demoEmail}</span>
-              </button>
-            ))}
-          </div>
-          <p style={styles.demoMeta}>Password: demo123</p>
+          <p style={styles.demoRow}><span style={styles.demoLabel}>Volunteer:</span> volunteer@resqlink.com</p>
+          <p style={styles.demoRow}><span style={styles.demoLabel}>Password:</span> demo123</p>
+          <button
+            type="button"
+            style={styles.fillBtn}
+            onClick={() => { setEmail("volunteer@resqlink.com"); setPassword("demo123"); }}
+          >
+            Fill Demo Credentials
+          </button>
         </div>
-      </div>
 
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(12px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+      </div>
     </div>
   );
 }
@@ -186,15 +129,14 @@ const styles = {
     justifyContent: "center",
     padding: "24px",
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-    animation: "fadeIn 0.4s ease both",
   },
   card: {
     backgroundColor: "#ffffff",
-    borderRadius: 10,
-    boxShadow: "0px 10px 7.5px rgba(0,0,0,0.1), 0px 4px 3px rgba(0,0,0,0.1)",
+    borderRadius: 16,
+    boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
     width: "100%",
-    maxWidth: 448,
-    padding: "32px",
+    maxWidth: 420,
+    padding: "36px 32px",
     boxSizing: "border-box",
   },
   logoRow: {
@@ -202,17 +144,12 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
-    marginBottom: 28,
-  },
-  logoImg: {
-    height: 48,
-    width: "auto",
-    objectFit: "contain",
+    marginBottom: 24,
   },
   logoText: {
-    fontSize: 24,
-    fontWeight: 600,
-    color: "#0f172a",
+    fontSize: 22,
+    fontWeight: 700,
+    color: "#1e3a8a",
     letterSpacing: "-0.3px",
   },
   headingBlock: {
@@ -220,16 +157,26 @@ const styles = {
     marginBottom: 24,
   },
   heading: {
-    fontSize: 20,
-    fontWeight: 600,
+    fontSize: 22,
+    fontWeight: 700,
     color: "#0f172a",
     margin: "0 0 6px",
   },
   subheading: {
     fontSize: 14,
-    fontWeight: 400,
     color: "#64748b",
     margin: 0,
+  },
+  errorBox: {
+    backgroundColor: "#fef2f2",
+    border: "1px solid #fecaca",
+    color: "#dc2626",
+    borderRadius: 8,
+    padding: "10px 14px",
+    fontSize: 13,
+    fontWeight: 500,
+    textAlign: "center",
+    marginBottom: 16,
   },
   form: {
     display: "flex",
@@ -240,160 +187,112 @@ const styles = {
   fieldGroup: {
     display: "flex",
     flexDirection: "column",
-    gap: 4,
+    gap: 6,
   },
   label: {
     fontSize: 14,
     fontWeight: 500,
-    color: "#0a0a0a",
-    lineHeight: "14px",
+    color: "#0f172a",
   },
   input: {
     width: "100%",
-    height: 36,
-    backgroundColor: "#f3f3f5",
-    border: "0.8px solid rgba(0,0,0,0)",
-    borderRadius: 8,
-    padding: "4px 12px",
+    height: 44,
+    backgroundColor: "#f1f5f9",
+    border: "1.5px solid transparent",
+    borderRadius: 10,
+    padding: "0 14px",
     fontSize: 14,
     color: "#0f172a",
     outline: "none",
     boxSizing: "border-box",
-    transition: "border-color 0.15s, box-shadow 0.15s",
     fontFamily: "inherit",
+    transition: "border-color 0.15s",
   },
   inputFocus: {
     width: "100%",
-    height: 36,
-    backgroundColor: "#f3f3f5",
-    border: "0.8px solid #15803d",
-    borderRadius: 8,
-    padding: "4px 12px",
+    height: 44,
+    backgroundColor: "#f1f5f9",
+    border: "1.5px solid #1e3a8a",
+    borderRadius: 10,
+    padding: "0 14px",
     fontSize: 14,
     color: "#0f172a",
     outline: "none",
     boxSizing: "border-box",
-    boxShadow: "0 0 0 3px rgba(21,128,61,0.1)",
-    transition: "border-color 0.15s, box-shadow 0.15s",
     fontFamily: "inherit",
   },
-  eyeBtn: {
-    position: "absolute",
-    right: 10,
-    top: "50%",
-    transform: "translateY(-50%)",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    padding: 0,
-    display: "flex",
-    alignItems: "center",
-  },
-  signInBtn: {
+  btn: {
     width: "100%",
-    height: 36,
-    backgroundColor: "#15803d",
+    height: 46,
+    backgroundColor: "#1e3a8a",
     color: "#ffffff",
-    fontSize: 14,
-    fontWeight: 500,
+    fontSize: 15,
+    fontWeight: 600,
     border: "none",
-    borderRadius: 8,
+    borderRadius: 10,
     cursor: "pointer",
-    transition: "background-color 0.15s, transform 0.1s",
     fontFamily: "inherit",
+    marginTop: 4,
   },
-  signInBtnLoading: {
-    backgroundColor: "#166534",
+  btnDisabled: {
+    backgroundColor: "#3b5bdb",
     cursor: "not-allowed",
   },
-  spinnerWrap: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  spinner: {
-    display: "inline-block",
-    width: 14,
-    height: 14,
-    border: "2px solid rgba(255,255,255,0.3)",
-    borderTopColor: "#fff",
-    borderRadius: "50%",
-    animation: "spin 0.7s linear infinite",
-  },
-  registerLine: {
+  linkLine: {
     textAlign: "center",
     fontSize: 14,
-    margin: "0 0 8px",
-  },
-  registerGray: {
     color: "#64748b",
-    fontWeight: 400,
+    margin: "14px 0 6px",
   },
-  registerLink: {
-    color: "#15803d",
-    fontWeight: 600,
-    textDecoration: "none",
-  },
-  forgotWrap: {
-    textAlign: "center",
-    marginBottom: 24,
-  },
-  forgot: {
-    fontSize: 14,
-    color: "#64748b",
-    fontWeight: 500,
-    opacity: 0.5,
-    textDecoration: "none",
-  },
-  demoBox: {
-    backgroundColor: "#f1f5f9",
-    borderRadius: 10,
-    padding: "16px 16px 14px",
-  },
-  demoTitle: {
-    fontSize: 12,
-    fontWeight: 600,
-    color: "#64748b",
-    margin: "0 0 8px",
-    lineHeight: "16px",
-  },
-  demoGrid: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 2,
-    marginBottom: 4,
-  },
-  demoRow: {
-    display: "flex",
-    gap: 4,
-    background: "transparent",
+  linkBtn: {
+    background: "none",
     border: "none",
+    color: "#1e3a8a",
+    fontWeight: 700,
+    fontSize: 14,
     cursor: "pointer",
-    padding: "2px 4px",
-    borderRadius: 4,
-    textAlign: "left",
-    transition: "background-color 0.1s",
+    padding: 0,
     fontFamily: "inherit",
   },
-  demoLabel: {
-    fontSize: 12,
+  forgotLine: {
+    textAlign: "center",
+    margin: "0 0 20px",
+  },
+  forgotText: {
+    fontSize: 14,
+    color: "#94a3b8",
+  },
+  demoBox: {
+    backgroundColor: "#f8fafc",
+    border: "1px solid #e2e8f0",
+    borderRadius: 10,
+    padding: "14px 16px",
+  },
+  demoTitle: {
+    fontSize: 13,
     fontWeight: 600,
-    color: "#64748b",
-    lineHeight: "16px",
-    whiteSpace: "nowrap",
+    color: "#475569",
+    margin: "0 0 6px",
   },
-  demoEmail: {
-    fontSize: 12,
-    fontWeight: 400,
+  demoRow: {
+    fontSize: 13,
     color: "#64748b",
-    lineHeight: "16px",
+    margin: "2px 0",
   },
-  demoMeta: {
+  demoLabel: {
+    fontWeight: 600,
+    color: "#475569",
+  },
+  fillBtn: {
+    marginTop: 10,
+    background: "none",
+    border: "1px solid #cbd5e1",
+    borderRadius: 6,
+    padding: "5px 12px",
     fontSize: 12,
-    fontWeight: 400,
-    color: "#64748b",
-    margin: "4px 0 0 4px",
-    lineHeight: "16px",
+    color: "#475569",
+    cursor: "pointer",
+    fontFamily: "inherit",
+    fontWeight: 500,
   },
 };

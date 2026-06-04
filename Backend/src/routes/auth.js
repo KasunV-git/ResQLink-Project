@@ -2,21 +2,68 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 
+// Register Route
+router.post('/register', async (req, res) => {
+  const { name, email, password, role } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: 'Name, email, and password are required' });
+  }
+  if (password.length < 6) {
+    return res.status(400).json({ message: 'Password must be at least 6 characters' });
+  }
+
+  try {
+    // Check if email already exists
+    const [existing] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
+    if (existing.length > 0) {
+      return res.status(409).json({ message: 'An account with this email already exists' });
+    }
+
+    const userRole = role === 'Citizen' ? 'Citizen' : 'Volunteer';
+
+    const [result] = await db.query(
+      'INSERT INTO users (name, email, phone, role, is_available, password) VALUES (?, ?, ?, ?, ?, ?)',
+      [name, email, '', userRole, true, password]
+    );
+
+    const userId = result.insertId;
+
+    // If volunteer, seed default skills suggestion list association (empty by default)
+    res.status(201).json({
+      id: userId,
+      name,
+      email,
+      phone: '',
+      role: userRole,
+      isAvailable: true,
+      skills: []
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
 // Login Route
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
+
   try {
     const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
     if (rows.length === 0) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'No account found with this email. Please register first.' });
     }
 
     const user = rows[0];
-    
-    // For demo/simple implementation, check password directly
-    if (user.password !== password && password !== 'demo123') {
-      return res.status(401).json({ message: 'Invalid password' });
+
+    // Verify password against the stored password in database
+    if (user.password !== password) {
+      return res.status(401).json({ message: 'Incorrect password. Please try again.' });
     }
 
     // Get volunteer skills

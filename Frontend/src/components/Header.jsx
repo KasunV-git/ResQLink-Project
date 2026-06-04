@@ -1,51 +1,91 @@
 import React from "react";
-import { Bell, User } from "lucide-react";
+import { Bell, User, Menu } from "lucide-react";
+import logo from "../assets/Logo & Name Side-cropped.svg";
 
-export default function Header({ user, alertsCount, onTabChange }) {
+export default function Header({ user, alertsCount, onTabChange, onMenuToggle }) {
   return (
-    <div className="bg-white border-[#e5e7eb] border-b-[0.8px] border-solid h-[64px] shrink-0 w-full flex items-center justify-between px-6 z-10 shadow-sm">
-      {/* Brand Logo */}
-      <div 
-        className="flex items-center gap-3 cursor-pointer"
-        onClick={() => onTabChange("dashboard")}
-      >
-        <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M24 4L6 12V24C6 33.4 14.1 42.2 24 44C33.9 42.2 42 33.4 42 24V12L24 4Z" fill="#15803d"/>
-          <path d="M26 16H22V22H16V26H22V32H26V26H32V22H26V16Z" fill="white"/>
-        </svg>
-        <span className="font-semibold text-xl text-[#0f172a] tracking-tight">ResQLink</span>
+    <header style={{
+      width: "100%",
+      height: 64,
+      backgroundColor: "#fff",
+      borderBottom: "1px solid #e2e8f0",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: "0 20px",
+      flexShrink: 0,
+      boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+      zIndex: 10,
+    }}>
+      {/* Left: hamburger (mobile) + logo */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <button
+          onClick={onMenuToggle}
+          className="sidebar-toggle"
+          style={{ background: "none", border: "none", cursor: "pointer", padding: 6, borderRadius: 8, display: "none" }}
+        >
+          <Menu size={20} color="#475569" />
+        </button>
+        <img
+          src={logo}
+          alt="ResQLink"
+          style={{ height: 36, width: "auto", cursor: "pointer" }}
+          onClick={() => onTabChange("dashboard")}
+        />
       </div>
 
-      {/* User Actions */}
-      <div className="flex items-center gap-6">
-        {/* Notification Bell */}
-        <button 
-          className="relative block p-2 rounded-full hover:bg-slate-100 transition-colors"
+      {/* Right: bell + user */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        {/* Bell */}
+        <button
           onClick={() => onTabChange("alerts")}
+          style={{ position: "relative", background: "none", border: "none", cursor: "pointer", padding: 8, borderRadius: "50%" }}
         >
-          <Bell className="w-5 h-5 text-slate-500" />
+          <Bell size={20} color="#64748b" />
           {alertsCount > 0 && (
-            <div className="absolute bg-[#dc2626] border border-white flex items-center justify-center rounded-full w-5 h-5 -top-1 -right-1">
-              <span className="text-[11px] font-bold text-white text-center">
-                {alertsCount}
-              </span>
-            </div>
+            <span style={{
+              position: "absolute", top: 2, right: 2,
+              backgroundColor: "#dc2626", color: "#fff",
+              borderRadius: "50%", width: 18, height: 18,
+              fontSize: 10, fontWeight: 700,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              border: "2px solid #fff",
+            }}>
+              {alertsCount}
+            </span>
           )}
         </button>
 
-        {/* Profile Tag */}
-        <button 
-          className="flex gap-2.5 items-center justify-center py-1 px-3 rounded-full hover:bg-slate-100 transition-colors border border-slate-200"
+        {/* Profile */}
+        <button
           onClick={() => onTabChange("profile")}
+          style={{
+            display: "flex", alignItems: "center", gap: 10,
+            background: "none", border: "1px solid #e2e8f0",
+            borderRadius: 999, padding: "5px 14px 5px 6px",
+            cursor: "pointer", fontFamily: "inherit",
+          }}
         >
-          <div className="bg-[#15803d] flex items-center justify-center rounded-full w-7 h-7">
-            <User className="w-4 h-4 text-white" />
+          <div style={{
+            width: 30, height: 30, borderRadius: "50%",
+            backgroundColor: "#15803d",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            flexShrink: 0,
+          }}>
+            <User size={16} color="#fff" />
           </div>
-          <span className="font-semibold text-[#0f172a] text-sm whitespace-nowrap">
-            {user?.name || "Kasun Volunteer"}
+          <span className="username-label" style={{ fontSize: 14, fontWeight: 600, color: "#0f172a", whiteSpace: "nowrap" }}>
+            {user?.name || "Volunteer"}
           </span>
         </button>
       </div>
-    </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .sidebar-toggle { display: block !important; }
+          .username-label { display: none; }
+        }
+      `}</style>
+    </header>
   );
 }

@@ -9,7 +9,8 @@ import Skills from "./Skills";
 import Alerts from "./Alerts";
 import Profile from "./Profile";
 
-export default function VolunteerApp() {
+export default function VolunteerApp({ startOnRegister = false, onLogout }) {
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem("resqlink_volunteer_user");
     return saved ? JSON.parse(saved) : null;
@@ -70,6 +71,7 @@ export default function VolunteerApp() {
     setCurrentSkills([]);
     setSuggestedSkills([]);
     setAlerts([]);
+    if (onLogout) onLogout();
   };
 
   const handleToggleAvailability = async () => {
@@ -136,7 +138,12 @@ export default function VolunteerApp() {
   };
 
   if (!user) {
-    return <LoginPage onLoginSuccess={handleLoginSuccess} />;
+    return (
+      <LoginPage
+        onLoginSuccess={handleLoginSuccess}
+        initialShowRegister={startOnRegister}
+      />
+    );
   }
 
   const highAlertCount = alerts.filter((a) => a.priority === "high").length;
@@ -199,21 +206,72 @@ export default function VolunteerApp() {
     }
   };
 
+  const closeTab = (tab) => { setActiveTab(tab); setSidebarOpen(false); };
+
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-slate-100 font-sans">
+    <div style={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column", backgroundColor: "#f1f5f9", fontFamily: "'Inter',sans-serif" }}>
+
       <Header
         user={user}
         alertsCount={highAlertCount}
-        onTabChange={setActiveTab}
+        onTabChange={closeTab}
+        onMenuToggle={() => setSidebarOpen(o => !o)}
       />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-        <div className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-[1000px] mx-auto pb-12">
+
+      <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
+
+        {/* overlay for mobile */}
+        {sidebarOpen && (
+          <div
+            onClick={() => setSidebarOpen(false)}
+            style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.3)", zIndex: 20 }}
+            className="sidebar-overlay"
+          />
+        )}
+
+        {/* Sidebar */}
+        <div
+          className="sidebar-wrapper"
+          style={{ height: "100%", zIndex: 30 }}
+        >
+          <Sidebar activeTab={activeTab} onTabChange={closeTab} />
+        </div>
+
+        {/* Mobile sidebar — slide in */}
+        <div
+          className="sidebar-mobile"
+          style={{
+            position: "fixed",
+            top: 64,
+            left: 0,
+            bottom: 0,
+            zIndex: 30,
+            transform: sidebarOpen ? "translateX(0)" : "translateX(-100%)",
+            transition: "transform 0.2s ease",
+          }}
+        >
+          <Sidebar activeTab={activeTab} onTabChange={closeTab} />
+        </div>
+
+        {/* Main content */}
+        <main style={{ flex: 1, overflowY: "auto", padding: "32px 24px" }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto", paddingBottom: 48 }}>
             {renderContent()}
           </div>
-        </div>
+        </main>
+
       </div>
+
+      <style>{`
+        .sidebar-mobile { display: none !important; }
+        .sidebar-wrapper { display: flex !important; }
+        @media (max-width: 768px) {
+          .sidebar-wrapper { display: none !important; }
+          .sidebar-mobile  { display: block !important; }
+          .sidebar-overlay { display: block; }
+        }
+      `}</style>
+
     </div>
   );
 }
