@@ -117,9 +117,7 @@ export default function Alerts({ alerts, onCreateAlert, onDeleteAlert, isDarkMod
 
             <div className="flex flex-col gap-1.5">
               <label className={`text-xs font-bold uppercase tracking-wider ${isDarkMode ? "text-slate-400" : "text-slate-700"}`}>Target Recipients</label>
-              <input
-                type="text"
-                placeholder="e.g. All Volunteers"
+              <select
                 value={target}
                 onChange={(e) => setTarget(e.target.value)}
                 className={`w-full text-sm rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-600 ${
@@ -128,7 +126,13 @@ export default function Alerts({ alerts, onCreateAlert, onDeleteAlert, isDarkMod
                     : "bg-slate-50 border-slate-200 text-slate-900 focus:bg-white focus:border-emerald-600"
                 }`}
                 required
-              />
+              >
+                <option value="For Volunteers" className={isDarkMode ? "bg-slate-950 text-white" : ""}>👥 For Volunteers</option>
+                <option value="Medical Responders" className={isDarkMode ? "bg-slate-950 text-white" : ""}>🏥 Medical Responders</option>
+                <option value="Search & Rescue" className={isDarkMode ? "bg-slate-950 text-white" : ""}>🔍 Search & Rescue</option>
+                <option value="Logistics & Supply" className={isDarkMode ? "bg-slate-950 text-white" : ""}>📦 Logistics & Supply</option>
+                <option value="First Responders" className={isDarkMode ? "bg-slate-950 text-white" : ""}>🚨 First Responders</option>
+              </select>
             </div>
 
             <button

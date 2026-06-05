@@ -1,22 +1,35 @@
-import { Bell, User, Sun, Moon } from "lucide-react";
+import { Bell, User, Sun, Moon, Menu } from "lucide-react";
 
-export default function Header({ user, alertsCount, onTabChange, isDarkMode, onToggleTheme }) {
+export default function Header({ user, alertsCount, onTabChange, isDarkMode, onToggleTheme, onToggleSidebar }) {
   return (
-    <div className={`border-b-[0.8px] border-solid h-[64px] shrink-0 w-full flex items-center justify-between px-6 z-10 shadow-sm transition-colors duration-200 ${
+    <div className={`border-b-[0.8px] border-solid h-[64px] shrink-0 w-full flex items-center justify-between px-4 sm:px-6 z-10 shadow-sm transition-colors duration-200 ${
       isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-[#e5e7eb] text-slate-900"
     }`}>
-      {/* Brand Logo */}
-      <div 
-        className="flex items-center gap-3 cursor-pointer"
-        onClick={() => onTabChange("dashboard")}
-      >
-        <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M24 4L6 12V24C6 33.4 14.1 42.2 24 44C33.9 42.2 42 33.4 42 24V12L24 4Z" fill="#15803d"/>
-          <path d="M26 16H22V22H16V26H22V32H26V26H32V22H26V16Z" fill="white"/>
-        </svg>
-        <span className={`font-semibold text-xl tracking-tight transition-colors duration-200 ${
-          isDarkMode ? "text-white" : "text-[#0f172a]"
-        }`}>ResQLink</span>
+      {/* Brand Logo & Menu Button */}
+      <div className="flex items-center gap-2">
+        {/* Mobile Menu Button */}
+        <button 
+          onClick={onToggleSidebar}
+          className={`lg:hidden p-2 rounded-lg transition-colors cursor-pointer mr-1 ${
+            isDarkMode ? "hover:bg-slate-800 text-white hover:text-slate-200" : "hover:bg-slate-100 text-slate-700 hover:text-slate-900"
+          }`}
+          title="Toggle Mobile Menu"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+
+        <div 
+          className="flex items-center gap-3 cursor-pointer"
+          onClick={() => onTabChange("dashboard")}
+        >
+          <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 4L6 12V24C6 33.4 14.1 42.2 24 44C33.9 42.2 42 33.4 42 24V12L24 4Z" fill="#15803d"/>
+            <path d="M26 16H22V22H16V26H22V32H26V26H32V22H26V16Z" fill="white"/>
+          </svg>
+          <span className={`font-semibold text-xl tracking-tight transition-colors duration-200 ${
+            isDarkMode ? "text-white" : "text-[#0f172a]"
+          }`}>ResQLink</span>
+        </div>
       </div>
 
       {/* User Actions */}
@@ -59,7 +72,7 @@ export default function Header({ user, alertsCount, onTabChange, isDarkMode, onT
           <div className="bg-[#15803d] flex items-center justify-center rounded-full w-7 h-7">
             <User className="w-4 h-4 text-white" />
           </div>
-          <span className={`font-semibold text-sm whitespace-nowrap transition-colors ${
+          <span className={`hidden sm:inline font-semibold text-sm whitespace-nowrap transition-colors ${
             isDarkMode ? "text-slate-200" : "text-[#0f172a]"
           }`}>
             {user?.name || "Kasun Volunteer"}

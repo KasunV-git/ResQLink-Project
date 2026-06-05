@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Header from "../../components/Header";
 import Dashboard from "./Dashboard";
 import Volunteers from "./Volunteers";
@@ -9,13 +11,13 @@ import Profile from "../volunteer/Profile"; // We can reuse the profile page sin
 import AIAnalysis from "./AIAnalysis";
 
 // Custom Admin Sidebar
-function AdminSidebar({ activeTab, onTabChange, isDarkMode }) {
+function AdminSidebar({ activeTab, onTabChange, isDarkMode, isMobile, onClose }) {
   const menuItems = [
     { id: "dashboard", label: "Overview", icon: "📊" },
-    { id: "volunteers", label: "Volunteers", icon: "👥" },
-    { id: "assignments", label: "Assignments", icon: "📋" },
-    { id: "alerts", label: "Alerts", icon: "🔔" },
-    { id: "ai-analysis", label: "AI Analysis", icon: "🧠" },
+    { id: "volunteers", label: "Volunteer Assignments", icon: "👥" },
+    { id: "assignments", label: "Resource Allocations", icon: "📋" },
+    { id: "alerts", label: "Alert Management", icon: "🔔" },
+    { id: "ai-analysis", label: "AI Insights", icon: "🧠" },
     { id: "profile", label: "Profile", icon: "👤" },
   ];
 
@@ -23,6 +25,20 @@ function AdminSidebar({ activeTab, onTabChange, isDarkMode }) {
     <div className={`border-r-[0.8px] border-solid w-[256px] h-full shrink-0 flex flex-col pt-4 px-4 gap-1 shadow-sm transition-colors duration-200 ${
       isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-[#e5e7eb] text-slate-900"
     }`}>
+      {/* Mobile Drawer Close Button */}
+      {isMobile && (
+        <div className="flex justify-between items-center mb-4 px-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+          <span className="font-bold text-sm text-[#15803d]">ResQLink Admin</span>
+          <button 
+            onClick={onClose}
+            className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
+              isDarkMode ? "border-slate-800 hover:bg-slate-800 text-slate-400" : "border-slate-200 hover:bg-slate-100 text-slate-600"
+            }`}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
       <div className={`px-3 py-2 text-xs font-bold uppercase tracking-wider ${
         isDarkMode ? "text-slate-500" : "text-slate-400"
       }`}>
@@ -59,6 +75,7 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
     return saved ? JSON.parse(saved) : true;
   });
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [volunteers, setVolunteers] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [alerts, setAlerts] = useState([]);
@@ -245,7 +262,7 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
         );
       case "ai-analysis":
         return (
-          <AIAnalysis isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+          <AIAnalysis isDarkMode={isDarkMode} />
         );
       default:
         return (
@@ -264,10 +281,50 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
         onTabChange={setActiveTab}
         isDarkMode={isDarkMode}
         onToggleTheme={() => setIsDarkMode(!isDarkMode)}
+        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
       />
-      <div className="flex flex-1 overflow-hidden">
-        <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} isDarkMode={isDarkMode} />
-        <div className="flex-1 overflow-y-auto p-8">
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Desktop Sidebar */}
+        <div className="hidden lg:block">
+          <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} isDarkMode={isDarkMode} />
+        </div>
+
+        {/* Mobile Sidebar overlay */}
+        <AnimatePresence>
+          {sidebarOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.45 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setSidebarOpen(false)}
+                className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-[2px]"
+              />
+              {/* Slide-in Sidebar Panel */}
+              <motion.div
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+                className="fixed top-0 bottom-0 left-0 z-50 lg:hidden w-[256px] h-full shadow-2xl flex"
+              >
+                <AdminSidebar
+                  activeTab={activeTab}
+                  onTabChange={(tab) => {
+                    setActiveTab(tab);
+                    setSidebarOpen(false);
+                  }}
+                  isDarkMode={isDarkMode}
+                  isMobile={true}
+                  onClose={() => setSidebarOpen(false)}
+                />
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        <div className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="max-w-[1100px] mx-auto pb-12">
             {renderContent()}
           </div>
