@@ -1,20 +1,33 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react";
 import RegisterPage from "./RegisterPage";
+import ForgotPasswordPage from "./ForgotPasswordPage";
 import logo from "../../assets/Logo & Name Side-cropped.svg";
 
 export default function LoginPage({ onLoginSuccess, initialShowRegister = false }) {
-  const [showRegister, setShowRegister] = useState(initialShowRegister);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [showRegister,       setShowRegister]       = useState(initialShowRegister);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [email,       setEmail]       = useState("");
+  const [password,    setPassword]    = useState("");
+  const [showPwd,     setShowPwd]     = useState(false);
+  const [loading,     setLoading]     = useState(false);
+  const [error,       setError]       = useState("");
 
   if (showRegister) {
     return (
       <RegisterPage
         onLoginSuccess={onLoginSuccess}
         onBackToLogin={() => setShowRegister(false)}
+      />
+    );
+  }
+
+  if (showForgotPassword) {
+    return (
+      <ForgotPasswordPage
+        onBackToLogin={() => setShowForgotPassword(false)}
+        onRegister={() => { setShowForgotPassword(false); setShowRegister(true); }}
       />
     );
   }
@@ -69,16 +82,28 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false 
 
           <div style={styles.fieldGroup}>
             <label style={styles.label}>Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={styles.input}
-              onFocus={(e) => Object.assign(e.target.style, styles.inputFocus)}
-              onBlur={(e) => Object.assign(e.target.style, styles.input)}
-              required
-            />
+            <div style={{ position: "relative" }}>
+              <input
+                type={showPwd ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={{ ...styles.input, paddingRight: 42 }}
+                onFocus={(e) => Object.assign(e.target.style, { ...styles.inputFocus, paddingRight: "42px" })}
+                onBlur={(e)  => Object.assign(e.target.style, { ...styles.input,      paddingRight: "42px" })}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPwd(v => !v)}
+                style={styles.eyeBtn}
+                tabIndex={-1}
+              >
+                {showPwd
+                  ? <EyeOff size={16} color="#94a3b8" />
+                  : <Eye    size={16} color="#94a3b8" />}
+              </button>
+            </div>
           </div>
 
           <button
@@ -99,7 +124,15 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false 
           </button>
         </p>
         <p style={styles.forgotLine}>
-          <span style={styles.forgotText}>Forgot password?</span>
+          <button
+            type="button"
+            onClick={() => setShowForgotPassword(true)}
+            style={{ background:"none", border:"none", cursor:"pointer", fontSize:14, color:"#64748b", fontFamily:"inherit", fontWeight:500, padding:0, transition:"color 0.2s" }}
+            onMouseEnter={e => e.target.style.color = "#1e3a8a"}
+            onMouseLeave={e => e.target.style.color = "#64748b"}
+          >
+            Forgot password?
+          </button>
         </p>
 
         {/* Demo Credentials */}
@@ -128,9 +161,21 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    minHeight: "100vh",
     padding: "40px 24px",
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+  },
+  eyeBtn: {
+    position: "absolute",
+    right: 12,
+    top: "50%",
+    transform: "translateY(-50%)",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    padding: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   card: {
     backgroundColor: "#ffffff",

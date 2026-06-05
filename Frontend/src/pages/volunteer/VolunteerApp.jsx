@@ -135,10 +135,10 @@ export default function VolunteerApp({ startOnRegister = false, onLogout }) {
     }
   };
 
-  const handleUpdateProfile = async ({ name, phone }) => {
+  const handleUpdateProfile = async ({ firstName, lastName, phone }) => {
     if (!user) return;
     try {
-      const response = await axios.put(`/api/auth/profile/${user.id}`, { name, phone });
+      const response = await axios.put(`/api/auth/profile/${user.id}`, { firstName, lastName, phone });
       const updated = response.data;
       setUser(updated);
       localStorage.setItem("resqlink_volunteer_user", JSON.stringify(updated));

@@ -6,43 +6,47 @@ const db      = require('../config/db');
 /* ── helpers ── */
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Fetch a user by ID and return a safe object (no password)
+// Fetch a user by ID — returns safe object (no password)
 async function getUserById(id) {
   const [rows] = await db.query(
-    'SELECT id, name, email, phone, role, is_available FROM users WHERE id = ?',
+    'SELECT id, first_name, last_name, email, phone, role, is_available FROM users WHERE id = ?',
     [id]
   );
   if (rows.length === 0) return null;
-  const user = rows[0];
+  const u = rows[0];
 
   const [skillRows] = await db.query(
     `SELECT s.name FROM skills s
      JOIN user_skills us ON s.id = us.skill_id
      WHERE us.user_id = ?`,
-    [user.id]
+    [u.id]
   );
 
   return {
-    id:          user.id,
-    name:        user.name,
-    email:       user.email,
-    phone:       user.phone || '',
-    role:        user.role,
-    isAvailable: Boolean(user.is_available),
+    id:          u.id,
+    firstName:   u.first_name,
+    lastName:    u.last_name,
+    name:        `${u.first_name} ${u.last_name}`,   // combined for display
+    email:       u.email,
+    phone:       u.phone || '',
+    role:        u.role,
+    isAvailable: Boolean(u.is_available),
     skills:      skillRows.map(r => r.name),
   };
 }
 
 /* ══ POST /api/auth/register ══ */
 router.post('/register', async (req, res) => {
-  const name     = (req.body.name     || '').trim();
-  const email    = (req.body.email    || '').trim().toLowerCase();
-  const password = (req.body.password || '');
-  const role     = req.body.role === 'Citizen' ? 'Citizen' : 'Volunteer';
+  const firstName = (req.body.firstName || '').trim();
+  const lastName  = (req.body.lastName  || '').trim();
+  const email     = (req.body.email     || '').trim().toLowerCase();
+  const password  = (req.body.password  || '');
+  const phone     = (req.body.phone     || '').trim();
+  const role      = req.body.role === 'Citizen' ? 'Citizen' : 'Volunteer';
 
   // Validation
-  if (!name || !email || !password) {
-    return res.status(400).json({ message: 'Name, email, and password are required.' });
+  if (!firstName || !lastName || !email || !password) {
+    return res.status(400).json({ message: 'First name, last name, email, and password are required.' });
   }
   if (!EMAIL_REGEX.test(email)) {
     return res.status(400).json({ message: 'Please enter a valid email address.' });
@@ -50,25 +54,21 @@ router.post('/register', async (req, res) => {
   if (password.length < 6) {
     return res.status(400).json({ message: 'Password must be at least 6 characters.' });
   }
-  if (name.length > 100) {
+  if (firstName.length > 100 || lastName.length > 100) {
     return res.status(400).json({ message: 'Name is too long.' });
   }
 
   try {
-    // Check duplicate email
-    const [existing] = await db.query(
-      'SELECT id FROM users WHERE email = ?', [email]
-    );
+    const [existing] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
     if (existing.length > 0) {
       return res.status(409).json({ message: 'An account with this email already exists.' });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const [result] = await db.query(
-      'INSERT INTO users (name, email, phone, role, is_available, password) VALUES (?, ?, ?, ?, ?, ?)',
-      [name, email, null, role, 1, hashedPassword]
+      'INSERT INTO users (first_name, last_name, email, phone, role, is_available, password) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [firstName, lastName, email, phone || null, role, 1, hashedPassword]
     );
 
     const newUser = await getUserById(result.insertId);
@@ -89,15 +89,11 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    // Fetch user including password hash for verification
-    const [rows] = await db.query(
-      'SELECT id, password FROM users WHERE email = ?', [email]
-    );
+    const [rows] = await db.query('SELECT id, password FROM users WHERE email = ?', [email]);
     if (rows.length === 0) {
       return res.status(404).json({ message: 'No account found with this email. Please register first.' });
     }
 
-    // Compare password with stored hash
     const passwordMatch = await bcrypt.compare(password, rows[0].password);
     if (!passwordMatch) {
       return res.status(401).json({ message: 'Incorrect password. Please try again.' });
@@ -114,9 +110,7 @@ router.post('/login', async (req, res) => {
 /* ══ GET /api/auth/profile/:id ══ */
 router.get('/profile/:id', async (req, res) => {
   const userId = parseInt(req.params.id, 10);
-  if (isNaN(userId)) {
-    return res.status(400).json({ message: 'Invalid user ID.' });
-  }
+  if (isNaN(userId)) return res.status(400).json({ message: 'Invalid user ID.' });
 
   try {
     const user = await getUserById(userId);
@@ -131,18 +125,22 @@ router.get('/profile/:id', async (req, res) => {
 /* ══ PUT /api/auth/profile/:id ══ */
 router.put('/profile/:id', async (req, res) => {
   const userId = parseInt(req.params.id, 10);
-  if (isNaN(userId)) {
-    return res.status(400).json({ message: 'Invalid user ID.' });
-  }
+  if (isNaN(userId)) return res.status(400).json({ message: 'Invalid user ID.' });
 
-  const { name, phone, isAvailable } = req.body;
+  const { firstName, lastName, phone, isAvailable } = req.body;
   const updates = [];
   const params  = [];
 
-  if (name !== undefined) {
-    const trimmed = name.trim();
-    if (!trimmed) return res.status(400).json({ message: 'Name cannot be empty.' });
-    updates.push('name = ?');
+  if (firstName !== undefined) {
+    const trimmed = firstName.trim();
+    if (!trimmed) return res.status(400).json({ message: 'First name cannot be empty.' });
+    updates.push('first_name = ?');
+    params.push(trimmed);
+  }
+  if (lastName !== undefined) {
+    const trimmed = lastName.trim();
+    if (!trimmed) return res.status(400).json({ message: 'Last name cannot be empty.' });
+    updates.push('last_name = ?');
     params.push(trimmed);
   }
   if (phone !== undefined) {

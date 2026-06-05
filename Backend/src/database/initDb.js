@@ -41,9 +41,9 @@ async function initDb() {
     if (existingUsers.length === 0) {
       const hashedPassword = await bcrypt.hash('demo123', 10);
       const [insertUser] = await connection.query(
-        `INSERT INTO users (name, email, phone, role, is_available, password)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        ['Demo Volunteer', 'volunteer@resqlink.com', '+1 234 567 8901', 'Volunteer', 1, hashedPassword]
+        `INSERT INTO users (first_name, last_name, email, phone, role, is_available, password)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        ['Demo', 'Volunteer', 'volunteer@resqlink.com', '+1 234 567 8901', 'Volunteer', 1, hashedPassword]
       );
       volunteerId = insertUser.insertId;
       console.log('✅ Demo volunteer seeded.');

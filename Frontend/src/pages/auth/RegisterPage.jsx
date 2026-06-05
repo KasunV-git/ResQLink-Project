@@ -1,25 +1,35 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react";
 import logo from "../../assets/Logo & Name Side-cropped.svg";
 
 export default function RegisterPage({ onLoginSuccess, onBackToLogin }) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("Volunteer");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName,  setLastName]  = useState("");
+  const [email,     setEmail]     = useState("");
+  const [phone,     setPhone]     = useState("");
+  const [password,  setPassword]  = useState("");
+  const [showPwd,   setShowPwd]   = useState(false);
+  const [role,      setRole]      = useState("Volunteer");
+  const [loading,   setLoading]   = useState(false);
+  const [error,     setError]     = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!firstName.trim() || !lastName.trim()) {
+      setError("First name and last name are required.");
+      return;
+    }
     if (password.length < 6) {
-      setError("Password must be at least 6 characters");
+      setError("Password must be at least 6 characters.");
       return;
     }
     setLoading(true);
     setError("");
     try {
-      const response = await axios.post("/api/auth/register", { name, email, password, role });
+      const response = await axios.post("/api/auth/register", {
+        firstName, lastName, email, phone, password, role,
+      });
       onLoginSuccess(response.data);
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed. Please try again.");
@@ -29,100 +39,138 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin }) {
   };
 
   const roles = [
-    { value: "Citizen", description: "Report disasters and receive alerts" },
-    { value: "Volunteer", description: "Assist in disaster response efforts" },
+    { value: "Citizen",   description: "Report disasters and receive alerts"   },
+    { value: "Volunteer", description: "Assist in disaster response efforts"   },
   ];
 
+  const inputStyle   = S.input;
+  const inputFocused = S.inputFocus;
+
   return (
-    <div style={styles.page}>
-      <div className="anim-scale-in" style={styles.card}>
+    <div style={S.page}>
+      <div className="anim-scale-in" style={S.card}>
 
         {/* Logo */}
-        <div style={styles.logoRow}>
+        <div style={S.logoRow}>
           <img src={logo} alt="ResQLink" style={{ height: 44, width: "auto" }} />
         </div>
 
         {/* Heading */}
-        <div style={styles.headingBlock}>
-          <h2 style={styles.heading}>Create Account</h2>
-          <p style={styles.subheading}>Join ResQLink to help your community</p>
+        <div style={S.headingBlock}>
+          <h2 style={S.heading}>Create Account</h2>
+          <p style={S.subheading}>Join ResQLink to help your community</p>
         </div>
 
         {/* Error */}
-        {error && <div style={styles.errorBox}>{error}</div>}
+        {error && <div style={S.errorBox}>{error}</div>}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} style={styles.form}>
+        <form onSubmit={handleSubmit} style={S.form}>
 
-          {/* Full Name */}
-          <div style={styles.fieldGroup}>
-            <label style={styles.label}>Full Name</label>
-            <input
-              type="text"
-              placeholder="Enter your full name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              style={styles.input}
-              onFocus={(e) => Object.assign(e.target.style, styles.inputFocus)}
-              onBlur={(e) => Object.assign(e.target.style, styles.input)}
-              required
-            />
+          {/* First Name + Last Name — side by side */}
+          <div style={{ display: "flex", gap: 12 }}>
+            <div style={{ ...S.fieldGroup, flex: 1 }}>
+              <label style={S.label}>First Name</label>
+              <input
+                type="text"
+                placeholder="First name"
+                value={firstName}
+                onChange={e => setFirstName(e.target.value)}
+                style={inputStyle}
+                onFocus={e => Object.assign(e.target.style, inputFocused)}
+                onBlur={e  => Object.assign(e.target.style, inputStyle)}
+                required
+              />
+            </div>
+            <div style={{ ...S.fieldGroup, flex: 1 }}>
+              <label style={S.label}>Last Name</label>
+              <input
+                type="text"
+                placeholder="Last name"
+                value={lastName}
+                onChange={e => setLastName(e.target.value)}
+                style={inputStyle}
+                onFocus={e => Object.assign(e.target.style, inputFocused)}
+                onBlur={e  => Object.assign(e.target.style, inputStyle)}
+                required
+              />
+            </div>
           </div>
 
           {/* Email */}
-          <div style={styles.fieldGroup}>
-            <label style={styles.label}>Email</label>
+          <div style={S.fieldGroup}>
+            <label style={S.label}>Email</label>
             <input
               type="email"
               placeholder="Enter your email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={styles.input}
-              onFocus={(e) => Object.assign(e.target.style, styles.inputFocus)}
-              onBlur={(e) => Object.assign(e.target.style, styles.input)}
+              onChange={e => setEmail(e.target.value)}
+              style={inputStyle}
+              onFocus={e => Object.assign(e.target.style, inputFocused)}
+              onBlur={e  => Object.assign(e.target.style, inputStyle)}
               required
             />
           </div>
 
-          {/* Password */}
-          <div style={styles.fieldGroup}>
-            <label style={styles.label}>Password</label>
+          {/* Password with eye toggle */}
+          <div style={S.fieldGroup}>
+            <label style={S.label}>Password</label>
+            <div style={{ position: "relative" }}>
+              <input
+                type={showPwd ? "text" : "password"}
+                placeholder="Create a password (min. 6 characters)"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                style={{ ...inputStyle, paddingRight: 42 }}
+                onFocus={e => Object.assign(e.target.style, { ...inputFocused, paddingRight: "42px" })}
+                onBlur={e  => Object.assign(e.target.style, { ...inputStyle,   paddingRight: "42px" })}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPwd(v => !v)}
+                style={S.eyeBtn}
+                tabIndex={-1}
+              >
+                {showPwd
+                  ? <EyeOff size={16} color="#94a3b8" />
+                  : <Eye    size={16} color="#94a3b8" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Number — after Password */}
+          <div style={S.fieldGroup}>
+            <label style={S.label}>Mobile Number</label>
             <input
-              type="password"
-              placeholder="Create a password (min. 6 characters)"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={styles.input}
-              onFocus={(e) => Object.assign(e.target.style, styles.inputFocus)}
-              onBlur={(e) => Object.assign(e.target.style, styles.input)}
-              required
+              type="tel"
+              placeholder="e.g. +1 234 567 8901"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              style={inputStyle}
+              onFocus={e => Object.assign(e.target.style, inputFocused)}
+              onBlur={e  => Object.assign(e.target.style, inputStyle)}
             />
           </div>
 
           {/* Select Role */}
-          <div style={styles.fieldGroup}>
-            <label style={styles.label}>Select Role</label>
-            <div style={styles.roleGroup}>
-              {roles.map((r) => (
+          <div style={S.fieldGroup}>
+            <label style={S.label}>Select Role</label>
+            <div style={S.roleGroup}>
+              {roles.map(r => (
                 <label
                   key={r.value}
-                  style={{
-                    ...styles.roleOption,
-                    ...(role === r.value ? styles.roleOptionSelected : {}),
-                  }}
                   onClick={() => setRole(r.value)}
+                  style={{ ...S.roleOption, ...(role === r.value ? S.roleOptionSelected : {}) }}
                 >
-                  <div style={styles.radioWrapper}>
-                    <div style={{
-                      ...styles.radioOuter,
-                      ...(role === r.value ? styles.radioOuterSelected : {}),
-                    }}>
-                      {role === r.value && <div style={styles.radioInner} />}
+                  <div style={S.radioWrapper}>
+                    <div style={{ ...S.radioOuter, ...(role === r.value ? S.radioOuterSelected : {}) }}>
+                      {role === r.value && <div style={S.radioInner} />}
                     </div>
                   </div>
-                  <div style={styles.roleText}>
-                    <span style={styles.roleName}>{r.value}</span>
-                    <span style={styles.roleDesc}>{r.description}</span>
+                  <div style={S.roleText}>
+                    <span style={S.roleName}>{r.value}</span>
+                    <span style={S.roleDesc}>{r.description}</span>
                   </div>
                 </label>
               ))}
@@ -133,18 +181,16 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin }) {
             type="submit"
             disabled={loading}
             className="btn-anim"
-            style={{ ...styles.btn, ...(loading ? styles.btnDisabled : {}) }}
+            style={{ ...S.btn, ...(loading ? S.btnDisabled : {}) }}
           >
             {loading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
 
         {/* Back to Login */}
-        <p style={styles.linkLine}>
+        <p style={S.linkLine}>
           Already have an account?{" "}
-          <button onClick={onBackToLogin} style={styles.linkBtn}>
-            Sign in here
-          </button>
+          <button onClick={onBackToLogin} style={S.linkBtn}>Sign in here</button>
         </p>
 
       </div>
@@ -152,194 +198,32 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin }) {
   );
 }
 
-const styles = {
-  page: {
-    minHeight: "100vh",
-    backgroundColor: "#f1f5f9",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "40px 24px",
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-  },
-  card: {
-    backgroundColor: "#ffffff",
-    borderRadius: 16,
-    boxShadow: "0 4px 32px rgba(0,0,0,0.10)",
-    width: "100%",
-    maxWidth: 460,
-    padding: "40px 36px",
-    boxSizing: "border-box",
-  },
-  logoRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    marginBottom: 24,
-  },
-  logoText: {
-    fontSize: 22,
-    fontWeight: 700,
-    color: "#1e3a8a",
-    letterSpacing: "-0.3px",
-  },
-  headingBlock: {
-    textAlign: "center",
-    marginBottom: 24,
-  },
-  heading: {
-    fontSize: 22,
-    fontWeight: 700,
-    color: "#0f172a",
-    margin: "0 0 6px",
-  },
-  subheading: {
-    fontSize: 14,
-    color: "#64748b",
-    margin: 0,
-  },
-  errorBox: {
-    backgroundColor: "#fef2f2",
-    border: "1px solid #fecaca",
-    color: "#dc2626",
-    borderRadius: 8,
-    padding: "10px 14px",
-    fontSize: 13,
-    fontWeight: 500,
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 16,
-    marginBottom: 16,
-  },
-  fieldGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 6,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: 500,
-    color: "#0f172a",
-  },
-  input: {
-    width: "100%",
-    height: 44,
-    backgroundColor: "#f1f5f9",
-    border: "1.5px solid transparent",
-    borderRadius: 10,
-    padding: "0 14px",
-    fontSize: 14,
-    color: "#0f172a",
-    outline: "none",
-    boxSizing: "border-box",
-    fontFamily: "inherit",
-    transition: "border-color 0.15s",
-  },
-  inputFocus: {
-    width: "100%",
-    height: 44,
-    backgroundColor: "#f1f5f9",
-    border: "1.5px solid #1e3a8a",
-    borderRadius: 10,
-    padding: "0 14px",
-    fontSize: 14,
-    color: "#0f172a",
-    outline: "none",
-    boxSizing: "border-box",
-    fontFamily: "inherit",
-  },
-  roleGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-  },
-  roleOption: {
-    display: "flex",
-    alignItems: "center",
-    gap: 14,
-    border: "1.5px solid #e2e8f0",
-    borderRadius: 10,
-    padding: "12px 14px",
-    cursor: "pointer",
-    transition: "border-color 0.15s, background-color 0.15s",
-    backgroundColor: "#ffffff",
-  },
-  roleOptionSelected: {
-    border: "1.5px solid #1e3a8a",
-    backgroundColor: "#eff6ff",
-  },
-  radioWrapper: {
-    flexShrink: 0,
-  },
-  radioOuter: {
-    width: 18,
-    height: 18,
-    borderRadius: "50%",
-    border: "2px solid #cbd5e1",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    transition: "border-color 0.15s",
-  },
-  radioOuterSelected: {
-    border: "2px solid #1e3a8a",
-  },
-  radioInner: {
-    width: 9,
-    height: 9,
-    borderRadius: "50%",
-    backgroundColor: "#1e3a8a",
-  },
-  roleText: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 2,
-  },
-  roleName: {
-    fontSize: 14,
-    fontWeight: 600,
-    color: "#0f172a",
-  },
-  roleDesc: {
-    fontSize: 12,
-    color: "#64748b",
-  },
-  btn: {
-    width: "100%",
-    height: 46,
-    backgroundColor: "#1e3a8a",
-    color: "#ffffff",
-    fontSize: 15,
-    fontWeight: 600,
-    border: "none",
-    borderRadius: 10,
-    cursor: "pointer",
-    fontFamily: "inherit",
-    marginTop: 4,
-  },
-  btnDisabled: {
-    backgroundColor: "#3b5bdb",
-    cursor: "not-allowed",
-  },
-  linkLine: {
-    textAlign: "center",
-    fontSize: 14,
-    color: "#64748b",
-    margin: "14px 0 0",
-  },
-  linkBtn: {
-    background: "none",
-    border: "none",
-    color: "#1e3a8a",
-    fontWeight: 700,
-    fontSize: 14,
-    cursor: "pointer",
-    padding: 0,
-    fontFamily: "inherit",
-  },
+const S = {
+  page:        { minHeight:"100vh", backgroundColor:"#f1f5f9", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 24px", fontFamily:"'Inter',-apple-system,sans-serif" },
+  card:        { backgroundColor:"#fff", borderRadius:16, boxShadow:"0 4px 32px rgba(0,0,0,0.10)", width:"100%", maxWidth:480, padding:"40px 36px", boxSizing:"border-box" },
+  logoRow:     { display:"flex", alignItems:"center", justifyContent:"center", marginBottom:24 },
+  headingBlock:{ textAlign:"center", marginBottom:24 },
+  heading:     { fontSize:22, fontWeight:700, color:"#0f172a", margin:"0 0 6px" },
+  subheading:  { fontSize:14, color:"#64748b", margin:0 },
+  errorBox:    { backgroundColor:"#fef2f2", border:"1px solid #fecaca", color:"#dc2626", borderRadius:8, padding:"10px 14px", fontSize:13, fontWeight:500, textAlign:"center", marginBottom:16 },
+  form:        { display:"flex", flexDirection:"column", gap:14, marginBottom:16 },
+  fieldGroup:  { display:"flex", flexDirection:"column", gap:6 },
+  label:       { fontSize:13, fontWeight:600, color:"#0f172a" },
+  input:       { width:"100%", height:42, backgroundColor:"#f1f5f9", border:"1.5px solid transparent", borderRadius:10, padding:"0 12px", fontSize:14, color:"#0f172a", outline:"none", boxSizing:"border-box", fontFamily:"inherit", transition:"border-color 0.15s" },
+  inputFocus:  { width:"100%", height:42, backgroundColor:"#f1f5f9", border:"1.5px solid #1e3a8a", borderRadius:10, padding:"0 12px", fontSize:14, color:"#0f172a", outline:"none", boxSizing:"border-box", fontFamily:"inherit" },
+  eyeBtn:      { position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", padding:0, display:"flex", alignItems:"center", justifyContent:"center" },
+  roleGroup:   { display:"flex", flexDirection:"column", gap:10 },
+  roleOption:  { display:"flex", alignItems:"center", gap:14, border:"1.5px solid #e2e8f0", borderRadius:10, padding:"11px 14px", cursor:"pointer", transition:"border-color 0.15s,background-color 0.15s", backgroundColor:"#fff" },
+  roleOptionSelected: { border:"1.5px solid #1e3a8a", backgroundColor:"#eff6ff" },
+  radioWrapper:{ flexShrink:0 },
+  radioOuter:  { width:18, height:18, borderRadius:"50%", border:"2px solid #cbd5e1", display:"flex", alignItems:"center", justifyContent:"center", transition:"border-color 0.15s" },
+  radioOuterSelected: { border:"2px solid #1e3a8a" },
+  radioInner:  { width:9, height:9, borderRadius:"50%", backgroundColor:"#1e3a8a" },
+  roleText:    { display:"flex", flexDirection:"column", gap:2 },
+  roleName:    { fontSize:14, fontWeight:600, color:"#0f172a" },
+  roleDesc:    { fontSize:12, color:"#64748b" },
+  btn:         { width:"100%", height:46, backgroundColor:"#1e3a8a", color:"#fff", fontSize:15, fontWeight:600, border:"none", borderRadius:10, cursor:"pointer", fontFamily:"inherit", marginTop:4 },
+  btnDisabled: { backgroundColor:"#3b5bdb", cursor:"not-allowed" },
+  linkLine:    { textAlign:"center", fontSize:14, color:"#64748b", margin:"14px 0 0" },
+  linkBtn:     { background:"none", border:"none", color:"#1e3a8a", fontWeight:700, fontSize:14, cursor:"pointer", padding:0, fontFamily:"inherit" },
 };
