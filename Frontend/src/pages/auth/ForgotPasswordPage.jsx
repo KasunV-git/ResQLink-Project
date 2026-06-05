@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import logo from "../../assets/Logo & Name Side-cropped.svg";
 
-export default function ForgotPasswordPage({ onBackToLogin, onRegister }) {
+export default function ForgotPasswordPage({ onBackToLogin, onRegister, onGoHome }) {
   const [email,     setEmail]     = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading,   setLoading]   = useState(false);
@@ -32,27 +32,41 @@ export default function ForgotPasswordPage({ onBackToLogin, onRegister }) {
   if (submitted) {
     return (
       <div style={S.page}>
-        <div className="anim-scale-in" style={S.card}>
+        <div className="anim-scale-in" style={{ ...S.card, textAlign:"center" }}>
 
           {/* Green check icon */}
-          <div style={{ display:"flex", justifyContent:"center", marginBottom:20 }}>
-            <div style={{ width:72, height:72, borderRadius:"50%", backgroundColor:"#dcfce7", display:"flex", alignItems:"center", justifyContent:"center" }}>
-              <CheckCircle size={36} color="#15803d" strokeWidth={2} />
+          <div style={{ display:"flex", justifyContent:"center", marginBottom:24 }}>
+            <div style={{
+              width:80, height:80, borderRadius:"50%",
+              backgroundColor:"#dcfce7",
+              display:"flex", alignItems:"center", justifyContent:"center",
+              boxShadow:"0 0 0 8px #f0fdf4",
+            }}>
+              <CheckCircle size={40} color="#15803d" strokeWidth={2} />
             </div>
           </div>
 
-          <h2 style={{ ...S.heading, marginBottom:10 }}>Check Your Email</h2>
-          <p style={{ fontSize:14, color:"#64748b", textAlign:"center", lineHeight:1.65, marginBottom:24 }}>
+          {/* Heading */}
+          <h2 style={{ fontSize:22, fontWeight:700, color:"#0f172a", margin:"0 0 10px" }}>
+            Check Your Email
+          </h2>
+
+          {/* Subtext */}
+          <p style={{ fontSize:14, color:"#64748b", lineHeight:1.7, margin:"0 0 28px" }}>
             We've sent password reset instructions to{" "}
             <strong style={{ color:"#0f172a" }}>{email.trim().toLowerCase()}</strong>
           </p>
 
-          {/* Tips box */}
-          <div style={{ backgroundColor:"#f8fafc", border:"1px solid #e2e8f0", borderRadius:10, padding:"16px 18px", marginBottom:28 }}>
-            <p style={{ fontSize:13, fontWeight:600, color:"#475569", marginBottom:10 }}>
+          {/* Tips box — left-aligned text inside */}
+          <div style={{
+            backgroundColor:"#f8fafc", border:"1px solid #e2e8f0",
+            borderRadius:10, padding:"16px 18px", marginBottom:28,
+            textAlign:"left",
+          }}>
+            <p style={{ fontSize:13, fontWeight:600, color:"#475569", margin:"0 0 10px" }}>
               Didn't receive the email?
             </p>
-            <ul style={{ listStyle:"disc", paddingLeft:18, display:"flex", flexDirection:"column", gap:6 }}>
+            <ul style={{ listStyle:"disc", paddingLeft:18, margin:0, display:"flex", flexDirection:"column", gap:8 }}>
               {[
                 "Check your spam or junk folder",
                 "Make sure the email address is correct",
@@ -63,11 +77,8 @@ export default function ForgotPasswordPage({ onBackToLogin, onRegister }) {
             </ul>
           </div>
 
-          <button
-            onClick={onBackToLogin}
-            className="btn-anim"
-            style={S.btn}
-          >
+          {/* Back to Login button */}
+          <button onClick={onBackToLogin} className="btn-anim" style={S.btn}>
             Back to Login
           </button>
 
@@ -81,9 +92,15 @@ export default function ForgotPasswordPage({ onBackToLogin, onRegister }) {
     <div style={S.page}>
       <div className="anim-scale-in" style={S.card}>
 
-        {/* Logo */}
+        {/* Logo — click to go back to landing page */}
         <div style={{ display:"flex", justifyContent:"center", marginBottom:24 }}>
-          <img src={logo} alt="ResQLink" style={{ height:42, width:"auto" }} />
+          <img
+            src={logo}
+            alt="ResQLink"
+            onClick={onGoHome}
+            style={{ height:42, width:"auto", cursor: onGoHome ? "pointer" : "default" }}
+            title="Back to Home"
+          />
         </div>
 
         {/* Back to Login */}

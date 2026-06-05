@@ -5,7 +5,7 @@ import RegisterPage from "./RegisterPage";
 import ForgotPasswordPage from "./ForgotPasswordPage";
 import logo from "../../assets/Logo & Name Side-cropped.svg";
 
-export default function LoginPage({ onLoginSuccess, initialShowRegister = false }) {
+export default function LoginPage({ onLoginSuccess, initialShowRegister = false, onGoHome }) {
   const [showRegister,       setShowRegister]       = useState(initialShowRegister);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [email,       setEmail]       = useState("");
@@ -19,6 +19,7 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false 
       <RegisterPage
         onLoginSuccess={onLoginSuccess}
         onBackToLogin={() => setShowRegister(false)}
+        onGoHome={onGoHome}
       />
     );
   }
@@ -28,6 +29,7 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false 
       <ForgotPasswordPage
         onBackToLogin={() => setShowForgotPassword(false)}
         onRegister={() => { setShowForgotPassword(false); setShowRegister(true); }}
+        onGoHome={onGoHome}
       />
     );
   }
@@ -50,9 +52,15 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false 
     <div style={styles.page}>
       <div className="anim-scale-in" style={styles.card}>
 
-        {/* Logo */}
+        {/* Logo — click to go back to landing page */}
         <div style={styles.logoRow}>
-          <img src={logo} alt="ResQLink" style={{ height: 44, width: "auto" }} />
+          <img
+            src={logo}
+            alt="ResQLink"
+            onClick={onGoHome}
+            style={{ height: 44, width: "auto", cursor: onGoHome ? "pointer" : "default" }}
+            title="Back to Home"
+          />
         </div>
 
         {/* Heading */}

@@ -10,7 +10,7 @@ import Skills from "./Skills";
 import Alerts from "./Alerts";
 import Profile from "./Profile";
 
-export default function VolunteerApp({ startOnRegister = false, onLogout }) {
+export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHome }) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem("resqlink_volunteer_user");
@@ -153,6 +153,7 @@ export default function VolunteerApp({ startOnRegister = false, onLogout }) {
       <LoginPage
         onLoginSuccess={handleLoginSuccess}
         initialShowRegister={startOnRegister}
+        onGoHome={onGoHome}
       />
     );
   }

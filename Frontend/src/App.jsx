@@ -32,6 +32,7 @@ export default function App() {
       <VolunteerApp
         startOnRegister={startOnRegister}
         onLogout={handleLogout}
+        onGoHome={handleLogout}
       />
     );
   }

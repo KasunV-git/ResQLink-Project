@@ -3,7 +3,7 @@ import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import logo from "../../assets/Logo & Name Side-cropped.svg";
 
-export default function RegisterPage({ onLoginSuccess, onBackToLogin }) {
+export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }) {
   const [firstName, setFirstName] = useState("");
   const [lastName,  setLastName]  = useState("");
   const [email,     setEmail]     = useState("");
@@ -50,9 +50,15 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin }) {
     <div style={S.page}>
       <div className="anim-scale-in" style={S.card}>
 
-        {/* Logo */}
+        {/* Logo — click to go back to landing page */}
         <div style={S.logoRow}>
-          <img src={logo} alt="ResQLink" style={{ height: 44, width: "auto" }} />
+          <img
+            src={logo}
+            alt="ResQLink"
+            onClick={onGoHome}
+            style={{ height: 44, width: "auto", cursor: onGoHome ? "pointer" : "default" }}
+            title="Back to Home"
+          />
         </div>
 
         {/* Heading */}
