@@ -82,7 +82,7 @@ export default function AIAnalysis({ isDarkMode }) {
 
   return (
     <div
-      className={`min-h-screen p-1 -m-8 px-8 py-8 transition-colors duration-300 font-sans ${
+      className={`min-h-screen p-1 -m-4 md:-m-8 px-4 md:px-8 py-4 md:py-8 transition-colors duration-300 font-sans ${
         isDarkMode ? "bg-slate-950 text-white" : "bg-slate-50 text-slate-900"
       }`}
     >
@@ -99,7 +99,7 @@ export default function AIAnalysis({ isDarkMode }) {
         >
           <div className="flex flex-col gap-1">
             <h1 className="font-bold text-3xl tracking-tight text-purple-600 dark:text-purple-400">
-              Resource Intelligence Center
+              Intelligence Center
             </h1>
             <p className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
               Monitor operational insights, resource trends, and AI-predicted disaster response metrics.
@@ -254,7 +254,7 @@ export default function AIAnalysis({ isDarkMode }) {
               <h2 className="font-semibold text-lg">AI Operations Mapping</h2>
               
               <div
-                className={`border rounded-xl overflow-hidden shadow-sm h-[580px] flex flex-col transition-colors duration-200 ${
+                className={`border rounded-xl overflow-hidden shadow-sm h-[400px] lg:h-[580px] flex flex-col transition-colors duration-200 ${
                   isDarkMode
                     ? "bg-slate-900 border-slate-800 text-white"
                     : "bg-white border-slate-200 text-slate-900"

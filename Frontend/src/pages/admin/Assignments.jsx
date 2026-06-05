@@ -16,7 +16,7 @@ export default function Assignments({ assignments, onCancelAssignment, onComplet
     <div className="w-full flex flex-col gap-8" data-name="AdminAssignments">
       {/* Title */}
       <div className="flex flex-col gap-1">
-        <h1 className={`font-semibold text-3xl tracking-tight transition-colors ${textHeading}`}>Assignments Master Log</h1>
+        <h1 className={`font-semibold text-3xl tracking-tight transition-colors ${textHeading}`}>Resource Allocation Log</h1>
         <p className={`text-base transition-colors ${textMuted}`}>View and manage all volunteer dispatches and incident reports</p>
       </div>
 
@@ -87,7 +87,7 @@ export default function Assignments({ assignments, onCancelAssignment, onComplet
                           className={`inline-flex items-center gap-1 text-xs font-semibold py-1.5 px-2.5 rounded-lg shadow-sm transition-colors border cursor-pointer ${
                             isDarkMode 
                               ? "bg-slate-950 border-red-500/20 text-red-400 hover:bg-red-500/10" 
-                              : "bg-white border-red-200 text-red-600 hover:bg-red-55"
+                              : "bg-white border-red-200 text-red-600 hover:bg-red-50"
                           }`}
                         >
                           <X className="w-3.5 h-3.5" />
