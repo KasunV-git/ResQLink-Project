@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
+import Footer from "../../components/Footer";
 import LoginPage from "../auth/LoginPage";
 import Dashboard from "./Dashboard";
 import Assignments from "./Assignments";
@@ -77,15 +78,25 @@ export default function VolunteerApp({ startOnRegister = false, onLogout }) {
   const handleToggleAvailability = async () => {
     if (!user) return;
     const nextAvailability = !user.isAvailable;
+
+    // ── Optimistic update — change UI immediately before API responds ──
+    const optimisticUser = { ...user, isAvailable: nextAvailability };
+    setUser(optimisticUser);
+    localStorage.setItem("resqlink_volunteer_user", JSON.stringify(optimisticUser));
+
     try {
       const response = await axios.put(`/api/auth/profile/${user.id}`, {
         isAvailable: nextAvailability,
       });
-      const updated = response.data;
-      setUser(updated);
-      localStorage.setItem("resqlink_volunteer_user", JSON.stringify(updated));
+      // Confirm with actual server response
+      const confirmed = response.data;
+      setUser(confirmed);
+      localStorage.setItem("resqlink_volunteer_user", JSON.stringify(confirmed));
     } catch (error) {
       console.error("Failed to toggle availability:", error);
+      // ── Revert back if API call fails ──
+      setUser(user);
+      localStorage.setItem("resqlink_volunteer_user", JSON.stringify(user));
     }
   };
 
@@ -146,16 +157,18 @@ export default function VolunteerApp({ startOnRegister = false, onLogout }) {
     );
   }
 
-  const highAlertCount = alerts.filter((a) => a.priority === "high").length;
+  const highAlertCount = alerts.length; // show total active alerts count on badge
 
   const renderContent = () => {
     if (loading && activeAssignments.length === 0) {
       return (
-        <div className="flex-1 flex items-center justify-center text-slate-500 font-medium">
-          <div className="flex flex-col items-center gap-3">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#15803d]"></div>
-            <span>Loading portal data...</span>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", padding:"80px 0" }}>
+          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:14 }}>
+            <div style={{ width:36, height:36, border:"3px solid #e2e8f0", borderTopColor:"#15803d",
+              borderRadius:"50%", animation:"spin 0.7s linear infinite" }} />
+            <span style={{ color:"#64748b", fontWeight:500 }}>Loading portal data...</span>
           </div>
+          <style>{`@keyframes spin { to { transform:rotate(360deg) } }`}</style>
         </div>
       );
     }
@@ -254,10 +267,11 @@ export default function VolunteerApp({ startOnRegister = false, onLogout }) {
         </div>
 
         {/* Main content */}
-        <main style={{ flex: 1, overflowY: "auto", padding: "32px 24px" }}>
-          <div style={{ maxWidth: 1100, margin: "0 auto", paddingBottom: 48 }}>
+        <main style={{ flex:1, overflowY:"auto", display:"flex", flexDirection:"column" }}>
+          <div key={activeTab} className="page-enter" style={{ flex:1, width:"100%", padding:"36px 40px 40px" }}>
             {renderContent()}
           </div>
+          <Footer />
         </main>
 
       </div>

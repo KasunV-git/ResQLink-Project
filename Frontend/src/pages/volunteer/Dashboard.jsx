@@ -1,175 +1,174 @@
 import React from "react";
 import { AlertCircle, MapPin, ClipboardList, CheckCircle } from "lucide-react";
 
-export default function Dashboard({ 
-  user, 
-  onToggleAvailability, 
-  activeAssignments, 
-  completedAssignments, 
-  alerts, 
-  onTabChange 
-}) {
-  const isAvailable = user?.isAvailable ?? true;
-  
-  // Stats
-  const activeCount = activeAssignments.length;
+export default function Dashboard({ user, onToggleAvailability, activeAssignments, completedAssignments, alerts, onTabChange }) {
+  const isAvailable   = user?.isAvailable ?? true;
+  const activeCount   = activeAssignments.length;
   const completedCount = completedAssignments.length;
-  const totalCount = activeCount + completedCount;
+  const totalCount    = activeCount + completedCount;
 
   return (
-    <div className="w-full flex flex-col gap-6" data-name="VolunteerDashboard">
-      {/* Title & Welcome */}
-      <div className="flex flex-col gap-1">
-        <h1 className="font-semibold text-3xl text-slate-900 tracking-tight">Volunteer Dashboard</h1>
-        <p className="text-slate-500 text-base">
-          Welcome, {user?.name || "Kasun Volunteer"}! Manage your assignments and availability
-        </p>
+    <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
+
+      {/* Title */}
+      <div className="anim-fade-in-up">
+        <h1 style={{ fontSize:28, fontWeight:700, color:"#0f172a", margin:"0 0 6px" }}>Volunteer Dashboard</h1>
+        <p style={{ fontSize:15, color:"#64748b", margin:0 }}>Welcome, {user?.name || "Volunteer"}! Manage your assignments and availability</p>
       </div>
 
-      {/* Availability Status Card */}
-      <div className={`bg-white border-[1.6px] border-solid rounded-xl p-6 transition-colors shadow-sm ${
-        isAvailable ? "border-emerald-600" : "border-slate-300"
-      }`}>
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col gap-1">
-            <h2 className="font-semibold text-lg text-slate-900">Availability Status</h2>
-            <p className="text-slate-500 text-sm">
-              {isAvailable 
-                ? "You are currently available for assignments" 
-                : "You are currently unavailable for assignments"
-              }
+      {/* Availability */}
+      <div className="anim-fade-in-up d-100 hover-card"
+        style={{ backgroundColor:"#fff", border:`1.5px solid ${isAvailable?"#15803d":"#e2e8f0"}`, borderRadius:14, padding:"20px 24px", boxShadow:"0 2px 12px rgba(0,0,0,0.05)", transition:"border-color 0.3s ease, box-shadow 0.22s ease, transform 0.22s ease" }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
+          <div>
+            <h2 style={{ fontSize:17, fontWeight:600, color:"#0f172a", margin:"0 0 4px" }}>Availability Status</h2>
+            <p style={{ fontSize:14, color:"#64748b", margin:0 }}>
+              {isAvailable ? "You are currently available for assignments" : "You are currently unavailable for assignments"}
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="font-medium text-slate-800 text-sm">
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            <span style={{
+              fontSize: 14, fontWeight: 600,
+              color: isAvailable ? "#15803d" : "#94a3b8",
+              transition: "color 0.3s ease",
+            }}>
               {isAvailable ? "Available" : "Unavailable"}
             </span>
-            <button
+
+            {/* Toggle Switch */}
+            <div
               onClick={onToggleAvailability}
-              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                isAvailable ? "bg-[#15803d]" : "bg-slate-300"
-              }`}
+              style={{
+                position: "relative",
+                width: 48,
+                height: 26,
+                borderRadius: 13,
+                backgroundColor: isAvailable ? "#15803d" : "#cbd5e1",
+                cursor: "pointer",
+                transition: "background-color 0.3s ease",
+                flexShrink: 0,
+                boxShadow: isAvailable ? "0 0 0 3px rgba(21,128,61,0.15)" : "none",
+              }}
             >
-              <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                  isAvailable ? "translate-x-5" : "translate-x-0"
-                }`}
-              />
-            </button>
+              {/* Circle */}
+              <div style={{
+                position: "absolute",
+                top: 3,
+                left: 3,
+                width: 20,
+                height: 20,
+                borderRadius: "50%",
+                backgroundColor: "#fff",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.25)",
+                transition: "transform 0.28s ease",
+                transform: isAvailable ? "translateX(22px)" : "translateX(0px)",
+              }} />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Cards Row: Active Assignments & Recent Alerts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Cards row */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:20 }}>
+
         {/* Active Assignments */}
-        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col h-[380px]">
-          <div className="flex justify-between items-center pb-4 border-b border-slate-100 mb-4">
-            <div className="flex items-center gap-2.5">
-              <ClipboardList className="w-5 h-5 text-[#15803d]" />
-              <h3 className="font-semibold text-base text-slate-900">Active Assignments</h3>
+        <div className="anim-fade-in-up d-150"
+          style={{ backgroundColor:"#fff", border:"1px solid #e2e8f0", borderRadius:14, padding:"20px 24px", boxShadow:"0 2px 12px rgba(0,0,0,0.05)", display:"flex", flexDirection:"column", minHeight:340 }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", paddingBottom:14, borderBottom:"1px solid #f1f5f9", marginBottom:14 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+              <ClipboardList size={18} color="#15803d" />
+              <span style={{ fontSize:15, fontWeight:600, color:"#0f172a" }}>Active Assignments</span>
             </div>
-            <button 
-              onClick={() => onTabChange("assignments")}
-              className="text-[#15803d] font-medium text-sm hover:underline"
-            >
-              View All &rarr;
+            <button onClick={()=>onTabChange("assignments")} style={{ background:"none", border:"none", cursor:"pointer", fontSize:13, fontWeight:600, color:"#15803d", fontFamily:"inherit", transition:"opacity 0.2s" }}
+              onMouseEnter={e=>e.target.style.opacity=0.7} onMouseLeave={e=>e.target.style.opacity=1}>
+              View All →
             </button>
           </div>
-
-          <div className="flex-1 overflow-y-auto flex flex-col gap-3 pr-1">
+          <div style={{ flex:1, overflowY:"auto", display:"flex", flexDirection:"column", gap:10 }}>
             {activeAssignments.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-sm gap-2">
-                <CheckCircle className="w-8 h-8 text-slate-300" />
-                No active assignments
+              <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", color:"#94a3b8", gap:8 }}>
+                <CheckCircle size={32} color="#e2e8f0" />
+                <span style={{ fontSize:13 }}>No active assignments</span>
               </div>
-            ) : (
-              activeAssignments.slice(0, 2).map((item) => (
-                <div key={item.id} className="border border-slate-100 rounded-lg p-3 bg-slate-50 flex flex-col gap-2">
-                  <div className="flex justify-between items-start">
-                    <h4 className="font-semibold text-sm text-slate-900">{item.disaster}</h4>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                      item.status === 'in-progress' 
-                        ? 'bg-amber-100 text-amber-700 border border-amber-200' 
-                        : 'bg-sky-100 text-sky-700 border border-sky-200'
-                    }`}>
-                      {item.status}
-                    </span>
-                  </div>
-                  <p className="text-slate-600 text-sm">{item.task}</p>
-                  <div className="flex items-center gap-1.5 text-slate-500 text-xs mt-1">
-                    <MapPin className="w-3.5 h-3.5" />
-                    <span>Location: {item.location}</span>
-                  </div>
+            ) : activeAssignments.slice(0,2).map((item,i)=>(
+              <div key={item.id} style={{ border:"1px solid #f1f5f9", borderRadius:10, padding:"12px 14px", backgroundColor:"#f8fafc",
+                transition:"background-color 0.2s ease, transform 0.2s ease", cursor:"default" }}
+                onMouseEnter={e=>{e.currentTarget.style.backgroundColor="#f1f5f9";e.currentTarget.style.transform="translateX(3px)"}}
+                onMouseLeave={e=>{e.currentTarget.style.backgroundColor="#f8fafc";e.currentTarget.style.transform="translateX(0)"}}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:6 }}>
+                  <span style={{ fontSize:14, fontWeight:600, color:"#0f172a" }}>{item.disaster}</span>
+                  <span style={{ fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:20, textTransform:"uppercase",
+                    backgroundColor: item.status==="in-progress"?"#fef3c7":"#e0f2fe",
+                    color:           item.status==="in-progress"?"#92400e":"#0369a1" }}>
+                    {item.status}
+                  </span>
                 </div>
-              ))
-            )}
+                <p style={{ fontSize:13, color:"#64748b", margin:"0 0 6px" }}>{item.task}</p>
+                <div style={{ display:"flex", alignItems:"center", gap:6, fontSize:12, color:"#94a3b8" }}>
+                  <MapPin size={12} /><span>{item.location}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Recent Alerts */}
-        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col h-[380px]">
-          <div className="flex justify-between items-center pb-4 border-b border-slate-100 mb-4">
-            <div className="flex items-center gap-2.5">
-              <AlertCircle className="w-5 h-5 text-red-600" />
-              <h3 className="font-semibold text-base text-slate-900">Recent Alerts</h3>
+        <div className="anim-fade-in-up d-200"
+          style={{ backgroundColor:"#fff", border:"1px solid #e2e8f0", borderRadius:14, padding:"20px 24px", boxShadow:"0 2px 12px rgba(0,0,0,0.05)", display:"flex", flexDirection:"column", minHeight:340 }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", paddingBottom:14, borderBottom:"1px solid #f1f5f9", marginBottom:14 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+              <AlertCircle size={18} color="#dc2626" />
+              <span style={{ fontSize:15, fontWeight:600, color:"#0f172a" }}>Recent Alerts</span>
             </div>
-            <button 
-              onClick={() => onTabChange("alerts")}
-              className="text-[#15803d] font-medium text-sm hover:underline"
-            >
-              View All &rarr;
+            <button onClick={()=>onTabChange("alerts")} style={{ background:"none", border:"none", cursor:"pointer", fontSize:13, fontWeight:600, color:"#15803d", fontFamily:"inherit", transition:"opacity 0.2s" }}
+              onMouseEnter={e=>e.target.style.opacity=0.7} onMouseLeave={e=>e.target.style.opacity=1}>
+              View All →
             </button>
           </div>
-
-          <div className="flex-1 overflow-y-auto flex flex-col gap-3 pr-1">
+          <div style={{ flex:1, overflowY:"auto", display:"flex", flexDirection:"column", gap:10 }}>
             {alerts.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-sm">
-                No active alerts
-              </div>
-            ) : (
-              alerts.slice(0, 3).map((alert) => (
-                <div key={alert.id} className="border border-slate-100 rounded-lg p-3 bg-slate-50 flex flex-col gap-2">
-                  <div className="flex justify-between items-center">
-                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                      alert.priority === 'high' 
-                        ? 'bg-red-100 text-red-700 border border-red-200' 
-                        : alert.priority === 'medium'
-                        ? 'bg-amber-100 text-amber-700 border border-amber-200'
-                        : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
-                    }`}>
-                      {alert.priority.toUpperCase()}
+              <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", color:"#94a3b8", fontSize:13 }}>No active alerts</div>
+            ) : alerts.slice(0,3).map(alert=>{
+              const cfg = alert.priority==="high"
+                ? { bg:"#fef2f2", color:"#dc2626", border:"#fecaca" }
+                : alert.priority==="medium"
+                ? { bg:"#fffbeb", color:"#d97706", border:"#fde68a" }
+                : { bg:"#f0fdf4", color:"#16a34a", border:"#bbf7d0" };
+              return (
+                <div key={alert.id} style={{ borderRadius:10, padding:"12px 14px", backgroundColor:cfg.bg, border:`1px solid ${cfg.border}`,
+                  transition:"transform 0.2s ease" }}
+                  onMouseEnter={e=>e.currentTarget.style.transform="translateX(3px)"}
+                  onMouseLeave={e=>e.currentTarget.style.transform="translateX(0)"}>
+                  <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
+                    <span style={{ fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:20, backgroundColor:"#fff", color:cfg.color, textTransform:"uppercase" }}>
+                      {alert.priority}
                     </span>
-                    <span className="text-slate-400 text-[10px]">{alert.time}</span>
+                    <span style={{ fontSize:11, color:"#94a3b8" }}>{alert.time}</span>
                   </div>
-                  <p className="text-slate-700 text-xs font-medium leading-relaxed">{alert.message}</p>
+                  <p style={{ fontSize:13, color:"#374151", fontWeight:500, margin:0, lineHeight:1.5 }}>{alert.message}</p>
                 </div>
-              ))
-            )}
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* Counter widgets at the bottom */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2">
-        {/* Total Assignments */}
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col items-center justify-center text-center gap-1.5">
-          <span className="font-bold text-3xl text-[#15803d]">{totalCount}</span>
-          <span className="text-slate-500 text-xs uppercase tracking-wider font-semibold">Total Assignments</span>
-        </div>
-
-        {/* Active Tasks */}
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col items-center justify-center text-center gap-1.5">
-          <span className="font-bold text-3xl text-amber-500">{activeCount}</span>
-          <span className="text-slate-500 text-xs uppercase tracking-wider font-semibold">Active Tasks</span>
-        </div>
-
-        {/* Completed */}
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col items-center justify-center text-center gap-1.5">
-          <span className="font-bold text-3xl text-emerald-600">{completedCount}</span>
-          <span className="text-slate-500 text-xs uppercase tracking-wider font-semibold">Completed</span>
-        </div>
+      {/* Stats */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))", gap:16 }}>
+        {[
+          { label:"Total Assignments", value:totalCount,    color:"#15803d" },
+          { label:"Active Tasks",      value:activeCount,   color:"#d97706" },
+          { label:"Completed",         value:completedCount, color:"#16a34a" },
+        ].map(({label,value,color},i)=>(
+          <div key={label} className={`anim-fade-in-up hover-card d-${(i+2)*100}`}
+            style={{ backgroundColor:"#fff", border:"1px solid #e2e8f0", borderRadius:14, padding:"24px 16px",
+              boxShadow:"0 2px 12px rgba(0,0,0,0.05)", textAlign:"center" }}>
+            <div style={{ fontSize:36, fontWeight:700, color, marginBottom:6 }}>{value}</div>
+            <div style={{ fontSize:12, color:"#94a3b8", fontWeight:600, textTransform:"uppercase", letterSpacing:"0.05em" }}>{label}</div>
+          </div>
+        ))}
       </div>
+
     </div>
   );
 }

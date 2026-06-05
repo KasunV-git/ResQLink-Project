@@ -1,22 +1,63 @@
 @import "tailwindcss";
 
 *, *::before, *::after { box-sizing: border-box; }
-
-html { width: 100%; height: 100%; }
-
+html { width: 100%; height: 100%; scroll-behavior: smooth; }
 body {
-  width: 100%;
-  min-height: 100%;
-  margin: 0;
-  padding: 0;
+  width: 100%; min-height: 100%; margin: 0; padding: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   background-color: #f1f5f9;
 }
+#root { width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
 
-#root {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+/* ══ Keyframes ══ */
+@keyframes fadeIn       { from { opacity:0 }                              to { opacity:1 } }
+@keyframes fadeInUp     { from { opacity:0; transform:translateY(30px) }  to { opacity:1; transform:translateY(0) } }
+@keyframes fadeInDown   { from { opacity:0; transform:translateY(-20px) } to { opacity:1; transform:translateY(0) } }
+@keyframes fadeInLeft   { from { opacity:0; transform:translateX(-30px) } to { opacity:1; transform:translateX(0) } }
+@keyframes fadeInRight  { from { opacity:0; transform:translateX(30px) }  to { opacity:1; transform:translateX(0) } }
+@keyframes scaleIn      { from { opacity:0; transform:scale(0.93) }       to { opacity:1; transform:scale(1) } }
+@keyframes slideInLeft  { from { transform:translateX(-100%) }            to { transform:translateX(0) } }
+
+/* ══ Animation classes ══ */
+.anim-fade-in       { animation: fadeIn      0.4s ease both; }
+.anim-fade-in-up    { animation: fadeInUp    0.5s ease both; }
+.anim-fade-in-down  { animation: fadeInDown  0.4s ease both; }
+.anim-fade-in-left  { animation: fadeInLeft  0.5s ease both; }
+.anim-fade-in-right { animation: fadeInRight 0.5s ease both; }
+.anim-scale-in      { animation: scaleIn     0.4s ease both; }
+
+/* Delays */
+.d-100 { animation-delay:0.10s }
+.d-150 { animation-delay:0.15s }
+.d-200 { animation-delay:0.20s }
+.d-250 { animation-delay:0.25s }
+.d-300 { animation-delay:0.30s }
+.d-350 { animation-delay:0.35s }
+.d-400 { animation-delay:0.40s }
+.d-500 { animation-delay:0.50s }
+
+/* ══ Scroll reveal ══ */
+.reveal       { opacity:0; transform:translateY(28px);   transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal-left  { opacity:0; transform:translateX(-28px);  transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal-right { opacity:0; transform:translateX(28px);   transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible, .reveal-left.visible, .reveal-right.visible { opacity:1; transform:translate(0,0); }
+
+/* ══ Hover card lift ══ */
+.hover-card { transition: transform 0.22s ease, box-shadow 0.22s ease; cursor:default; }
+.hover-card:hover { transform:translateY(-5px); box-shadow:0 16px 40px rgba(0,0,0,0.11) !important; }
+
+/* ══ Button ══ */
+.btn-anim { transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.18s ease, color 0.18s ease; }
+.btn-anim:hover  { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.15); }
+.btn-anim:active { transform:scale(0.97); box-shadow:none; }
+
+/* ══ Sidebar item ══ */
+.sidebar-item { transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease; }
+.sidebar-item:hover { transform:translateX(4px); }
+
+/* ══ Tab page transition ══ */
+.page-enter { animation: fadeInUp 0.35s ease both; }
+
+/* ══ Input focus ══ */
+.input-anim { transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; }

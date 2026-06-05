@@ -35,7 +35,7 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false 
 
   return (
     <div style={styles.page}>
-      <div style={styles.card}>
+      <div className="anim-scale-in" style={styles.card}>
 
         {/* Logo */}
         <div style={styles.logoRow}>
@@ -84,6 +84,7 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false 
           <button
             type="submit"
             disabled={loading}
+            className="btn-anim"
             style={{ ...styles.btn, ...(loading ? styles.btnDisabled : {}) }}
           >
             {loading ? "Signing in..." : "Sign In"}
@@ -127,16 +128,17 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "24px",
+    minHeight: "100vh",
+    padding: "40px 24px",
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
   },
   card: {
     backgroundColor: "#ffffff",
     borderRadius: 16,
-    boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
+    boxShadow: "0 4px 32px rgba(0,0,0,0.10)",
     width: "100%",
-    maxWidth: 420,
-    padding: "36px 32px",
+    maxWidth: 460,
+    padding: "40px 36px",
     boxSizing: "border-box",
   },
   logoRow: {

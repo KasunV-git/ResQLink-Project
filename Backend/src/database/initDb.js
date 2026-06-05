@@ -1,204 +1,133 @@
-const mysql = require('mysql2/promise');
-const fs = require('fs');
-const path = require('path');
-require('dotenv').config();
+const mysql   = require('mysql2/promise');
+const bcrypt  = require('bcryptjs');
+const fs      = require('fs');
+const path    = require('path');
 
-const DB_HOST = process.env.DB_HOST || 'localhost';
-const DB_USER = process.env.DB_USER || 'root';
-const DB_PASSWORD = process.env.DB_PASSWORD || 'Renu_mysql';
-const DB_NAME = process.env.DB_NAME || 'resqlink';
+// dotenv already loaded in App.js
+const DB_HOST     = process.env.DB_HOST     || 'localhost';
+const DB_USER     = process.env.DB_USER     || 'root';
+const DB_PASSWORD = process.env.DB_PASSWORD || '';
+const DB_NAME     = process.env.DB_NAME     || 'resqlink';
 
 async function initDb() {
-  console.log('Initializing database...');
-  
-  // 1. Establish connection to MySQL server (without database selected)
+  console.log('🔄 Initializing database...');
+
   const connection = await mysql.createConnection({
-    host: DB_HOST,
-    user: DB_USER,
-    password: DB_PASSWORD
+    host:     DB_HOST,
+    user:     DB_USER,
+    password: DB_PASSWORD,
   });
 
   try {
-    // 2. Create Database if it does not exist
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;`);
-    console.log(`Database '${DB_NAME}' verified/created.`);
-    
-    // Switch to resqlink database
-    await connection.query(`USE \`${DB_NAME}\`;`);
+    // 1. Create database if missing
+    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\``);
+    await connection.query(`USE \`${DB_NAME}\``);
+    console.log(`✅ Database "${DB_NAME}" ready.`);
 
-    // 3. Read and execute schema.sql
-    const schemaPath = path.join(__dirname, 'schema.sql');
-    const schemaSql = fs.readFileSync(schemaPath, 'utf8');
-    
-    // Split the schema file by semicolon to run statements sequentially
-    const sqlStatements = schemaSql
-      .split(';')
-      .map(stmt => stmt.trim())
-      .filter(stmt => stmt.length > 0);
-
-    for (const stmt of sqlStatements) {
+    // 2. Create tables from schema
+    const schemaSql = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
+    const statements = schemaSql.split(';').map(s => s.trim()).filter(s => s.length > 0);
+    for (const stmt of statements) {
       await connection.query(stmt);
     }
-    console.log('Database tables created successfully.');
+    console.log('✅ Tables created/verified.');
 
-    // 4. Seed Initial Data
-    
-    // A. Seed Users
-    const [existingUsers] = await connection.query('SELECT * FROM users WHERE email = ?', ['volunteer@resqlink.com']);
+    // 3. Seed demo volunteer
+    const [existingUsers] = await connection.query(
+      'SELECT id FROM users WHERE email = ?', ['volunteer@resqlink.com']
+    );
+
     let volunteerId;
     if (existingUsers.length === 0) {
+      const hashedPassword = await bcrypt.hash('demo123', 10);
       const [insertUser] = await connection.query(
-        `INSERT INTO users (name, email, phone, role, is_available, password) 
+        `INSERT INTO users (name, email, phone, role, is_available, password)
          VALUES (?, ?, ?, ?, ?, ?)`,
-        ['Kasun Volunteer', 'volunteer@resqlink.com', '+1 234 567 8901', 'Volunteer', true, 'demo123']
+        ['Demo Volunteer', 'volunteer@resqlink.com', '+1 234 567 8901', 'Volunteer', 1, hashedPassword]
       );
       volunteerId = insertUser.insertId;
-      console.log('Volunteer Kasun seeded successfully.');
+      console.log('✅ Demo volunteer seeded.');
     } else {
       volunteerId = existingUsers[0].id;
-      console.log('Volunteer Kasun already exists.');
+      console.log('ℹ️  Demo volunteer already exists, skipping seed.');
     }
 
-    // B. Seed Skills
+    // 4. Seed skills
     const skillsToSeed = [
-      'First Aid', 'Search & Rescue', 'Communication', 'Medical', 
-      'Logistics', 'Translation', 'IT Support', 'Data Entry', 
-      'Shelter Management', 'Cooking', 'Driving', 'Construction', 
-      'Electrical', 'Plumbing'
+      'First Aid', 'Search & Rescue', 'Communication', 'Medical',
+      'Logistics', 'Translation', 'IT Support', 'Data Entry',
+      'Shelter Management', 'Cooking', 'Driving', 'Construction',
+      'Electrical', 'Plumbing',
     ];
-
     for (const skill of skillsToSeed) {
       await connection.query('INSERT IGNORE INTO skills (name) VALUES (?)', [skill]);
     }
-    console.log('Skills list seeded.');
+    console.log('✅ Skills seeded.');
 
-    // C. Associate initial skills with Kasun Volunteer
+    // 5. Associate initial skills with demo volunteer
     const initialSkills = ['First Aid', 'Search & Rescue', 'Communication'];
     for (const skillName of initialSkills) {
       const [skillRows] = await connection.query('SELECT id FROM skills WHERE name = ?', [skillName]);
       if (skillRows.length > 0) {
-        const skillId = skillRows[0].id;
         await connection.query(
           'INSERT IGNORE INTO user_skills (user_id, skill_id) VALUES (?, ?)',
-          [volunteerId, skillId]
+          [volunteerId, skillRows[0].id]
         );
       }
     }
-    console.log('Volunteer initial skills associated.');
+    console.log('✅ Initial skills assigned.');
 
-    // D. Seed Alerts
-    const [existingAlerts] = await connection.query('SELECT * FROM alerts');
+    // 6. Seed alerts
+    const [existingAlerts] = await connection.query('SELECT id FROM alerts LIMIT 1');
     if (existingAlerts.length === 0) {
       const alertsToSeed = [
-        {
-          priority: 'high',
-          message: 'Flash flood warning in Downtown area. Evacuate immediately.',
-          source: 'Emergency Services',
-          time: 'Apr 3, 03:00 PM',
-          target: 'For Volunteers'
-        },
-        {
-          priority: 'medium',
-          message: 'Power outage reported in North District. Crews dispatched.',
-          source: 'Infrastructure Team',
-          time: 'Apr 3, 01:45 PM',
-          target: 'For Volunteers'
-        },
-        {
-          priority: 'low',
-          message: 'Weather advisory: Heavy rain expected tonight.',
-          source: 'Weather Service',
-          time: 'Apr 3, 12:30 PM',
-          target: 'For Volunteers'
-        },
-        {
-          priority: 'high',
-          message: 'Volunteers needed urgently at Central Shelter.',
-          source: 'Coordination Center',
-          time: 'Apr 3, 03:30 PM',
-          target: 'For Volunteers'
-        }
+        { priority: 'high',   message: 'Flash flood warning in Downtown area. Evacuate immediately.',  source: 'Emergency Services',  time: 'Apr 3, 03:00 PM', target: 'For Volunteers' },
+        { priority: 'medium', message: 'Power outage reported in North District. Crews dispatched.',   source: 'Infrastructure Team', time: 'Apr 3, 01:45 PM', target: 'For Volunteers' },
+        { priority: 'low',    message: 'Weather advisory: Heavy rain expected tonight.',                source: 'Weather Service',     time: 'Apr 3, 12:30 PM', target: 'For Volunteers' },
+        { priority: 'high',   message: 'Volunteers needed urgently at Central Shelter.',               source: 'Coordination Center', time: 'Apr 3, 03:30 PM', target: 'For Volunteers' },
       ];
-
-      for (const alert of alertsToSeed) {
+      for (const a of alertsToSeed) {
         await connection.query(
-          `INSERT INTO alerts (priority, message, source, time, target) 
-           VALUES (?, ?, ?, ?, ?)`,
-          [alert.priority, alert.message, alert.source, alert.time, alert.target]
+          'INSERT INTO alerts (priority, message, source, time, target) VALUES (?, ?, ?, ?, ?)',
+          [a.priority, a.message, a.source, a.time, a.target]
         );
       }
-      console.log('Alerts seeded.');
+      console.log('✅ Alerts seeded.');
     } else {
-      console.log('Alerts already seeded.');
+      console.log('ℹ️  Alerts already seeded.');
     }
 
-    // E. Seed Assignments
-    const [existingAssignments] = await connection.query('SELECT * FROM assignments');
+    // 7. Seed assignments (use proper DATE format YYYY-MM-DD)
+    const [existingAssignments] = await connection.query('SELECT id FROM assignments LIMIT 1');
     if (existingAssignments.length === 0) {
       const assignmentsToSeed = [
-        {
-          user_id: volunteerId,
-          disaster: 'Downtown Flood',
-          task: 'Distribute emergency supplies',
-          location: 'Central Shelter',
-          status: 'in-progress',
-          assigned_date: '4/3/2026',
-          completed_date: null
-        },
-        {
-          user_id: volunteerId,
-          disaster: 'East District Earthquake',
-          task: 'Assist evacuation',
-          location: 'East District',
-          status: 'assigned',
-          assigned_date: '4/3/2026',
-          completed_date: null
-        },
-        {
-          user_id: volunteerId,
-          disaster: 'North District Power Outage',
-          task: 'Community support',
-          location: 'North Community Center',
-          status: 'completed',
-          assigned_date: '4/2/2026',
-          completed_date: '4/2/2026'
-        }
+        { disaster: 'Downtown Flood',           task: 'Distribute emergency supplies', location: 'Central Shelter',     status: 'in-progress', assigned_date: '2026-04-03', completed_date: null },
+        { disaster: 'East District Earthquake', task: 'Assist evacuation',             location: 'East District',       status: 'assigned',    assigned_date: '2026-04-03', completed_date: null },
+        { disaster: 'North District Power Outage', task: 'Community support',          location: 'North Community Center', status: 'completed', assigned_date: '2026-04-02', completed_date: '2026-04-02' },
       ];
-
-      for (const assign of assignmentsToSeed) {
+      for (const a of assignmentsToSeed) {
         await connection.query(
-          `INSERT INTO assignments (user_id, disaster, task, location, status, assigned_date, completed_date) 
+          `INSERT INTO assignments (user_id, disaster, task, location, status, assigned_date, completed_date)
            VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [
-            assign.user_id,
-            assign.disaster,
-            assign.task,
-            assign.location,
-            assign.status,
-            assign.assigned_date,
-            assign.completed_date
-          ]
+          [volunteerId, a.disaster, a.task, a.location, a.status, a.assigned_date, a.completed_date]
         );
       }
-      console.log('Assignments seeded.');
+      console.log('✅ Assignments seeded.');
     } else {
-      console.log('Assignments already seeded.');
+      console.log('ℹ️  Assignments already seeded.');
     }
 
-    console.log('Database initialization completed successfully!');
+    console.log('🎉 Database initialization complete!');
   } catch (error) {
-    console.error('Error during database initialization:', error);
+    console.error('❌ Database initialization error:', error.message);
     throw error;
   } finally {
     await connection.end();
   }
 }
 
-// Run immediately if executed directly
 if (require.main === module) {
-  initDb()
-    .then(() => process.exit(0))
-    .catch(() => process.exit(1));
+  initDb().then(() => process.exit(0)).catch(() => process.exit(1));
 }
 
 module.exports = initDb;

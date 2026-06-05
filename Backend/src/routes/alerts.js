@@ -5,7 +5,17 @@ const db = require('../config/db');
 // Get active emergency alerts
 router.get('/', async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT * FROM alerts ORDER BY id DESC');
+    const [rows] = await db.query(`
+      SELECT * FROM alerts
+      ORDER BY
+        CASE priority
+          WHEN 'high'   THEN 1
+          WHEN 'medium' THEN 2
+          WHEN 'low'    THEN 3
+          ELSE 4
+        END ASC,
+        created_at DESC
+    `);
     
     // Map db columns to match frontend expectations
     const alerts = rows.map(row => ({

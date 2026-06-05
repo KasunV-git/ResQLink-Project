@@ -1,89 +1,90 @@
 const express = require('express');
-const router = express.Router();
-const db = require('../config/db');
+const router  = express.Router();
+const db      = require('../config/db');
 
-// Get current and suggested skills for a user
+/* ══ GET /api/skills/:userId ══ */
 router.get('/:userId', async (req, res) => {
-  const userId = req.params.userId;
+  const userId = parseInt(req.params.userId, 10);
+  if (isNaN(userId)) {
+    return res.status(400).json({ message: 'Invalid user ID.' });
+  }
 
   try {
-    // 1. Get current skills
     const [currentRows] = await db.query(
-      `SELECT s.id, s.name FROM skills s 
-       JOIN user_skills us ON s.id = us.skill_id 
-       WHERE us.user_id = ?`,
+      `SELECT s.name FROM skills s
+       JOIN user_skills us ON s.id = us.skill_id
+       WHERE us.user_id = ?
+       ORDER BY s.name`,
       [userId]
     );
-    const currentSkills = currentRows.map(row => row.name);
+    const currentSkills = currentRows.map(r => r.name);
 
-    // 2. Get suggested skills (skills the user doesn't have)
-    const [allSkills] = await db.query('SELECT name FROM skills');
-    const allSkillsList = allSkills.map(row => row.name);
-    
-    const suggestedSkills = allSkillsList.filter(skill => !currentSkills.includes(skill));
+    const [allRows] = await db.query('SELECT name FROM skills ORDER BY name');
+    const suggestedSkills = allRows.map(r => r.name).filter(n => !currentSkills.includes(n));
 
-    res.json({
-      currentSkills,
-      suggestedSkills
-    });
+    return res.json({ currentSkills, suggestedSkills });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    console.error('Skills fetch error:', error.message);
+    return res.status(500).json({ message: 'Failed to fetch skills.' });
   }
 });
 
-// Add a skill to user
+/* ══ POST /api/skills/:userId ══ */
 router.post('/:userId', async (req, res) => {
-  const userId = req.params.userId;
-  const { skillName } = req.body;
+  const userId    = parseInt(req.params.userId, 10);
+  const skillName = (req.body.skillName || '').trim();
 
-  if (!skillName) {
-    return res.status(400).json({ message: 'Skill name is required' });
-  }
+  if (isNaN(userId)) return res.status(400).json({ message: 'Invalid user ID.' });
+  if (!skillName)     return res.status(400).json({ message: 'Skill name is required.' });
+  if (skillName.length > 100) return res.status(400).json({ message: 'Skill name is too long.' });
 
   try {
-    // 1. Verify skill exists in skills table or create it
+    // Get or create skill
     let skillId;
-    const [skillRows] = await db.query('SELECT id FROM skills WHERE name = ?', [skillName]);
-    
-    if (skillRows.length === 0) {
-      const [insertSkill] = await db.query('INSERT INTO skills (name) VALUES (?)', [skillName]);
-      skillId = insertSkill.insertId;
+    const [existing] = await db.query('SELECT id FROM skills WHERE name = ?', [skillName]);
+    if (existing.length === 0) {
+      const [inserted] = await db.query('INSERT INTO skills (name) VALUES (?)', [skillName]);
+      skillId = inserted.insertId;
     } else {
-      skillId = skillRows[0].id;
+      skillId = existing[0].id;
     }
 
-    // 2. Associate with user
-    await db.query('INSERT IGNORE INTO user_skills (user_id, skill_id) VALUES (?, ?)', [userId, skillId]);
+    // Associate with user (ignore if already associated)
+    await db.query(
+      'INSERT IGNORE INTO user_skills (user_id, skill_id) VALUES (?, ?)',
+      [userId, skillId]
+    );
 
-    res.json({ message: 'Skill added successfully' });
+    return res.json({ message: 'Skill added successfully.' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    console.error('Add skill error:', error.message);
+    return res.status(500).json({ message: 'Failed to add skill.' });
   }
 });
 
-// Remove a skill from user
+/* ══ DELETE /api/skills/:userId ══ */
 router.delete('/:userId', async (req, res) => {
-  const userId = req.params.userId;
-  const { skillName } = req.body;
+  const userId    = parseInt(req.params.userId, 10);
+  const skillName = (req.body.skillName || '').trim();
 
-  if (!skillName) {
-    return res.status(400).json({ message: 'Skill name is required' });
-  }
+  if (isNaN(userId)) return res.status(400).json({ message: 'Invalid user ID.' });
+  if (!skillName)     return res.status(400).json({ message: 'Skill name is required.' });
 
   try {
     const [skillRows] = await db.query('SELECT id FROM skills WHERE name = ?', [skillName]);
-    if (skillRows.length > 0) {
-      const skillId = skillRows[0].id;
-      await db.query('DELETE FROM user_skills WHERE user_id = ? AND skill_id = ?', [userId, skillId]);
-      res.json({ message: 'Skill removed successfully' });
-    } else {
-      res.status(404).json({ message: 'Skill not found' });
+    if (skillRows.length === 0) {
+      return res.status(404).json({ message: 'Skill not found.' });
     }
+
+    await db.query(
+      'DELETE FROM user_skills WHERE user_id = ? AND skill_id = ?',
+      [userId, skillRows[0].id]
+    );
+
+    return res.json({ message: 'Skill removed successfully.' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    console.error('Remove skill error:', error.message);
+    return res.status(500).json({ message: 'Failed to remove skill.' });
   }
 });
 
