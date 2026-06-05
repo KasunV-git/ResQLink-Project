@@ -2,18 +2,13 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
-import LoginPage from "../auth/LoginPage";
 import Dashboard from "./Dashboard";
 import Assignments from "./Assignments";
 import Skills from "./Skills";
 import Alerts from "./Alerts";
 import Profile from "./Profile";
 
-export default function VolunteerApp() {
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem("resqlink_volunteer_user");
-    return saved ? JSON.parse(saved) : null;
-  });
+export default function VolunteerApp({ user, onLogout, onUpdateUser }) {
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [activeAssignments, setActiveAssignments] = useState([]);
@@ -35,8 +30,7 @@ export default function VolunteerApp() {
       ]);
 
       const updatedUser = userRes.data;
-      setUser(updatedUser);
-      localStorage.setItem("resqlink_volunteer_user", JSON.stringify(updatedUser));
+      onUpdateUser(updatedUser);
 
       setActiveAssignments(assignRes.data.activeAssignments);
       setCompletedAssignments(assignRes.data.completedAssignments);
@@ -55,22 +49,16 @@ export default function VolunteerApp() {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchPortalData(user.id);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  const handleLoginSuccess = (userData) => {
-    setUser(userData);
-    localStorage.setItem("resqlink_volunteer_user", JSON.stringify(userData));
-    setActiveTab("dashboard");
-  };
-
   const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem("resqlink_volunteer_user");
     setActiveAssignments([]);
     setCompletedAssignments([]);
     setCurrentSkills([]);
     setSuggestedSkills([]);
     setAlerts([]);
+    onLogout();
   };
 
   const handleToggleAvailability = async () => {
@@ -81,8 +69,7 @@ export default function VolunteerApp() {
         isAvailable: nextAvailability,
       });
       const updated = response.data;
-      setUser(updated);
-      localStorage.setItem("resqlink_volunteer_user", JSON.stringify(updated));
+      onUpdateUser(updated);
     } catch (error) {
       console.error("Failed to toggle availability:", error);
     }
@@ -128,17 +115,12 @@ export default function VolunteerApp() {
     try {
       const response = await axios.put(`/api/auth/profile/${user.id}`, { name, phone });
       const updated = response.data;
-      setUser(updated);
-      localStorage.setItem("resqlink_volunteer_user", JSON.stringify(updated));
+      onUpdateUser(updated);
     } catch (error) {
       console.error("Failed to update profile:", error);
       throw error;
     }
   };
-
-  if (!user) {
-    return <LoginPage onLoginSuccess={handleLoginSuccess} />;
-  }
 
   const highAlertCount = alerts.filter((a) => a.priority === "high").length;
 
