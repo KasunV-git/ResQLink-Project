@@ -6,20 +6,26 @@ import Volunteers from "./Volunteers";
 import Assignments from "./Assignments";
 import Alerts from "./Alerts";
 import Profile from "../volunteer/Profile"; // We can reuse the profile page since it takes user, onUpdateProfile, and onLogout
+import AIAnalysis from "./AIAnalysis";
 
 // Custom Admin Sidebar
-function AdminSidebar({ activeTab, onTabChange }) {
+function AdminSidebar({ activeTab, onTabChange, isDarkMode }) {
   const menuItems = [
     { id: "dashboard", label: "Overview", icon: "📊" },
     { id: "volunteers", label: "Volunteers", icon: "👥" },
     { id: "assignments", label: "Assignments", icon: "📋" },
     { id: "alerts", label: "Alerts", icon: "🔔" },
+    { id: "ai-analysis", label: "AI Analysis", icon: "🧠" },
     { id: "profile", label: "Profile", icon: "👤" },
   ];
 
   return (
-    <div className="bg-white border-[#e5e7eb] border-r-[0.8px] border-solid w-[256px] h-full shrink-0 flex flex-col pt-4 px-4 gap-1 shadow-sm">
-      <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
+    <div className={`border-r-[0.8px] border-solid w-[256px] h-full shrink-0 flex flex-col pt-4 px-4 gap-1 shadow-sm transition-colors duration-200 ${
+      isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-[#e5e7eb] text-slate-900"
+    }`}>
+      <div className={`px-3 py-2 text-xs font-bold uppercase tracking-wider ${
+        isDarkMode ? "text-slate-500" : "text-slate-400"
+      }`}>
         Admin Controls
       </div>
       {menuItems.map((item) => {
@@ -28,9 +34,13 @@ function AdminSidebar({ activeTab, onTabChange }) {
           <button
             key={item.id}
             onClick={() => onTabChange(item.id)}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm font-medium ${
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm font-medium cursor-pointer ${
               isActive
-                ? "bg-emerald-50 text-emerald-700"
+                ? isDarkMode
+                  ? "bg-emerald-950/40 text-emerald-400"
+                  : "bg-emerald-50 text-emerald-700"
+                : isDarkMode
+                ? "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
                 : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
             }`}
           >
@@ -44,11 +54,19 @@ function AdminSidebar({ activeTab, onTabChange }) {
 }
 
 export default function AdminApp({ user, onLogout, onUpdateUser }) {
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem("resqlink_admin_theme");
+    return saved ? JSON.parse(saved) : true;
+  });
   const [activeTab, setActiveTab] = useState("dashboard");
   const [volunteers, setVolunteers] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem("resqlink_admin_theme", JSON.stringify(isDarkMode));
+  }, [isDarkMode]);
 
   const fetchAdminData = async () => {
     setLoading(true);
@@ -186,6 +204,7 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
             assignments={assignments}
             alerts={alerts}
             onTabChange={setActiveTab}
+            isDarkMode={isDarkMode}
           />
         );
       case "volunteers":
@@ -194,6 +213,7 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
             volunteers={volunteers}
             onToggleAvailability={handleToggleVolunteerAvailability}
             onAssign={handleCreateAssignment}
+            isDarkMode={isDarkMode}
           />
         );
       case "assignments":
@@ -202,6 +222,7 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
             assignments={assignments}
             onCancelAssignment={handleCancelAssignment}
             onCompleteAssignment={handleCompleteAssignment}
+            isDarkMode={isDarkMode}
           />
         );
       case "alerts":
@@ -210,6 +231,7 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
             alerts={alerts}
             onCreateAlert={handleCreateAlert}
             onDeleteAlert={handleDeleteAlert}
+            isDarkMode={isDarkMode}
           />
         );
       case "profile":
@@ -218,7 +240,12 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
             user={user}
             onUpdateProfile={handleUpdateProfile}
             onLogout={onLogout}
+            isDarkMode={isDarkMode}
           />
+        );
+      case "ai-analysis":
+        return (
+          <AIAnalysis isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
         );
       default:
         return (
@@ -228,14 +255,18 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
   };
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-slate-50 font-sans">
+    <div className={`flex flex-col h-screen overflow-hidden font-sans transition-colors duration-200 ${
+      isDarkMode ? "bg-slate-950 text-white" : "bg-slate-50 text-slate-900"
+    }`}>
       <Header
         user={user}
         alertsCount={highAlertCount}
         onTabChange={setActiveTab}
+        isDarkMode={isDarkMode}
+        onToggleTheme={() => setIsDarkMode(!isDarkMode)}
       />
       <div className="flex flex-1 overflow-hidden">
-        <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} isDarkMode={isDarkMode} />
         <div className="flex-1 overflow-y-auto p-8">
           <div className="max-w-[1100px] mx-auto pb-12">
             {renderContent()}
