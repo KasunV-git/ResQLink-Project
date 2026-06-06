@@ -22,7 +22,7 @@ export default function Footer() {
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <img src={logo} alt="ResQLink" style={{ height: 28, width: "auto" }} />
           <span style={{ fontSize: 13, color: "#94a3b8" }}>
-            A unified disaster response and coordination platform
+            Sri Lanka's unified disaster response and coordination platform
           </span>
         </div>
 

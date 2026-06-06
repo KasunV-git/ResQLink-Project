@@ -18,8 +18,8 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
   });
 
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [activeAssignments, setActiveAssignments] = useState([]);
-  const [completedAssignments, setCompletedAssignments] = useState([]);
+  // Single source of truth for all assignments (active + completed merged)
+  const [assignments, setAssignments] = useState([]);
   const [currentSkills, setCurrentSkills] = useState([]);
   const [suggestedSkills, setSuggestedSkills] = useState([]);
   const [alerts, setAlerts] = useState([]);
@@ -40,8 +40,10 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
       setUser(updatedUser);
       localStorage.setItem("resqlink_volunteer_user", JSON.stringify(updatedUser));
 
-      setActiveAssignments(assignRes.data.activeAssignments);
-      setCompletedAssignments(assignRes.data.completedAssignments);
+      setAssignments([
+        ...assignRes.data.activeAssignments,
+        ...assignRes.data.completedAssignments,
+      ]);
       setCurrentSkills(skillsRes.data.currentSkills);
       setSuggestedSkills(skillsRes.data.suggestedSkills);
       setAlerts(alertsRes.data);
@@ -67,8 +69,7 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem("resqlink_volunteer_user");
-    setActiveAssignments([]);
-    setCompletedAssignments([]);
+    setAssignments([]);
     setCurrentSkills([]);
     setSuggestedSkills([]);
     setAlerts([]);
@@ -100,14 +101,39 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
     }
   };
 
+  // assigned → in-progress  (optimistic: update status immediately, rollback on error)
+  const handleStartAssignment = async (assignmentId) => {
+    const snapshot = assignments;
+    setAssignments(prev =>
+      prev.map(a => a.id === assignmentId ? { ...a, status: "in-progress" } : a)
+    );
+    try {
+      await axios.post(`/api/assignments/${assignmentId}/start`);
+    } catch (error) {
+      setAssignments(snapshot); // revert
+      const msg = error.response?.data?.message || "Failed to start task.";
+      throw new Error(msg);
+    }
+  };
+
+  // in-progress → completed  (optimistic: update status + completedDate immediately)
   const handleCompleteAssignment = async (assignmentId) => {
+    const snapshot = assignments;
+    const today = new Date();
+    const completedDate = `${today.getMonth()+1}/${today.getDate()}/${today.getFullYear()}`;
+    setAssignments(prev =>
+      prev.map(a =>
+        a.id === assignmentId
+          ? { ...a, status: "completed", completedDate }
+          : a
+      )
+    );
     try {
       await axios.post(`/api/assignments/${assignmentId}/complete`);
-      const assignRes = await axios.get(`/api/assignments/${user.id}`);
-      setActiveAssignments(assignRes.data.activeAssignments);
-      setCompletedAssignments(assignRes.data.completedAssignments);
     } catch (error) {
-      console.error("Failed to complete assignment:", error);
+      setAssignments(snapshot); // revert
+      const msg = error.response?.data?.message || "Failed to complete assignment.";
+      throw new Error(msg);
     }
   };
 
@@ -158,10 +184,14 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
     );
   }
 
-  const highAlertCount = alerts.length; // show total active alerts count on badge
+  const highAlertCount = alerts.length;
+
+  // Derived arrays — Dashboard and other components that need the split still work
+  const activeAssignments    = assignments.filter(a => a.status !== "completed");
+  const completedAssignments = assignments.filter(a => a.status === "completed");
 
   const renderContent = () => {
-    if (loading && activeAssignments.length === 0) {
+    if (loading && assignments.length === 0) {
       return (
         <div style={{ display:"flex", alignItems:"center", justifyContent:"center", padding:"80px 0" }}>
           <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:14 }}>
@@ -189,8 +219,8 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
       case "assignments":
         return (
           <Assignments
-            activeAssignments={activeAssignments}
-            completedAssignments={completedAssignments}
+            assignments={assignments}
+            onStartAssignment={handleStartAssignment}
             onCompleteAssignment={handleCompleteAssignment}
           />
         );

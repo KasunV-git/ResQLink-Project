@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { User, Mail, Phone, Shield, LogOut, Check } from "lucide-react";
+import { SL_PHONE_PLACEHOLDER } from "../../data/sriLankaLocations";
 
 export default function Profile({ user, onUpdateProfile, onLogout }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -131,7 +132,7 @@ export default function Profile({ user, onUpdateProfile, onLogout }) {
                 value={phone}
                 onChange={e => setPhone(e.target.value)}
                 disabled={!isEditing}
-                placeholder="e.g. +1 234 567 8901"
+                placeholder={SL_PHONE_PLACEHOLDER}
                 className="w-full bg-slate-50 border border-slate-200 disabled:border-transparent rounded-lg py-2.5 pl-9 pr-3 text-sm font-medium text-slate-900 focus:outline-none focus:border-[#15803d] focus:bg-white transition-colors"
               />
             </div>

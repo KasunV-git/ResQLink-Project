@@ -64,7 +64,7 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
         {/* Heading */}
         <div style={S.headingBlock}>
           <h2 style={S.heading}>Create Account</h2>
-          <p style={S.subheading}>Join ResQLink to help your community</p>
+          <p style={S.subheading}>Join ResQLink and help protect Sri Lanka's communities</p>
         </div>
 
         {/* Error */}
@@ -150,7 +150,7 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
             <label style={S.label}>Mobile Number</label>
             <input
               type="tel"
-              placeholder="e.g. +1 234 567 8901"
+              placeholder="e.g. +94 77 123 4567"
               value={phone}
               onChange={e => setPhone(e.target.value)}
               style={inputStyle}

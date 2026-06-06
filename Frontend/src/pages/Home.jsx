@@ -20,28 +20,79 @@ function useScrollReveal() {
   }, []);
 }
 
+/* ── Sri Lanka–localised data ─────────────────────────────── */
+
+// Live incident preview shown in the hero card
 const incidents = [
-  { label: "Flood Alert - Downtown",     severity: "High",   dot: "#ef4444", badge: { bg:"#fef2f2", color:"#dc2626" }, time: "12 min ago" },
-  { label: "Fire - Industrial Area",     severity: "Medium", dot: "#f59e0b", badge: { bg:"#fffbeb", color:"#d97706" }, time: "28 min ago" },
-  { label: "Medical Emergency - Suburb", severity: "Low",    dot: "#22c55e", badge: { bg:"#f0fdf4", color:"#16a34a" }, time: "1 hr ago"   },
+  { label: "Flood Alert – Kelani River Basin",   severity: "High",   dot: "#ef4444", badge: { bg:"#fef2f2", color:"#dc2626" }, time: "18 min ago" },
+  { label: "Landslide Warning – Kegalle District",severity: "Medium", dot: "#f59e0b", badge: { bg:"#fffbeb", color:"#d97706" }, time: "35 min ago" },
+  { label: "Coastal Storm Alert – Galle Shoreline",severity: "Low",   dot: "#22c55e", badge: { bg:"#f0fdf4", color:"#16a34a" }, time: "2 hrs ago"  },
 ];
+
 const features = [
-  { Icon: MapPin,     title: "Real-Time Disaster Reporting",            desc: "Citizens report incidents with location, description, and media."     },
-  { Icon: Brain,      title: "AI-Assisted Severity Analysis",           desc: "Intelligent assessment of risk and impact."                           },
-  { Icon: Users,      title: "Smart Resource & Volunteer Coordination", desc: "Efficient assignment and tracking during emergencies."                 },
-  { Icon: Bell,       title: "Reliable Alerts & Monitoring",            desc: "Clear alerts and updates delivered to the right roles."               },
+  {
+    Icon: MapPin,
+    title: "Real-Time Incident Reporting",
+    desc:  "Citizens across Sri Lanka report floods, landslides, and storm damage with precise location, description, and media.",
+  },
+  {
+    Icon: Brain,
+    title: "AI-Assisted Severity Analysis",
+    desc:  "Intelligent risk assessment aligned with DMC and NBRO severity classification standards for accurate prioritisation.",
+  },
+  {
+    Icon: Users,
+    title: "Volunteer & Resource Coordination",
+    desc:  "Deploy NDRC volunteers and relief resources efficiently across Sri Lanka's 25 districts during active emergencies.",
+  },
+  {
+    Icon: Bell,
+    title: "DMC & NBRO Alert Integration",
+    desc:  "Real-time alerts from the Disaster Management Centre and NBRO delivered instantly to the right field responders.",
+  },
 ];
+
 const steps = [
-  { Icon: Clock,     label: "1. Disaster Reported",     desc: "Citizens submit incident details with location and media" },
-  { Icon: Brain,     label: "2. Severity Analyzed",     desc: "AI assesses impact and prioritizes response"             },
-  { Icon: UserCheck, label: "3. Resources Assigned",    desc: "Volunteers and resources are coordinated"                },
-  { Icon: Activity,  label: "4. Continuous Monitoring", desc: "Real-time tracking and updates until resolution"         },
+  { Icon: Clock,     label: "1. Incident Reported",     desc: "Citizens submit disaster details with location and media via the platform" },
+  { Icon: Brain,     label: "2. Severity Assessed",     desc: "AI analyses impact and prioritises response in line with DMC guidelines"   },
+  { Icon: UserCheck, label: "3. Volunteers Deployed",   desc: "NDRC volunteers and district resources are coordinated and assigned"        },
+  { Icon: Activity,  label: "4. Continuous Monitoring", desc: "Real-time tracking and status updates until full resolution"               },
 ];
+
 const roles = [
-  { Icon: Users,     title: "Citizen",       color: "#0d9488", items: ["Report disasters","View alerts","Submit feedback"]                    },
-  { Icon: UserCheck, title: "Volunteer",     color: "#15803d", items: ["Manage availability","Receive assignments","Complete response tasks"]  },
-  { Icon: Shield,    title: "Administrator", color: "#1e3a8a", items: ["Review reports","Allocate resources","Monitor system status"]          },
+  {
+    Icon:  Users,
+    title: "Citizen",
+    color: "#0d9488",
+    items: [
+      "Report flood, landslide, or storm incidents",
+      "Receive real-time DMC & NBRO alerts",
+      "Track local emergency response updates",
+    ],
+  },
+  {
+    Icon:  UserCheck,
+    title: "Volunteer",
+    color: "#15803d",
+    items: [
+      "Manage field deployment availability",
+      "Receive district-level task assignments",
+      "Complete disaster response operations",
+    ],
+  },
+  {
+    Icon:  Shield,
+    title: "Administrator",
+    color: "#1e3a8a",
+    items: [
+      "Review and verify DMC incident reports",
+      "Coordinate district resources and relief camps",
+      "Monitor island-wide response status",
+    ],
+  },
 ];
+
+/* ══════════════════ COMPONENT ══════════════════════════════ */
 
 export default function Home({ onLogin, onRegister }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -77,7 +128,7 @@ export default function Home({ onLogin, onRegister }) {
           </button>
         </div>
 
-        {/* Mobile dropdown menu */}
+        {/* Mobile dropdown */}
         {menuOpen && (
           <div className="md:hidden anim-fade-in-down bg-white border-t border-slate-100 px-4 py-4 flex flex-col gap-3">
             {[["features","Features"],["how","How It Works"],["roles","Roles"]].map(([id, label]) => (
@@ -99,14 +150,15 @@ export default function Home({ onLogin, onRegister }) {
       <section className="w-full bg-white py-12 md:py-16 lg:py-20 px-4 md:px-6">
         <div className="max-w-[1200px] mx-auto flex flex-col lg:flex-row items-center gap-10 lg:gap-12">
 
-          {/* Left — text */}
+          {/* Left — headline & CTAs */}
           <div className="anim-fade-in-left w-full lg:flex-1">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight text-slate-900 mb-4 md:mb-5">
-              ResQLink – Intelligent Disaster Response, When Every Second Matters
+              ResQLink – Sri Lanka's Intelligent Disaster Response Platform
             </h1>
             <p className="text-base md:text-lg text-slate-500 leading-relaxed mb-7 md:mb-8">
-              ResQLink is a role-based disaster response platform that enables citizens, volunteers,
-              and authorities to report incidents, analyze severity, coordinate resources, and respond efficiently in real time.
+              Connecting citizens, volunteers, and authorities across Sri Lanka to report
+              incidents, coordinate relief efforts, and respond to floods, landslides,
+              and coastal emergencies in real time.
             </p>
             <div className="flex flex-wrap gap-3 md:gap-4">
               <button className="btn-anim bg-[#1e3a8a] text-white border-none rounded-[9px] px-6 py-3 text-[15px] font-semibold cursor-pointer">
@@ -119,16 +171,17 @@ export default function Home({ onLogin, onRegister }) {
             </div>
           </div>
 
-          {/* Right — live stats card */}
+          {/* Right — live incidents preview card */}
           <div className="anim-fade-in-right w-full lg:flex-1 lg:max-w-[440px]">
             <div className="hover-card bg-white rounded-2xl border border-slate-100 p-5 md:p-6"
               style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.10)" }}>
+
               {/* Stats row */}
               <div className="flex justify-between pb-4 mb-4 border-b border-slate-100">
                 {[
-                  { l:"Active Incidents", v:"24",  c:"text-slate-900"   },
-                  { l:"Volunteers",       v:"156", c:"text-slate-900"   },
-                  { l:"Resolved",         v:"89%", c:"text-emerald-600" },
+                  { l: "Active Incidents", v: "18",    c: "text-slate-900"    },
+                  { l: "Volunteers",       v: "2,400", c: "text-slate-900"    },
+                  { l: "Resolved",         v: "87%",   c: "text-emerald-600"  },
                 ].map(s => (
                   <div key={s.l} className="text-center">
                     <div className={`text-2xl md:text-[26px] font-bold ${s.c}`}>{s.v}</div>
@@ -136,6 +189,7 @@ export default function Home({ onLogin, onRegister }) {
                   </div>
                 ))}
               </div>
+
               {/* Incident rows */}
               <div className="flex flex-col gap-2.5">
                 {incidents.map(inc => (
@@ -163,9 +217,11 @@ export default function Home({ onLogin, onRegister }) {
       {/* ── FEATURES ── */}
       <section id="features" className="w-full bg-slate-50 py-12 md:py-16 lg:py-20 px-4 md:px-6">
         <div className="max-w-[1200px] mx-auto">
-          <h2 className="reveal text-2xl md:text-3xl font-bold text-center text-slate-900 mb-3">Platform Features</h2>
+          <h2 className="reveal text-2xl md:text-3xl font-bold text-center text-slate-900 mb-3">
+            Platform Features
+          </h2>
           <p className="reveal text-base md:text-[17px] text-slate-500 text-center mb-10 md:mb-12">
-            Comprehensive tools for efficient emergency response
+            Purpose-built tools for Sri Lanka's disaster response ecosystem
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
             {features.map(({ Icon, title, desc }, i) => (
@@ -185,7 +241,9 @@ export default function Home({ onLogin, onRegister }) {
       {/* ── HOW IT WORKS ── */}
       <section id="how" className="w-full bg-white py-12 md:py-16 lg:py-20 px-4 md:px-6">
         <div className="max-w-[1200px] mx-auto">
-          <h2 className="reveal text-2xl md:text-3xl font-bold text-center text-slate-900 mb-3">How It Works</h2>
+          <h2 className="reveal text-2xl md:text-3xl font-bold text-center text-slate-900 mb-3">
+            How It Works
+          </h2>
           <p className="reveal text-base md:text-[17px] text-slate-500 text-center mb-10 md:mb-12">
             A streamlined response workflow from incident to resolution
           </p>
@@ -207,9 +265,11 @@ export default function Home({ onLogin, onRegister }) {
       {/* ── ROLES ── */}
       <section id="roles" className="w-full bg-slate-50 py-12 md:py-16 lg:py-20 px-4 md:px-6">
         <div className="max-w-[1200px] mx-auto">
-          <h2 className="reveal text-2xl md:text-3xl font-bold text-center text-slate-900 mb-3">Role-Based Access</h2>
+          <h2 className="reveal text-2xl md:text-3xl font-bold text-center text-slate-900 mb-3">
+            Role-Based Access
+          </h2>
           <p className="reveal text-base md:text-[17px] text-slate-500 text-center mb-10 md:mb-12">
-            Tailored experiences for every user type
+            Tailored experiences for every user in Sri Lanka's response network
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
             {roles.map(({ Icon, title, color, items }, i) => (
@@ -240,10 +300,11 @@ export default function Home({ onLogin, onRegister }) {
       <section className="w-full bg-[#1e3a8a] py-12 md:py-16 lg:py-20 px-4 md:px-6">
         <div className="reveal max-w-[700px] mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 md:mb-4">
-            Start Using ResQLink Today
+            Protect Sri Lanka's Communities with ResQLink
           </h2>
           <p className="text-[15px] md:text-base text-blue-200 mb-8 md:mb-10 leading-relaxed">
-            Join the platform that connects communities and saves lives during emergencies
+            Join the platform trusted by DMC partners, NDRC volunteers, and district
+            coordinators to coordinate relief and save lives during emergencies.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <button onClick={onLogin}
@@ -264,7 +325,9 @@ export default function Home({ onLogin, onRegister }) {
           <div className="flex flex-col sm:flex-row justify-between items-start gap-5 mb-5">
             <div>
               <img src={logo} alt="ResQLink" className="h-8 w-auto mb-2" />
-              <p className="text-[13px] text-slate-400 m-0">A unified disaster response and coordination platform</p>
+              <p className="text-[13px] text-slate-400 m-0">
+                Sri Lanka's unified disaster response and coordination platform
+              </p>
             </div>
             <div className="flex gap-6 md:gap-7">
               {["Privacy", "Terms"].map(t => (

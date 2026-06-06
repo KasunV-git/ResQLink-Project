@@ -145,8 +145,8 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
 
         {/* Demo Credentials */}
         <div style={styles.demoBox}>
-          <p style={styles.demoTitle}>Demo Credentials:</p>
-          <p style={styles.demoRow}><span style={styles.demoLabel}>Volunteer:</span> volunteer@resqlink.com</p>
+          <p style={styles.demoTitle}>Demo Credentials (Kamal Perera):</p>
+          <p style={styles.demoRow}><span style={styles.demoLabel}>Email:</span> volunteer@resqlink.com</p>
           <p style={styles.demoRow}><span style={styles.demoLabel}>Password:</span> demo123</p>
           <button
             type="button"
