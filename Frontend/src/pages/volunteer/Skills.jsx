@@ -16,7 +16,7 @@ export default function Skills({ currentSkills, suggestedSkills, onAddSkill, onR
   };
 
   return (
-    <div className="w-full flex flex-col gap-6" data-name="SkillsPage">
+    <div className="w-full flex flex-col gap-4 md:gap-6" data-name="SkillsPage">
       {/* Title */}
       <div className="flex flex-col gap-1">
         <h1 className="font-semibold text-3xl text-slate-900 tracking-tight">My Skills</h1>
@@ -24,8 +24,8 @@ export default function Skills({ currentSkills, suggestedSkills, onAddSkill, onR
       </div>
 
       {/* Your Skills Card */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col gap-4">
-        <div className="flex justify-between items-center pb-2">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 md:p-6 shadow-sm flex flex-col gap-4">
+        <div className="flex flex-wrap justify-between items-center gap-2 pb-2">
           <div className="flex items-center gap-2">
             <Award className="w-5 h-5 text-[#15803d]" />
             <h2 className="font-semibold text-base text-slate-900">
@@ -93,7 +93,7 @@ export default function Skills({ currentSkills, suggestedSkills, onAddSkill, onR
       </div>
 
       {/* Suggested Skills Card */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col gap-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 md:p-6 shadow-sm flex flex-col gap-4">
         <div className="flex flex-col gap-1 pb-2">
           <h3 className="font-semibold text-base text-slate-900">Suggested Skills</h3>
           <p className="text-slate-400 text-xs">Click on any skill to add it to your profile</p>

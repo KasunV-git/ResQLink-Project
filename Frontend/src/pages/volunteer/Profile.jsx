@@ -39,7 +39,7 @@ export default function Profile({ user, onUpdateProfile, onLogout }) {
   };
 
   return (
-    <div className="w-full flex flex-col gap-6" data-name="ProfilePage">
+    <div className="w-full flex flex-col gap-4 md:gap-6" data-name="ProfilePage">
 
       {/* Title */}
       <div className="anim-fade-in-up flex flex-col gap-1">
@@ -60,7 +60,7 @@ export default function Profile({ user, onUpdateProfile, onLogout }) {
       )}
 
       {/* Profile Card */}
-      <div className="anim-fade-in-up d-100 bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col gap-6">
+      <div className="anim-fade-in-up d-100 bg-white border border-slate-200 rounded-xl p-4 md:p-6 shadow-sm flex flex-col gap-5 md:gap-6">
         <div className="flex justify-between items-center pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <User className="w-5 h-5 text-[#15803d]" />
@@ -169,7 +169,7 @@ export default function Profile({ user, onUpdateProfile, onLogout }) {
       </div>
 
       {/* Logout Card */}
-      <div className="anim-fade-in-up d-200 bg-white border border-red-200 rounded-xl p-6 shadow-sm flex items-center justify-between">
+      <div className="anim-fade-in-up d-200 bg-white border border-red-200 rounded-xl p-4 md:p-6 shadow-sm flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h3 className="font-semibold text-base text-slate-900">Sign Out</h3>
           <p className="text-slate-500 text-sm">Sign out of your ResQLink account</p>

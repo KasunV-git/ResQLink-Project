@@ -243,17 +243,14 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
           />
         )}
 
-        {/* Sidebar */}
-        <div
-          className="sidebar-wrapper"
-          style={{ height: "100%", zIndex: 30, flexShrink: 0 }}
-        >
+        {/* Sidebar — desktop only */}
+        <div className="hidden md:flex flex-shrink-0 h-full" style={{ zIndex: 30 }}>
           <Sidebar activeTab={activeTab} onTabChange={closeTab} />
         </div>
 
-        {/* Mobile sidebar — slide in */}
+        {/* Sidebar — mobile slide-in drawer */}
         <div
-          className="sidebar-mobile"
+          className="md:hidden"
           style={{
             position: "fixed",
             top: 64,
@@ -277,15 +274,6 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
 
       </div>
 
-      <style>{`
-        .sidebar-mobile { display: none !important; }
-        .sidebar-wrapper { display: flex !important; }
-        @media (max-width: 768px) {
-          .sidebar-wrapper { display: none !important; }
-          .sidebar-mobile  { display: block !important; }
-          .sidebar-overlay { display: block; }
-        }
-      `}</style>
 
     </div>
   );

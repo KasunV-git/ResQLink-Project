@@ -3,7 +3,7 @@ import { Bell, Info } from "lucide-react";
 
 export default function Alerts({ alerts }) {
   return (
-    <div className="w-full flex flex-col gap-6" data-name="AlertsPage">
+    <div className="w-full flex flex-col gap-4 md:gap-6" data-name="AlertsPage">
       {/* Title */}
       <div className="flex flex-col gap-1">
         <h1 className="font-semibold text-3xl text-slate-900 tracking-tight">Emergency Alerts</h1>
@@ -11,7 +11,7 @@ export default function Alerts({ alerts }) {
       </div>
 
       {/* Active Alerts List Card */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col gap-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 md:p-6 shadow-sm flex flex-col gap-4">
         <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
           <Bell className="w-5 h-5 text-red-600" />
           <h2 className="font-semibold text-base text-slate-900">

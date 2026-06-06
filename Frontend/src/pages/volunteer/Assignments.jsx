@@ -3,7 +3,7 @@ import { Check, MapPin, ClipboardCheck, ClipboardList, CheckCircle } from "lucid
 
 export default function Assignments({ activeAssignments, completedAssignments, onCompleteAssignment }) {
   return (
-    <div className="w-full flex flex-col gap-8" data-name="AssignmentsPage">
+    <div className="w-full flex flex-col gap-4 md:gap-8" data-name="AssignmentsPage">
       {/* Title */}
       <div className="flex flex-col gap-1">
         <h1 className="font-semibold text-3xl text-slate-900 tracking-tight">My Assignments</h1>
@@ -12,9 +12,9 @@ export default function Assignments({ activeAssignments, completedAssignments, o
 
       {/* Active Assignments Table Card */}
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="flex items-center gap-2.5 px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+        <div className="flex items-center gap-2.5 px-4 md:px-6 py-3 md:py-4 border-b border-slate-100 bg-slate-50/50">
           <ClipboardList className="w-5 h-5 text-[#15803d]" />
-          <h2 className="font-semibold text-base text-slate-900">
+          <h2 className="font-semibold text-sm md:text-base text-slate-900">
             Active Assignments ({activeAssignments.length})
           </h2>
         </div>
@@ -77,9 +77,9 @@ export default function Assignments({ activeAssignments, completedAssignments, o
 
       {/* Completed Assignments Table Card */}
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="flex items-center gap-2.5 px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+        <div className="flex items-center gap-2.5 px-4 md:px-6 py-3 md:py-4 border-b border-slate-100 bg-slate-50/50">
           <ClipboardCheck className="w-5 h-5 text-emerald-600" />
-          <h2 className="font-semibold text-base text-slate-900">
+          <h2 className="font-semibold text-sm md:text-base text-slate-900">
             Completed Assignments ({completedAssignments.length})
           </h2>
         </div>

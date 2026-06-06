@@ -4,88 +4,58 @@ import logo from "../assets/Logo & Name Side-cropped.svg";
 
 export default function Header({ user, alertsCount, onTabChange, onMenuToggle }) {
   return (
-    <header style={{
-      width: "100%",
-      height: 64,
-      backgroundColor: "#fff",
-      borderBottom: "1px solid #e2e8f0",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "0 24px",
-      flexShrink: 0,
-      boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-      zIndex: 10,
-    }}>
-      {/* Left: hamburger (mobile) + logo */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+    <header className="w-full h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6 flex-shrink-0 z-10"
+      style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+
+      {/* Left: hamburger (mobile only) + logo */}
+      <div className="flex items-center gap-3">
         <button
           onClick={onMenuToggle}
-          className="sidebar-toggle"
-          style={{ background: "none", border: "none", cursor: "pointer", padding: 6, borderRadius: 8, display: "none" }}
+          className="md:hidden bg-transparent border-none cursor-pointer p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
+          aria-label="Open menu"
         >
-          <Menu size={20} color="#475569" />
+          <Menu size={20} />
         </button>
         <img
           src={logo}
           alt="ResQLink"
-          style={{ height: 36, width: "auto", cursor: "pointer" }}
+          className="h-9 w-auto cursor-pointer"
           onClick={() => onTabChange("dashboard")}
         />
       </div>
 
-      {/* Right: bell + user */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      {/* Right: bell + profile */}
+      <div className="flex items-center gap-2 md:gap-3">
+
         {/* Bell */}
         <button
           onClick={() => onTabChange("alerts")}
-          style={{ position: "relative", background: "none", border: "none", cursor: "pointer", padding: 8, borderRadius: "50%" }}
+          className="relative bg-transparent border-none cursor-pointer p-2 rounded-full hover:bg-slate-100 transition-colors"
+          aria-label="Alerts"
         >
           <Bell size={20} color="#64748b" />
           {alertsCount > 0 && (
-            <span style={{
-              position: "absolute", top: 2, right: 2,
-              backgroundColor: "#dc2626", color: "#fff",
-              borderRadius: "50%", width: 18, height: 18,
-              fontSize: 10, fontWeight: 700,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              border: "2px solid #fff",
-            }}>
+            <span className="absolute top-0.5 right-0.5 bg-red-600 text-white rounded-full text-[10px] font-bold flex items-center justify-center border-2 border-white"
+              style={{ width: 18, height: 18 }}>
               {alertsCount}
             </span>
           )}
         </button>
 
-        {/* Profile */}
+        {/* Profile pill */}
         <button
           onClick={() => onTabChange("profile")}
-          style={{
-            display: "flex", alignItems: "center", gap: 10,
-            background: "none", border: "1px solid #e2e8f0",
-            borderRadius: 999, padding: "5px 14px 5px 6px",
-            cursor: "pointer", fontFamily: "inherit",
-          }}
+          className="flex items-center gap-2.5 bg-transparent border border-slate-200 rounded-full py-1.5 pr-3.5 pl-1.5 cursor-pointer hover:bg-slate-50 transition-colors"
         >
-          <div style={{
-            width: 30, height: 30, borderRadius: "50%",
-            backgroundColor: "#15803d",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            flexShrink: 0,
-          }}>
-            <User size={16} color="#fff" />
+          <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-[#15803d] flex items-center justify-center flex-shrink-0">
+            <User size={15} color="#fff" />
           </div>
-          <span className="username-label" style={{ fontSize: 14, fontWeight: 600, color: "#0f172a", whiteSpace: "nowrap" }}>
+          <span className="hidden md:block text-sm font-semibold text-slate-900 whitespace-nowrap">
             {user?.name || "Volunteer"}
           </span>
         </button>
       </div>
 
-      <style>{`
-        @media (max-width: 768px) {
-          .sidebar-toggle { display: block !important; }
-          .username-label { display: none; }
-        }
-      `}</style>
     </header>
   );
 }
