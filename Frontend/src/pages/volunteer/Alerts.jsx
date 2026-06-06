@@ -52,7 +52,7 @@ export default function Alerts({ alerts }) {
                     <span className="text-slate-400 font-medium">{alert.time}</span>
                   </div>
 
-                  <p className="text-slate-900 text-sm font-semibold leading-relaxed">
+                  <p className="text-slate-900 text-base font-semibold leading-relaxed">
                     {alert.message}
                   </p>
 

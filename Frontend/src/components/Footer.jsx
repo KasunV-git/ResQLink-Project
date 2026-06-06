@@ -5,26 +5,23 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer style={{
+    <footer className="app-footer" style={{
       width: "100%",
       backgroundColor: "#fff",
       borderTop: "1px solid #e2e8f0",
-      padding: "18px 24px",
       flexShrink: 0,
     }}>
       <div style={{
-        maxWidth: 1100,
-        margin: "0 auto",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         flexWrap: "wrap",
-        gap: 12,
+        gap: 10,
       }}>
         {/* Left — logo + tagline */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <img src={logo} alt="ResQLink" style={{ height: 28, width: "auto" }} />
-          <span style={{ fontSize: 12, color: "#94a3b8" }}>
+          <span style={{ fontSize: 13, color: "#94a3b8" }}>
             A unified disaster response and coordination platform
           </span>
         </div>
@@ -39,8 +36,8 @@ export default function Footer() {
               {label}
             </a>
           ))}
-          <span style={{ fontSize: 12, color: "#cbd5e1" }}>|</span>
-          <span style={{ fontSize: 12, color: "#94a3b8" }}>© {year} ResQLink</span>
+          <span style={{ fontSize: 13, color: "#cbd5e1" }}>|</span>
+          <span style={{ fontSize: 13, color: "#94a3b8" }}>© {year} ResQLink</span>
         </div>
       </div>
     </footer>

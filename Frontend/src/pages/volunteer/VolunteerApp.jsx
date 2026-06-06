@@ -223,7 +223,7 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
   const closeTab = (tab) => { setActiveTab(tab); setSidebarOpen(false); };
 
   return (
-    <div style={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column", backgroundColor: "#f1f5f9", fontFamily: "'Inter',sans-serif" }}>
+    <div style={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column", backgroundColor: "#EDF0F3", fontFamily: "'Inter',sans-serif" }}>
 
       <Header
         user={user}
@@ -246,7 +246,7 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
         {/* Sidebar */}
         <div
           className="sidebar-wrapper"
-          style={{ height: "100%", zIndex: 30 }}
+          style={{ height: "100%", zIndex: 30, flexShrink: 0 }}
         >
           <Sidebar activeTab={activeTab} onTabChange={closeTab} />
         </div>
@@ -268,8 +268,8 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
         </div>
 
         {/* Main content */}
-        <main style={{ flex:1, overflowY:"auto", display:"flex", flexDirection:"column" }}>
-          <div key={activeTab} className="page-enter" style={{ flex:1, width:"100%", padding:"36px 40px 40px" }}>
+        <main style={{ flex:1, overflowY:"auto", display:"flex", flexDirection:"column", minWidth:0 }}>
+          <div key={activeTab} className="page-enter content-area">
             {renderContent()}
           </div>
           <Footer />

@@ -100,7 +100,7 @@ export default function Home({ onLogin, onRegister }) {
             <h1 style={{ fontSize:"clamp(28px,4vw,46px)", fontWeight:800, lineHeight:1.2, color:"#0f172a", marginBottom:20 }}>
               ResQLink – Intelligent Disaster Response,<br/>When Every Second Matters
             </h1>
-            <p style={{ fontSize:16, color:"#64748b", lineHeight:1.75, marginBottom:32 }}>
+            <p style={{ fontSize:17, color:"#64748b", lineHeight:1.8, marginBottom:32 }}>
               ResQLink is a role-based disaster response platform that enables citizens, volunteers,
               and authorities to report incidents, analyze severity, coordinate resources, and respond efficiently in real time.
             </p>
@@ -115,7 +115,7 @@ export default function Home({ onLogin, onRegister }) {
                 {[{l:"Active Incidents",v:"24",c:"#0f172a"},{l:"Volunteers",v:"156",c:"#0f172a"},{l:"Resolved",v:"89%",c:"#16a34a"}].map(s=>(
                   <div key={s.l} style={{ textAlign:"center" }}>
                     <div style={{ fontSize:26, fontWeight:700, color:s.c }}>{s.v}</div>
-                    <div style={{ fontSize:11, color:"#94a3b8", marginTop:2 }}>{s.l}</div>
+                    <div style={{ fontSize:12, color:"#94a3b8", marginTop:2 }}>{s.l}</div>
                   </div>
                 ))}
               </div>
@@ -127,10 +127,10 @@ export default function Home({ onLogin, onRegister }) {
                       <div style={{ width:9, height:9, borderRadius:"50%", backgroundColor:inc.dot, flexShrink:0 }}/>
                       <div>
                         <div style={{ fontSize:13, fontWeight:600, color:"#0f172a" }}>{inc.label}</div>
-                        <div style={{ fontSize:11, color:"#94a3b8", marginTop:2 }}>{inc.severity} severity • {inc.time}</div>
+                        <div style={{ fontSize:12, color:"#94a3b8", marginTop:2 }}>{inc.severity} severity • {inc.time}</div>
                       </div>
                     </div>
-                    <span style={{ fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:20, backgroundColor:inc.badge.bg, color:inc.badge.color }}>{inc.severity}</span>
+                    <span style={{ fontSize:12, fontWeight:700, padding:"3px 10px", borderRadius:20, backgroundColor:inc.badge.bg, color:inc.badge.color }}>{inc.severity}</span>
                   </div>
                 ))}
               </div>
@@ -151,8 +151,8 @@ export default function Home({ onLogin, onRegister }) {
                 <div style={{ width:48, height:48, backgroundColor:"#eff6ff", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:16 }}>
                   <Icon size={22} color="#1e3a8a" />
                 </div>
-                <h3 style={{ fontSize:15, fontWeight:700, color:"#0f172a", marginBottom:8 }}>{title}</h3>
-                <p style={{ fontSize:13, color:"#64748b", lineHeight:1.65 }}>{desc}</p>
+                <h3 style={{ fontSize:16, fontWeight:700, color:"#0f172a", marginBottom:8 }}>{title}</h3>
+                <p style={{ fontSize:14, color:"#64748b", lineHeight:1.7 }}>{desc}</p>
               </div>
             ))}
           </div>
@@ -173,8 +173,8 @@ export default function Home({ onLogin, onRegister }) {
                   onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.boxShadow="0 4px 18px rgba(30,58,138,0.3)"}}>
                   <Icon size={26} color="#fff" />
                 </div>
-                <h3 style={{ fontSize:15, fontWeight:700, color:"#0f172a" }}>{label}</h3>
-                <p style={{ fontSize:13, color:"#64748b", lineHeight:1.65 }}>{desc}</p>
+                <h3 style={{ fontSize:16, fontWeight:700, color:"#0f172a" }}>{label}</h3>
+                <p style={{ fontSize:14, color:"#64748b", lineHeight:1.7 }}>{desc}</p>
               </div>
             ))}
           </div>
@@ -196,7 +196,7 @@ export default function Home({ onLogin, onRegister }) {
                 </div>
                 <ul style={{ listStyle:"none", padding:0, margin:0, display:"flex", flexDirection:"column", gap:12 }}>
                   {items.map(item=>(
-                    <li key={item} style={{ display:"flex", alignItems:"center", gap:10, fontSize:14, color:"#475569", fontWeight:500 }}>
+                    <li key={item} style={{ display:"flex", alignItems:"center", gap:10, fontSize:15, color:"#475569", fontWeight:500 }}>
                       <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                         <circle cx="9" cy="9" r="9" fill={color} opacity="0.12"/>
                         <path d="M5.5 9l2.5 2.5 4.5-5" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -262,6 +262,6 @@ const S = {
   heroPrimary: { backgroundColor:"#1e3a8a", color:"#fff",       border:"none",               borderRadius:9, padding:"13px 26px", fontSize:15, fontWeight:600, cursor:"pointer", fontFamily:"inherit" },
   heroOutline: { backgroundColor:"#fff",     color:"#1e3a8a",   border:"2px solid #1e3a8a",  borderRadius:9, padding:"13px 26px", fontSize:15, fontWeight:600, cursor:"pointer", fontFamily:"inherit" },
   ctaBtn:      { backgroundColor:"transparent", color:"#fff",   border:"2px solid #fff",     borderRadius:9, padding:"13px 36px", fontSize:15, fontWeight:600, cursor:"pointer", fontFamily:"inherit" },
-  h2:   { fontSize:"clamp(22px,3vw,30px)", fontWeight:700, textAlign:"center", color:"#0f172a", marginBottom:10 },
-  sub:  { fontSize:15, color:"#64748b", textAlign:"center", marginBottom:48 },
+  h2:   { fontSize:"clamp(24px,3vw,32px)", fontWeight:700, textAlign:"center", color:"#0f172a", marginBottom:10 },
+  sub:  { fontSize:16, color:"#64748b", textAlign:"center", marginBottom:48 },
 };
