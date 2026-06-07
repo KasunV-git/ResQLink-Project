@@ -1,106 +1,280 @@
-import Sidebar from "../../components/citizen/Sidebar";
-import Topbar from "../../components/citizen/Topbar";
-import { MapPin, Compass, ShieldCheck, AlertTriangle } from "lucide-react";
+// frontend/src/pages/citizen/MapPage.jsx
+// Install: npm install leaflet react-leaflet
+import { useState, useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import {
+    Layers, Navigation, AlertTriangle, Shield,
+    Building, Activity, X, ChevronRight,
+} from 'lucide-react';
+import { getNearbyHazards } from '../../api/disasterApi';
+
+/* ── Fix Leaflet default icon broken in Webpack/Vite ── */
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+});
+
+/* ── Custom SVG markers ── */
+const makeIcon = (color, emoji) => L.divIcon({
+    html: `<div style="
+    width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);
+    background:${color};border:3px solid #fff;display:flex;align-items:center;
+    justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);
+  "><span style="transform:rotate(45deg);font-size:14px;line-height:1">${emoji}</span></div>`,
+    className: '',
+    iconSize: [34, 34],
+    iconAnchor: [17, 34],
+    popupAnchor: [0, -36],
+});
+
+const icons = {
+    flood: makeIcon('#3182ce', '🌊'),
+    fire: makeIcon('#e53e3e', '🔥'),
+    landslide: makeIcon('#dd6b20', '⛰️'),
+    shelter: makeIcon('#38a169', '🏥'),
+    hazard: makeIcon('#d69e2e', '⚠️'),
+    user: makeIcon('#1a2456', '📍'),
+};
+
+/* ── Demo map markers ── */
+const DEMO_MARKERS = [
+    { id: 1, type: 'flood', lat: 7.2906, lng: 80.6337, title: 'Flash Flood Zone B4', severity: 'CRITICAL', desc: 'Water level rising at creek junction. Evacuation in progress.' },
+    { id: 2, type: 'landslide', lat: 7.3050, lng: 80.6200, title: 'Landslide Risk Area', severity: 'HIGH', desc: 'Unstable slopes after overnight rainfall. Sector 12 roads closed.' },
+    { id: 3, type: 'shelter', lat: 7.2800, lng: 80.6450, title: 'Safe Zone – School', severity: 'SAFE', desc: 'Kandy Primary School – 200 capacity evacuation center. Medical outpost active.' },
+    { id: 4, type: 'shelter', lat: 7.2750, lng: 80.6150, title: 'Safe Zone – Community Hall', severity: 'SAFE', desc: 'Peradeniya Community Hall – 150 capacity.' },
+    { id: 5, type: 'fire', lat: 7.3100, lng: 80.6500, title: 'Industrial Fire', severity: 'HIGH', desc: 'Chemical plant fire. 500m exclusion zone active.' },
+    { id: 6, type: 'hazard', lat: 7.2950, lng: 80.6600, title: 'Road Hazard', severity: 'MODERATE', desc: 'Main Street partially blocked. Use alternate routes.' },
+];
+
+/* ── Auto-center helper ── */
+const FlyTo = ({ center }) => {
+    const map = useMap();
+    useEffect(() => { if (center) map.flyTo(center, 14, { duration: 1.2 }); }, [center]);
+    return null;
+};
+
+/* ─────────────────────── */
+
+const LAYERS = [
+    { key: 'ALL', label: 'All', icon: Layers },
+    { key: 'flood', label: 'Floods', icon: Activity },
+    { key: 'shelter', label: 'Shelters', icon: Shield },
+    { key: 'fire', label: 'Fire', icon: AlertTriangle },
+    { key: 'hazard', label: 'Hazards', icon: AlertTriangle },
+];
+
+const SEVERITY_COLOR = {
+    CRITICAL: '#e53e3e',
+    HIGH: '#dd6b20',
+    MODERATE: '#d69e2e',
+    SAFE: '#38a169',
+};
 
 const MapPage = () => {
+    const [markers, setMarkers] = useState(DEMO_MARKERS);
+    const [layer, setLayer] = useState('ALL');
+    const [center, setCenter] = useState(null);
+    const [active, setActive] = useState(null); // selected marker
+    const [userPos, setUserPos] = useState(null);
+    const [locating, setLocating] = useState(false);
+
+    /* Load real hazards from API (falls back to demo) */
+    useEffect(() => {
+        if (userPos) {
+            getNearbyHazards({ lat: userPos[0], lng: userPos[1], radius: 20 })
+                .then(({ data }) => { if (data.data?.length) setMarkers(data.data); })
+                .catch(() => { });
+        }
+    }, [userPos]);
+
+    const locateMe = () => {
+        setLocating(true);
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const pos2 = [pos.coords.latitude, pos.coords.longitude];
+                setUserPos(pos2);
+                setCenter(pos2);
+                setLocating(false);
+            },
+            () => setLocating(false),
+        );
+    };
+
+    const visible = layer === 'ALL' ? markers : markers.filter(m => m.type === layer);
+
     return (
-        <div className="min-h-screen bg-[#F5F7FA] text-slate-900 overflow-x-hidden">
-            <Topbar />
+        <div style={s.page}>
+            {/* ── Page title ── */}
+            <div style={s.pageHead}>
+                <div>
+                    <h1 style={s.title}>Safety Map</h1>
+                    <p style={s.sub}>Live hazard zones, safe shelters, and evacuation routes in your area.</p>
+                </div>
+                <button onClick={locateMe} style={s.locateBtn} disabled={locating}>
+                    <Navigation size={14} />
+                    {locating ? 'Locating…' : 'My Location'}
+                </button>
+            </div>
 
-            <div className="flex min-h-screen pt-20">
-                <Sidebar />
+            {/* ── Layer filter ── */}
+            <div style={s.filterBar}>
+                {LAYERS.map(({ key, label, icon: Icon }) => (
+                    <button
+                        key={key}
+                        onClick={() => setLayer(key)}
+                        style={{ ...s.layerBtn, ...(layer === key ? s.layerActive : {}) }}
+                    >
+                        <Icon size={13} />
+                        {label}
+                    </button>
+                ))}
+            </div>
 
-                <main className="flex-1 px-4 py-10 sm:px-6 lg:px-10">
-                    <div className="mx-auto w-full max-w-[1400px] space-y-8">
+            {/* ── Map + sidebar ── */}
+            <div style={s.mapWrapper}>
+                {/* Leaflet map */}
+                <div style={s.mapContainer}>
+                    <MapContainer
+                        center={[7.2906, 80.6337]}
+                        zoom={13}
+                        style={{ height: '100%', width: '100%', borderRadius: active ? '16px 0 0 16px' : 16 }}
+                    >
+                        <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution="© OpenStreetMap contributors"
+                        />
+                        {center && <FlyTo center={center} />}
 
-                        {/* Page Header */}
-                        <header className="rounded-[28px] border border-slate-200 bg-white/95 p-8 shadow-sm sm:p-10 mb-2">
-                            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                                <div className="max-w-3xl">
-                                    <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#0B1F6D] mb-3">
-                                        Situation map
-                                    </p>
-                                    <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 mb-4">
-                                        Live safety map and hazard overlay.
-                                    </h1>
-                                    <p className="text-base leading-7 text-slate-600 sm:text-lg">
-                                        Review current threats, evacuation routes, and nearby resources across your district.
-                                    </p>
-                                </div>
-                                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                                        <p className="text-sm uppercase tracking-[0.24em] text-slate-500 mb-3">Active Hazards</p>
-                                        <p className="text-3xl font-semibold text-slate-900">5</p>
-                                    </div>
-                                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                                        <p className="text-sm uppercase tracking-[0.24em] text-slate-500 mb-3">Safe Corridors</p>
-                                        <p className="text-3xl font-semibold text-slate-900">12</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </header>
+                        {/* User position */}
+                        {userPos && (
+                            <>
+                                <Marker position={userPos} icon={icons.user}>
+                                    <Popup>Your current location</Popup>
+                                </Marker>
+                                <Circle center={userPos} radius={500} pathOptions={{ color: '#1a2456', fillOpacity: .08 }} />
+                            </>
+                        )}
 
-                        {/* Map + Sidebar Panel */}
-                        <div className="grid gap-6 xl:grid-cols-[1.4fr_0.6fr]">
-                            <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                                <div className="rounded-[28px] overflow-hidden border border-slate-200">
-                                    <iframe
-                                        title="safety-map"
-                                        className="h-[320px] w-full rounded-[28px] sm:h-[420px] lg:h-[520px]"
-                                        src="https://maps.google.com/maps?q=Sri Lanka&t=&z=7&ie=UTF8&iwloc=&output=embed"
-                                    />
-                                </div>
-                            </section>
+                        {/* Hazard / shelter markers */}
+                        {visible.map((m) => (
+                            <Marker
+                                key={m.id}
+                                position={[m.lat, m.lng]}
+                                icon={icons[m.type] ?? icons.hazard}
+                                eventHandlers={{ click: () => { setActive(m); setCenter([m.lat, m.lng]); } }}
+                            >
+                                <Popup>
+                                    <strong>{m.title}</strong><br />
+                                    <span style={{ color: SEVERITY_COLOR[m.severity] ?? '#718096' }}>{m.severity}</span>
+                                </Popup>
+                            </Marker>
+                        ))}
 
-                            <aside className="space-y-5">
-                                {/* Current Zone */}
-                                <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                                    <div className="flex items-center gap-4 mb-5">
-                                        <div className="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-[#E8F4FF] text-[#0B1F6D]">
-                                            <Compass size={24} />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm uppercase tracking-[0.24em] text-slate-500 mb-1">Current zone</p>
-                                            <p className="text-xl font-semibold text-slate-900">Metropolitan Sector 4</p>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2 rounded-3xl bg-slate-50 p-5 text-sm leading-7 text-slate-600">
-                                        <p className="font-semibold text-slate-800 mb-1">Status</p>
-                                        <p>Moderate observation with localized flood watch.</p>
-                                        <p>Emergency resources are standing by nearby.</p>
-                                    </div>
-                                </div>
+                        {/* Danger circle overlay for critical markers */}
+                        {visible.filter(m => m.severity === 'CRITICAL').map(m => (
+                            <Circle
+                                key={`c-${m.id}`}
+                                center={[m.lat, m.lng]}
+                                radius={300}
+                                pathOptions={{ color: '#e53e3e', fillColor: '#e53e3e', fillOpacity: .12 }}
+                            />
+                        ))}
+                    </MapContainer>
+                </div>
 
-                                {/* Field Assistance */}
-                                <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                                    <div className="flex items-center gap-4 mb-6">
-                                        <div className="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-[#E8F4FF] text-[#0B1F6D]">
-                                            <ShieldCheck size={24} />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm uppercase tracking-[0.24em] text-slate-500 mb-1">Quick tools</p>
-                                            <p className="text-xl font-semibold text-slate-900">Field assistance</p>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-3">
-                                        <button className="flex w-full items-center justify-between rounded-3xl border border-slate-200 bg-[#F7FBFF] px-5 py-4 text-left text-slate-700 transition hover:bg-[#EDF4FF] hover:shadow-sm active:scale-[0.98]">
-                                            <span className="font-medium">Report a new hazard</span>
-                                            <AlertTriangle className="text-[#0B1F6D] shrink-0 ml-3" />
-                                        </button>
-                                        <button className="flex w-full items-center justify-between rounded-3xl border border-slate-200 bg-[#F7FBFF] px-5 py-4 text-left text-slate-700 transition hover:bg-[#EDF4FF] hover:shadow-sm active:scale-[0.98]">
-                                            <span className="font-medium">View evacuation routes</span>
-                                            <MapPin className="text-[#0B1F6D] shrink-0 ml-3" />
-                                        </button>
-                                    </div>
-                                </div>
-                            </aside>
+                {/* Detail panel */}
+                {active && (
+                    <div style={s.detailPanel} className="fade-in">
+                        <button onClick={() => setActive(null)} style={s.closeBtn}><X size={16} /></button>
+                        <div style={{ ...s.detailSev, background: SEVERITY_COLOR[active.severity] + '18', color: SEVERITY_COLOR[active.severity] ?? '#718096' }}>
+                            {active.severity}
                         </div>
-
+                        <h3 style={s.detailTitle}>{active.title}</h3>
+                        <p style={s.detailDesc}>{active.desc}</p>
+                        <div style={s.detailCoords}>
+                            📍 {active.lat.toFixed(4)}, {active.lng.toFixed(4)}
+                        </div>
+                        {active.type === 'shelter' && (
+                            <button
+                                onClick={() => setCenter([active.lat, active.lng])}
+                                style={s.navBtn}
+                            >
+                                <Navigation size={14} /> Navigate <ChevronRight size={14} />
+                            </button>
+                        )}
                     </div>
-                </main>
+                )}
+            </div>
+
+            {/* ── Legend ── */}
+            <div style={s.legend} className="card">
+                <div style={s.legendTitle}>Map Legend</div>
+                {[
+                    { color: '#3182ce', emoji: '🌊', label: 'Flood Zone' },
+                    { color: '#e53e3e', emoji: '🔥', label: 'Fire / Exclusion Zone' },
+                    { color: '#dd6b20', emoji: '⛰️', label: 'Landslide Risk' },
+                    { color: '#38a169', emoji: '🏥', label: 'Safe Shelter / Evacuation Center' },
+                    { color: '#d69e2e', emoji: '⚠️', label: 'General Hazard' },
+                    { color: '#1a2456', emoji: '📍', label: 'Your Location' },
+                ].map(({ color, emoji, label }) => (
+                    <div key={label} style={s.legendItem}>
+                        <span style={{ ...s.legendDot, background: color }}>{emoji}</span>
+                        <span style={s.legendLabel}>{label}</span>
+                    </div>
+                ))}
             </div>
         </div>
     );
+};
+
+const s = {
+    page: { display: 'flex', flexDirection: 'column', gap: 20 },
+    pageHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
+    title: { fontFamily: "'Syne',sans-serif", fontSize: 28, fontWeight: 800, color: '#1a202c', marginBottom: 4 },
+    sub: { color: '#718096', fontSize: 14 },
+    locateBtn: {
+        display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px',
+        background: '#1a2456', color: '#fff', border: 'none', borderRadius: 10,
+        fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'DM Sans',sans-serif"
+    },
+    filterBar: { display: 'flex', gap: 8 },
+    layerBtn: {
+        display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px',
+        borderRadius: 8, fontSize: 12, fontWeight: 600, border: '1.5px solid #e2e8f0',
+        background: '#fff', color: '#718096', cursor: 'pointer', transition: 'all .18s ease'
+    },
+    layerActive: { background: '#1a2456', color: '#fff', borderColor: '#1a2456' },
+    mapWrapper: { display: 'flex', height: 520, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,.12)' },
+    mapContainer: { flex: 1 },
+    detailPanel: {
+        width: 280, background: '#fff', padding: 24, display: 'flex', flexDirection: 'column',
+        gap: 12, borderLeft: '1px solid #e2e8f0', position: 'relative', overflowY: 'auto'
+    },
+    closeBtn: {
+        position: 'absolute', top: 12, right: 12, background: '#f7fafc', border: '1px solid #e2e8f0',
+        borderRadius: 8, cursor: 'pointer', padding: 4, display: 'flex'
+    },
+    detailSev: {
+        display: 'inline-block', padding: '4px 12px', borderRadius: 999, fontSize: 11,
+        fontWeight: 700, letterSpacing: '.5px', textTransform: 'uppercase', width: 'fit-content'
+    },
+    detailTitle: { fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800, color: '#1a202c' },
+    detailDesc: { fontSize: 13, color: '#718096', lineHeight: 1.6 },
+    detailCoords: { fontSize: 12, color: '#a0aec0', fontFamily: 'monospace' },
+    navBtn: {
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 0',
+        background: 'linear-gradient(135deg, #1a9e7a, #147a5f)', color: '#fff', border: 'none',
+        borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: 'pointer', marginTop: 'auto'
+    },
+    legend: { padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' },
+    legendTitle: { fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 13, color: '#1a202c', marginRight: 8 },
+    legendItem: { display: 'flex', alignItems: 'center', gap: 6 },
+    legendDot: { width: 22, height: 22, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 },
+    legendLabel: { fontSize: 12, color: '#4a5568' },
 };
 
 export default MapPage;
