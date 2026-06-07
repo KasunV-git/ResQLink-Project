@@ -1,214 +1,238 @@
-import Sidebar from "../../components/citizen/Sidebar";
-import Topbar from "../../components/citizen/Topbar";
-import AlertCard from "../../components/citizen/AlertCard";
-import QuickCard from "../../components/citizen/QuickCard";
-import AssistanceCard from "../../components/citizen/AssistanceCard";
-import { ShieldCheck } from "lucide-react";
+// frontend/src/pages/citizen/Dashboard.jsx
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import {
+    ShieldCheck, Siren, Wind, CheckCircle2,
+    ChevronRight, FileText, Map, BookOpen, TriangleAlert,
+} from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { getAlerts } from '../../api/alertApi';
+import { getMyReports } from '../../api/disasterApi';
+import Loader from '../../components/common/Loader';
+
+/* ── Severity config ── */
+const severityConfig = {
+    'EXTREME SEVERITY': { color: '#e53e3e', bg: '#fff5f5', dot: '#e53e3e' },
+    'MODERATE ALERT': { color: '#dd6b20', bg: '#fffaf0', dot: '#dd6b20' },
+    UPDATE: { color: '#38a169', bg: '#f0fff4', dot: '#38a169' },
+    DEFAULT: { color: '#3182ce', bg: '#ebf8ff', dot: '#3182ce' },
+};
+
+const getSeverityStyle = (s) => severityConfig[s?.toUpperCase()] || severityConfig.DEFAULT;
+
+/* ── Relative time helper ── */
+const relTime = (iso) => {
+    const diff = Date.now() - new Date(iso);
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return 'Just now';
+    if (m < 60) return `${m} mins ago`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h} hours ago`;
+    return `${Math.floor(h / 24)} days ago`;
+};
+
+/* ── Alert icon map ── */
+const alertIcon = (severity) => {
+    if (severity === 'EXTREME SEVERITY') return <Siren size={18} color="#e53e3e" />;
+    if (severity === 'MODERATE ALERT') return <Wind size={18} color="#dd6b20" />;
+    return <CheckCircle2 size={18} color="#38a169" />;
+};
+
+/* ─────────────────────────── */
 
 const Dashboard = () => {
-    const alerts = [
-        {
-            title: "River Level Alert: Zone B4",
-            severity: "EXTREME SEVERITY",
-            message:
-                "Immediate evacuation required for coastal residents in Zone B4.",
-            time: "2 mins ago",
-            color: "border-red-600",
-        },
-        {
-            title: "High Wind Warning",
-            severity: "MODERATE ALERT",
-            message:
-                "Gusts up to 60mph expected between 2:00 PM and 6:00 PM today.",
-            time: "45 mins ago",
-            color: "border-orange-400",
-        },
-        {
-            title: "Road Clearance: Main St",
-            severity: "UPDATE",
-            message:
-                "Maintenance completed. Main Street is now open for emergency vehicles.",
-            time: "3 hours ago",
-            color: "border-teal-500",
-        },
-    ];
+    const { user } = useAuth();
+    const [alerts, setAlerts] = useState([]);
+    const [reports, setReports] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const quickLinks = [
-        {
-            title: "My Reports",
-            desc: "Track the status of your active reports",
-            to: "/report",
-        },
-        {
-            title: "Safety Map",
-            desc: "Review current hazard zones and safe corridors",
-            to: "/map",
-        },
-        {
-            title: "Resources",
-            desc: "Access guides, emergency kits, and support contacts",
-            to: "/alerts",
-        },
-    ];
+    useEffect(() => {
+        Promise.all([getAlerts({ limit: 3 }), getMyReports()])
+            .then(([alertRes, repRes]) => {
+                setAlerts(alertRes.data.data || []);
+                setReports(repRes.data.data || []);
+            })
+            .catch(() => { })
+            .finally(() => setLoading(false));
+    }, []);
+
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+
+    if (loading) return <Loader fullPage />;
 
     return (
-        <div className="min-h-screen bg-[#F5F7FA] text-slate-900 overflow-x-hidden">
-            <Topbar />
+        <div style={s.page}>
 
-            <div className="flex min-h-screen pt-20">
-                <Sidebar />
+            {/* ── Hero greeting ── */}
+            <section style={s.hero}>
+                <div>
+                    <h1 style={s.heroTitle}>{greeting}, Citizen {user?.name?.split(' ')[0] ?? 'User'}.</h1>
+                    <p style={s.heroSub}>
+                        The sentinel is active. Your local area is currently under moderate observation.
+                        Stay informed, stay safe.
+                    </p>
+                </div>
+            </section>
 
-                <main className="flex-1 px-6 py-10 max-w-[1600px] mx-auto">
-                    <div className="space-y-8">
-
-                        {/* Hero / Welcome Section */}
-                        <section className="rounded-[24px] border border-slate-200 bg-white/95 shadow-sm p-8 xl:p-10 mb-2">
-                            <div className="flex flex-col gap-8 xl:flex-row xl:items-center xl:justify-between">
-                                <div className="max-w-3xl">
-                                    <span className="inline-flex items-center rounded-full bg-[#EAF0FF] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] text-[#0B1F6D]">
-                                        Citizen Portal
-                                    </span>
-                                    <h1 className="mt-6 mb-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
-                                        Good Morning, Citizen Marcus.
-                                    </h1>
-                                    <p className="max-w-2xl text-base sm:text-lg leading-8 text-slate-600">
-                                        The sentinel is active. Your local area is currently under moderate observation.
-                                        Stay informed, stay safe.
-                                    </p>
-                                </div>
-
-                                <div className="rounded-3xl border border-[#DCE4F5] bg-[#F7F9FF] px-6 py-5 shadow-sm w-full max-w-sm">
-                                    <div className="flex items-center gap-4">
-                                        <div className="grid h-14 w-14 place-items-center rounded-3xl bg-[#0B1F6D] text-white shadow-md">
-                                            <ShieldCheck size={28} />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#0B1F6D] mb-2">
-                                                Alert Status
-                                            </p>
-                                            <p className="text-lg font-semibold text-slate-900">
-                                                Moderate observation in your zone
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-
-                        {/* Assistance + Identity Row */}
-                        <div className="grid gap-6 xl:grid-cols-[1.65fr_0.95fr]">
-                            <section className="rounded-[24px] border border-slate-200 bg-white shadow-sm p-8">
-                                <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-                                    <div>
-                                        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#0B1F6D] mb-3">
-                                            Immediate Assistance
-                                        </p>
-                                        <h2 className="mb-4 text-3xl font-extrabold text-slate-900">
-                                            Report hazards and emergencies instantly.
-                                        </h2>
-                                        <p className="max-w-2xl text-base leading-7 text-slate-600">
-                                            Your report helps first responders move faster. Share verified details, location, and severity to keep your community safe.
-                                        </p>
-                                    </div>
-
-                                    <AssistanceCard />
-                                </div>
-                            </section>
-
-                            <section className="rounded-[24px] border border-slate-200 bg-white shadow-sm p-8">
-                                <div className="flex items-center gap-4 mb-6">
-                                    <div className="grid h-14 w-14 place-items-center rounded-3xl bg-[#E8F7F0] text-[#0B6C57] shadow-sm">
-                                        <ShieldCheck size={26} />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#0B1F6D] mb-1">
-                                            Verified Identity
-                                        </p>
-                                        <h3 className="text-2xl font-semibold text-slate-900">
-                                            Marcus Aurelius
-                                        </h3>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <div className="rounded-3xl bg-slate-50 p-5">
-                                        <div className="flex items-center justify-between gap-4 mb-4">
-                                            <div>
-                                                <p className="text-sm text-slate-500 mb-1">Trust Score</p>
-                                                <p className="text-lg font-bold text-slate-900">92 / 100</p>
-                                            </div>
-                                            <span className="rounded-full bg-[#EAF0FF] px-4 py-1.5 text-sm font-semibold text-[#0B1F6D]">
-                                                Elite Respondee
-                                            </span>
-                                        </div>
-
-                                        <div className="rounded-full bg-slate-200 h-3 overflow-hidden">
-                                            <div className="h-3 rounded-full bg-[#0B1F6D] w-[92%] transition-all duration-500"></div>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid gap-4 sm:grid-cols-2">
-                                        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                                            <p className="text-xs uppercase tracking-[0.24em] text-slate-500 mb-2">Verification</p>
-                                            <p className="text-base font-semibold text-slate-900">Government ID Verified</p>
-                                        </div>
-                                        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                                            <p className="text-xs uppercase tracking-[0.24em] text-slate-500 mb-2">Emergency readiness</p>
-                                            <p className="text-base font-semibold text-slate-900">Alert subscriptions enabled</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
-
-                        {/* Alerts + Quick Navigation Row */}
-                        <div className="grid gap-6 xl:grid-cols-[1.7fr_0.95fr]">
-                            <section className="rounded-[24px] border border-slate-200 bg-white shadow-sm p-8">
-                                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-                                    <div>
-                                        <h2 className="text-2xl font-bold text-slate-900 mb-2">Recent Alerts</h2>
-                                        <p className="text-sm text-slate-500 max-w-xl">
-                                            Monitor the latest emergency updates and severity changes in your area.
-                                        </p>
-                                    </div>
-                                    <button className="inline-flex items-center justify-center rounded-full border border-[#D8E2F0] bg-[#F7F9FF] px-6 py-2.5 text-sm font-semibold text-[#0B1F6D] transition hover:bg-[#E8EFFD] hover:shadow-sm">
-                                        View All Alerts
-                                    </button>
-                                </div>
-
-                                <div className="space-y-4">
-                                    {alerts.map((alert, index) => (
-                                        <AlertCard key={index} alert={alert} />
-                                    ))}
-                                </div>
-                            </section>
-
-                            <aside className="rounded-[24px] border border-slate-200 bg-white shadow-sm p-8">
-                                <div className="mb-6">
-                                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Quick Navigation</h2>
-                                    <p className="text-sm text-slate-500">
-                                        Jump to the tools you use most during emergency response.
-                                    </p>
-                                </div>
-
-                                <div className="space-y-4">
-                                    {quickLinks.map((link) => (
-                                        <QuickCard
-                                            key={link.title}
-                                            title={link.title}
-                                            desc={link.desc}
-                                            to={link.to}
-                                        />
-                                    ))}
-                                </div>
-                            </aside>
-                        </div>
-
+            {/* ── Action strip ── */}
+            <div style={s.actionStrip}>
+                {/* Report disaster CTA */}
+                <div style={s.reportCard} className="card">
+                    <div>
+                        <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 18, color: '#1a202c', marginBottom: 4 }}>
+                            Immediate Assistance
+                        </h3>
+                        <p style={{ color: '#718096', fontSize: 13 }}>
+                            Spotted a hazard or emergency? Inform the network instantly.
+                        </p>
                     </div>
-                </main>
+                    <Link to="/citizen/report" style={s.reportBtn}>
+                        <TriangleAlert size={20} />
+                        Report Disaster
+                    </Link>
+                </div>
+
+                {/* Identity card */}
+                <div style={s.identityCard} className="card">
+                    <div style={s.identityIcon}><ShieldCheck size={22} color="#1a2456" /></div>
+                    <div>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: '#718096', letterSpacing: '.5px', marginBottom: 2 }}>
+                            Verified Identity
+                        </div>
+                        <div style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 15, color: '#1a202c' }}>
+                            {user?.name ?? 'Marcus Aurelius'}
+                        </div>
+                        <div style={s.trustBar}>
+                            <div style={s.trustFill} />
+                        </div>
+                        <div style={{ fontSize: 12, color: '#718096', marginTop: 4 }}>
+                            Trust Score: {user?.trustScore ?? 780} (Elite Respondee)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* ── Bottom grid: alerts + quick nav ── */}
+            <div style={s.grid}>
+
+                {/* Recent Alerts */}
+                <section>
+                    <div style={s.sectionHeader}>
+                        <h2 style={s.sectionTitle}>Recent Alerts</h2>
+                        <Link to="/citizen/alerts" style={s.viewAll}>View All →</Link>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        {alerts.length === 0 && (
+                            <div style={s.empty}>No active alerts in your area.</div>
+                        )}
+                        {alerts.map((alert) => {
+                            const cfg = getSeverityStyle(alert.severity);
+                            return (
+                                <div key={alert.alert_id} style={{ ...s.alertCard, borderLeftColor: cfg.dot }} className="card fade-in">
+                                    <div style={{ ...s.alertIconWrap, background: cfg.bg }}>
+                                        {alertIcon(alert.severity)}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={s.alertMeta}>
+                                            <span style={{ ...s.severityLabel, color: cfg.color }}>{alert.severity}</span>
+                                            <span style={s.alertTime}>{relTime(alert.sent_at)}</span>
+                                        </div>
+                                        <div style={s.alertTitle}>{alert.message?.split('.')[0]}</div>
+                                        <div style={s.alertBody}>{alert.message}</div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+
+                        {/* Demo alerts when API is empty */}
+                        {alerts.length === 0 && [
+                            { id: 1, severity: 'EXTREME SEVERITY', title: 'River Level Alert: Zone B4', body: 'Immediate evacuation required for coastal residents in Zone B4. Water levels rising rapidly.', time: '2 mins ago' },
+                            { id: 2, severity: 'MODERATE ALERT', title: 'High Wind Warning', body: 'Gusts up to 60mph expected between 2:00 PM and 6:00 PM today. Secure loose outdoor items.', time: '45 mins ago' },
+                            { id: 3, severity: 'UPDATE', title: 'Road Clearance: Main St', body: 'Maintenance completed. Main Street is now open for public transit and emergency vehicles.', time: '3 hours ago' },
+                        ].map((a) => {
+                            const cfg = getSeverityStyle(a.severity);
+                            return (
+                                <div key={a.id} style={{ ...s.alertCard, borderLeftColor: cfg.dot }} className="card fade-in">
+                                    <div style={{ ...s.alertIconWrap, background: cfg.bg }}>
+                                        {alertIcon(a.severity)}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={s.alertMeta}>
+                                            <span style={{ ...s.severityLabel, color: cfg.color }}>{a.severity}</span>
+                                            <span style={s.alertTime}>{a.time}</span>
+                                        </div>
+                                        <div style={s.alertTitle}>{a.title}</div>
+                                        <div style={s.alertBody}>{a.body}</div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </section>
+
+                {/* Quick Navigation */}
+                <section>
+                    <h2 style={{ ...s.sectionTitle, marginBottom: 16 }}>Quick Navigation</h2>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        {[
+                            { to: '/citizen/report', icon: FileText, label: 'My Reports', sub: `Track status of your ${reports.length || 3} reports`, bg: '#e8eaf6' },
+                            { to: '/citizen/map', icon: Map, label: 'Safety Map', sub: 'Explore safe zones and hazards', bg: '#e3f2fd' },
+                            { to: '/citizen/resources', icon: BookOpen, label: 'Resources', sub: 'Guides, supply kits, and kits', bg: '#fff3e0' },
+                        ].map(({ to, icon: Icon, label, sub, bg }) => (
+                            <Link key={to} to={to} style={s.quickCard} className="card">
+                                <div style={{ ...s.quickIcon, background: bg }}>
+                                    <Icon size={20} color="#1a2456" />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <div style={s.quickLabel}>{label}</div>
+                                    <div style={s.quickSub}>{sub}</div>
+                                </div>
+                                <ChevronRight size={16} color="#a0aec0" />
+                            </Link>
+                        ))}
+                    </div>
+                </section>
             </div>
         </div>
     );
+};
+
+/* ── Styles ── */
+const s = {
+    page: { display: 'flex', flexDirection: 'column', gap: 24 },
+    hero: {},
+    heroTitle: { fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, color: '#1a202c', marginBottom: 8 },
+    heroSub: { color: '#718096', fontSize: 15, maxWidth: 560 },
+    actionStrip: { display: 'grid', gridTemplateColumns: '1fr auto', gap: 20 },
+    reportCard: { padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' },
+    reportBtn: {
+        display: 'flex', alignItems: 'center', gap: 8, padding: '13px 24px',
+        background: 'linear-gradient(135deg, #1a9e7a, #147a5f)', color: '#fff',
+        borderRadius: 12, fontWeight: 700, fontSize: 14, fontFamily: "'DM Sans',sans-serif",
+        whiteSpace: 'nowrap', boxShadow: '0 4px 14px rgba(26,158,122,.35)',
+        transition: 'all .2s ease',
+    },
+    identityCard: { padding: 24, display: 'flex', gap: 16, alignItems: 'flex-start', minWidth: 240 },
+    identityIcon: { width: 48, height: 48, borderRadius: 12, background: 'rgba(26,36,86,.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+    trustBar: { height: 3, background: '#e2e8f0', borderRadius: 99, marginTop: 6, overflow: 'hidden' },
+    trustFill: { height: '100%', width: '78%', background: 'linear-gradient(90deg, #1a2456, #1a9e7a)', borderRadius: 99 },
+    grid: { display: 'grid', gridTemplateColumns: '1fr 340px', gap: 28, alignItems: 'start' },
+    sectionHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
+    sectionTitle: { fontFamily: "'Syne',sans-serif", fontSize: 18, fontWeight: 700, color: '#1a202c' },
+    viewAll: { fontSize: 13, fontWeight: 600, color: '#1a9e7a' },
+    alertCard: { display: 'flex', gap: 14, padding: 16, borderLeft: '4px solid transparent', alignItems: 'flex-start' },
+    alertIconWrap: { width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+    alertMeta: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
+    severityLabel: { fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' },
+    alertTime: { fontSize: 12, color: '#a0aec0' },
+    alertTitle: { fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 14, color: '#1a202c', marginBottom: 4 },
+    alertBody: { fontSize: 13, color: '#718096', lineHeight: 1.5 },
+    quickCard: { display: 'flex', alignItems: 'center', gap: 14, padding: 16 },
+    quickIcon: { width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+    quickLabel: { fontWeight: 600, fontSize: 14, color: '#1a202c', marginBottom: 2 },
+    quickSub: { fontSize: 12, color: '#718096' },
+    empty: { padding: 20, textAlign: 'center', color: '#a0aec0', fontSize: 14 },
 };
 
 export default Dashboard;
