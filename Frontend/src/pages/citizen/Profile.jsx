@@ -1,22 +1,9 @@
 import Sidebar from "../../components/citizen/Sidebar";
 import Topbar from "../../components/citizen/Topbar";
-
-import {
-    Mail,
-    Phone,
-    MapPin,
-    ShieldCheck,
-    LogOut,
-    Pencil,
-    Plus,
-    CircleHelp,
-} from "lucide-react";
-
+import { Mail, Phone, MapPin, ShieldCheck, LogOut, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Profile = () => {
-
-    // DATABASE DATA LATER
     const user = {
         name: "Marcus Aurelius",
         role: "Citizen",
@@ -24,199 +11,150 @@ const Profile = () => {
         phone: "+1 555-0123",
         region: "Metropolitan Sector 4",
         joined: "October 2023",
-        profile:
-            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+        profile: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
     };
 
     return (
-        <div className="bg-[#f5f7fb] min-h-screen">
-
-            {/* TOPBAR */}
+        <div className="min-h-screen bg-[#F5F7FA] text-slate-900 overflow-x-hidden">
             <Topbar />
 
-            {/* BODY */}
-            <div className="flex">
-
-                {/* LEFT SIDEBAR */}
+            <div className="flex min-h-screen pt-20">
                 <Sidebar />
 
-                {/* RIGHT CONTENT */}
-                <div className="flex-1 px-16 py-10">
+                <div className="flex-1 px-4 py-10 sm:px-6 lg:px-10">
+                    <div className="mx-auto w-full max-w-[1400px]">
+                        <div className="rounded-[28px] border border-slate-200 bg-white shadow-sm overflow-hidden">
 
-                    {/* PROFILE CARD */}
-                    <div className="bg-white rounded-[40px] overflow-hidden shadow-sm max-w-5xl mx-auto">
+                            {/* Profile Hero Banner */}
+                            <div className="bg-[#0B1F6D] p-8 sm:p-10">
+                                <div className="relative mx-auto max-w-6xl">
+                                    <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-end sm:justify-between">
+                                        <div className="text-center sm:text-left">
+                                            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-200 mb-4">
+                                                Citizen profile
+                                            </p>
+                                            <h1 className="text-4xl font-extrabold text-white mb-3">
+                                                {user.name}
+                                            </h1>
+                                            <p className="text-base leading-7 text-slate-200 sm:text-lg">
+                                                Verified citizen with active disaster reporting privileges.
+                                            </p>
+                                        </div>
+                                        <Link
+                                            to="/edit-profile"
+                                            className="inline-flex items-center justify-center gap-3 rounded-3xl border border-white/20 bg-white/10 px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-white/20 hover:shadow-lg active:scale-[0.98]"
+                                        >
+                                            <Pencil size={18} />
+                                            Edit Profile
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
 
-                        {/* HEADER */}
-                        <div className="h-72 bg-blue-950 relative">
+                            {/* Profile Content */}
+                            <div className="relative px-6 pb-12 sm:px-8 sm:pb-14">
+                                <div className="mx-auto flex max-w-6xl flex-col gap-8 lg:grid lg:grid-cols-[320px_minmax(0,1fr)] lg:gap-8 pt-2">
 
-                            {/* PROFILE IMAGE */}
-                            <div className="absolute left-14 bottom-[-60px]">
+                                    {/* Left Card: Avatar + Stats */}
+                                    <div className="-mt-20 rounded-[32px] bg-white p-7 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.25)]">
+                                        <div className="flex flex-col items-center gap-5 text-center mb-8">
+                                            <img
+                                                src={user.profile}
+                                                alt={user.name}
+                                                className="h-40 w-40 rounded-[32px] object-cover shadow-xl"
+                                            />
+                                            <div>
+                                                <p className="text-sm uppercase tracking-[0.24em] text-slate-400 mb-1">{user.role}</p>
+                                                <p className="text-lg font-semibold text-slate-900">Verified Responder</p>
+                                            </div>
+                                        </div>
 
-                                <img
-                                    src={user.profile}
-                                    alt=""
-                                    className="w-36 h-36 rounded-3xl object-cover border-8 border-white shadow-lg"
-                                />
+                                        <div className="space-y-4">
+                                            <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+                                                <p className="text-xs uppercase tracking-[0.24em] text-slate-500 mb-3">Member Since</p>
+                                                <p className="text-xl font-semibold text-slate-900">{user.joined}</p>
+                                            </div>
+                                            <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+                                                <p className="text-xs uppercase tracking-[0.24em] text-slate-500 mb-3">Region</p>
+                                                <p className="text-xl font-semibold text-slate-900">{user.region}</p>
+                                            </div>
+                                        </div>
+                                    </div>
 
+                                    {/* Right: Info Sections */}
+                                    <div className="space-y-6 mt-6 lg:mt-8">
+
+                                        {/* Contact Details */}
+                                        <section className="rounded-[32px] border border-slate-200 bg-slate-50 p-8">
+                                            <div className="mb-6">
+                                                <p className="text-sm uppercase tracking-[0.24em] text-slate-500 mb-2">Contact details</p>
+                                                <p className="text-2xl font-semibold text-slate-900">Account credentials</p>
+                                            </div>
+
+                                            <div className="grid gap-4 sm:grid-cols-2">
+                                                <div className="rounded-[28px] bg-white p-5 shadow-sm">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-[#E8F4FF] text-[#0B1F6D]">
+                                                            <Mail size={24} />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-xs uppercase tracking-[0.24em] text-slate-500 mb-2">Email Address</p>
+                                                            <p className="text-xl font-semibold text-slate-900">{user.email}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="rounded-[28px] bg-white p-5 shadow-sm">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-[#E8F4FF] text-[#0B1F6D]">
+                                                            <Phone size={24} />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-xs uppercase tracking-[0.24em] text-slate-500 mb-2">Contact Number</p>
+                                                            <p className="text-xl font-semibold text-slate-900">{user.phone}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+
+                                        {/* Security */}
+                                        <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+                                            <div className="flex items-center gap-4 mb-5">
+                                                <div className="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-[#E8F4FF] text-[#0B1F6D]">
+                                                    <ShieldCheck size={24} />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm uppercase tracking-[0.24em] text-slate-500 mb-1">Security</p>
+                                                    <p className="text-2xl font-semibold text-slate-900">Secure session active</p>
+                                                </div>
+                                            </div>
+                                            <p className="text-slate-600 leading-7">
+                                                Your profile and report activity are secured with encrypted transmissions and verified access controls.
+                                            </p>
+                                        </section>
+
+                                        {/* Logout */}
+                                        <div className="rounded-[32px] border border-slate-200 bg-slate-50 p-8 text-center">
+                                            <button className="inline-flex items-center justify-center gap-3 rounded-3xl border border-transparent bg-[#F8FAFC] px-8 py-4 text-base font-semibold text-slate-900 transition hover:bg-[#EDF2F7] hover:shadow-sm active:scale-[0.98]">
+                                                <LogOut size={20} />
+                                                Log Out of ResQLink
+                                            </button>
+                                            <p className="mt-5 text-sm text-slate-500">
+                                                Version 4.2.1 • Secure session encrypted
+                                            </p>
+                                        </div>
+
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
-
-                        {/* CONTENT */}
-                        <div className="pt-24 px-14 pb-14">
-
-                            {/* TOP SECTION */}
-                            <div className="flex justify-between items-center mb-14">
-
-                                <div>
-
-                                    <h1 className="text-6xl font-bold text-gray-900 mb-4">
-                                        {user.name}
-                                    </h1>
-
-                                    <div className="flex items-center gap-4">
-
-                                        <span className="bg-blue-100 text-blue-900 px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wider">
-                                            Citizen
-                                        </span>
-
-                                        <span className="text-gray-500 text-xl">
-                                            • Verified Responder
-                                        </span>
-
-                                    </div>
-
-                                </div>
-
-                                {/* EDIT BUTTON */}
-                                <Link
-                                    to="/edit-profile"
-                                    className="bg-teal-600 hover:bg-teal-700 transition-all duration-300 text-white px-10 py-5 rounded-2xl text-xl font-semibold flex items-center gap-4"
-                                >
-
-                                    <Pencil size={22} />
-
-                                    Edit Profile
-
-                                </Link>
-
-                            </div>
-
-                            {/* INFO GRID */}
-                            <div className="grid grid-cols-2 gap-8 mb-16">
-
-                                {/* EMAIL */}
-                                <div className="bg-gray-100 rounded-3xl p-8 flex items-center gap-6">
-
-                                    <div className="bg-white p-4 rounded-2xl">
-                                        <Mail className="text-blue-900" size={28} />
-                                    </div>
-
-                                    <div>
-
-                                        <p className="uppercase text-gray-400 tracking-[0.25em] text-sm mb-2">
-                                            Email Address
-                                        </p>
-
-                                        <p className="text-2xl font-semibold">
-                                            {user.email}
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                                {/* PHONE */}
-                                <div className="bg-gray-100 rounded-3xl p-8 flex items-center gap-6">
-
-                                    <div className="bg-white p-4 rounded-2xl">
-                                        <Phone className="text-blue-900" size={28} />
-                                    </div>
-
-                                    <div>
-
-                                        <p className="uppercase text-gray-400 tracking-[0.25em] text-sm mb-2">
-                                            Contact Number
-                                        </p>
-
-                                        <p className="text-2xl font-semibold">
-                                            {user.phone}
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                                {/* REGION */}
-                                <div className="bg-gray-100 rounded-3xl p-8 flex items-center gap-6">
-
-                                    <div className="bg-white p-4 rounded-2xl">
-                                        <MapPin className="text-blue-900" size={28} />
-                                    </div>
-
-                                    <div>
-
-                                        <p className="uppercase text-gray-400 tracking-[0.25em] text-sm mb-2">
-                                            Primary Region
-                                        </p>
-
-                                        <p className="text-2xl font-semibold">
-                                            {user.region}
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                                {/* MEMBER */}
-                                <div className="bg-gray-100 rounded-3xl p-8 flex items-center gap-6">
-
-                                    <div className="bg-white p-4 rounded-2xl">
-                                        <ShieldCheck className="text-blue-900" size={28} />
-                                    </div>
-
-                                    <div>
-
-                                        <p className="uppercase text-gray-400 tracking-[0.25em] text-sm mb-2">
-                                            Member Since
-                                        </p>
-
-                                        <p className="text-2xl font-semibold">
-                                            {user.joined}
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            {/* LOGOUT */}
-                            <div className="border-t pt-12 text-center">
-
-                                <button className="flex items-center gap-4 mx-auto text-3xl font-semibold hover:text-red-600 transition-all duration-300">
-
-                                    <LogOut size={34} />
-
-                                    Log Out of ResQLink
-
-                                </button>
-
-                                <p className="text-gray-400 mt-6 text-lg">
-                                    Version 4.2.1 • Secure Session Encrypted
-                                </p>
-
-                            </div>
-
-                        </div>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
     );
-}
+};
+
 export default Profile;

@@ -33,91 +33,179 @@ const Dashboard = () => {
         },
     ];
 
+    const quickLinks = [
+        {
+            title: "My Reports",
+            desc: "Track the status of your active reports",
+            to: "/report",
+        },
+        {
+            title: "Safety Map",
+            desc: "Review current hazard zones and safe corridors",
+            to: "/map",
+        },
+        {
+            title: "Resources",
+            desc: "Access guides, emergency kits, and support contacts",
+            to: "/alerts",
+        },
+    ];
+
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col">
+        <div className="min-h-screen bg-[#F5F7FA] text-slate-900 overflow-x-hidden">
             <Topbar />
 
-            <div className="flex flex-1">
+            <div className="flex min-h-screen pt-20">
                 <Sidebar />
 
-                <div className="p-10 flex-1 max-w-7xl w-full mx-auto">
-                    <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
-                        Good morning, Citizen Marcus.
-                    </h1>
+                <main className="flex-1 px-6 py-10 max-w-[1600px] mx-auto">
+                    <div className="space-y-8">
 
-                    <p className="text-slate-500 text-[17px] mb-8">
-                        The sentinel is active. Your local area is currently under moderate
-                        observation. Stay informed, stay safe.
-                    </p>
-
-                    <div className="grid grid-cols-3 gap-6 mb-10">
-                        <div className="col-span-2">
-                            <AssistanceCard />
-                        </div>
-
-                        <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="bg-blue-100 text-blue-900 p-3 rounded-2xl flex items-center justify-center">
-                                    <ShieldCheck size={26} />
+                        {/* Hero / Welcome Section */}
+                        <section className="rounded-[24px] border border-slate-200 bg-white/95 shadow-sm p-8 xl:p-10 mb-2">
+                            <div className="flex flex-col gap-8 xl:flex-row xl:items-center xl:justify-between">
+                                <div className="max-w-3xl">
+                                    <span className="inline-flex items-center rounded-full bg-[#EAF0FF] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] text-[#0B1F6D]">
+                                        Citizen Portal
+                                    </span>
+                                    <h1 className="mt-6 mb-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900">
+                                        Good Morning, Citizen Marcus.
+                                    </h1>
+                                    <p className="max-w-2xl text-base sm:text-lg leading-8 text-slate-600">
+                                        The sentinel is active. Your local area is currently under moderate observation.
+                                        Stay informed, stay safe.
+                                    </p>
                                 </div>
-                                <div>
-                                    <h2 className="font-bold text-lg text-slate-800">Verified Identity</h2>
-                                    <p className="text-gray-500 text-sm">Marcus Aurelius</p>
-                                </div>
-                            </div>
 
-                            <div className="border-t border-slate-250 my-4"></div>
-
-                            <div className="text-sm flex flex-col gap-2">
-                                <div className="w-full bg-slate-200 rounded-full h-1.5">
-                                    <div className="bg-blue-900 h-1.5 rounded-full w-3/4"></div>
-                                </div>
-                                <div className="flex justify-between mt-1 text-slate-650 font-medium text-xs">
-                                    <span>Trust Score: 780</span>
-                                    <span className="text-blue-900 font-bold">(Elite Respondee)</span>
+                                <div className="rounded-3xl border border-[#DCE4F5] bg-[#F7F9FF] px-6 py-5 shadow-sm w-full max-w-sm">
+                                    <div className="flex items-center gap-4">
+                                        <div className="grid h-14 w-14 place-items-center rounded-3xl bg-[#0B1F6D] text-white shadow-md">
+                                            <ShieldCheck size={28} />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#0B1F6D] mb-2">
+                                                Alert Status
+                                            </p>
+                                            <p className="text-lg font-semibold text-slate-900">
+                                                Moderate observation in your zone
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                        </section>
+
+                        {/* Assistance + Identity Row */}
+                        <div className="grid gap-6 xl:grid-cols-[1.65fr_0.95fr]">
+                            <section className="rounded-[24px] border border-slate-200 bg-white shadow-sm p-8">
+                                <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                                    <div>
+                                        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#0B1F6D] mb-3">
+                                            Immediate Assistance
+                                        </p>
+                                        <h2 className="mb-4 text-3xl font-extrabold text-slate-900">
+                                            Report hazards and emergencies instantly.
+                                        </h2>
+                                        <p className="max-w-2xl text-base leading-7 text-slate-600">
+                                            Your report helps first responders move faster. Share verified details, location, and severity to keep your community safe.
+                                        </p>
+                                    </div>
+
+                                    <AssistanceCard />
+                                </div>
+                            </section>
+
+                            <section className="rounded-[24px] border border-slate-200 bg-white shadow-sm p-8">
+                                <div className="flex items-center gap-4 mb-6">
+                                    <div className="grid h-14 w-14 place-items-center rounded-3xl bg-[#E8F7F0] text-[#0B6C57] shadow-sm">
+                                        <ShieldCheck size={26} />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#0B1F6D] mb-1">
+                                            Verified Identity
+                                        </p>
+                                        <h3 className="text-2xl font-semibold text-slate-900">
+                                            Marcus Aurelius
+                                        </h3>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="rounded-3xl bg-slate-50 p-5">
+                                        <div className="flex items-center justify-between gap-4 mb-4">
+                                            <div>
+                                                <p className="text-sm text-slate-500 mb-1">Trust Score</p>
+                                                <p className="text-lg font-bold text-slate-900">92 / 100</p>
+                                            </div>
+                                            <span className="rounded-full bg-[#EAF0FF] px-4 py-1.5 text-sm font-semibold text-[#0B1F6D]">
+                                                Elite Respondee
+                                            </span>
+                                        </div>
+
+                                        <div className="rounded-full bg-slate-200 h-3 overflow-hidden">
+                                            <div className="h-3 rounded-full bg-[#0B1F6D] w-[92%] transition-all duration-500"></div>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid gap-4 sm:grid-cols-2">
+                                        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                                            <p className="text-xs uppercase tracking-[0.24em] text-slate-500 mb-2">Verification</p>
+                                            <p className="text-base font-semibold text-slate-900">Government ID Verified</p>
+                                        </div>
+                                        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                                            <p className="text-xs uppercase tracking-[0.24em] text-slate-500 mb-2">Emergency readiness</p>
+                                            <p className="text-base font-semibold text-slate-900">Alert subscriptions enabled</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
+
+                        {/* Alerts + Quick Navigation Row */}
+                        <div className="grid gap-6 xl:grid-cols-[1.7fr_0.95fr]">
+                            <section className="rounded-[24px] border border-slate-200 bg-white shadow-sm p-8">
+                                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-slate-900 mb-2">Recent Alerts</h2>
+                                        <p className="text-sm text-slate-500 max-w-xl">
+                                            Monitor the latest emergency updates and severity changes in your area.
+                                        </p>
+                                    </div>
+                                    <button className="inline-flex items-center justify-center rounded-full border border-[#D8E2F0] bg-[#F7F9FF] px-6 py-2.5 text-sm font-semibold text-[#0B1F6D] transition hover:bg-[#E8EFFD] hover:shadow-sm">
+                                        View All Alerts
+                                    </button>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {alerts.map((alert, index) => (
+                                        <AlertCard key={index} alert={alert} />
+                                    ))}
+                                </div>
+                            </section>
+
+                            <aside className="rounded-[24px] border border-slate-200 bg-white shadow-sm p-8">
+                                <div className="mb-6">
+                                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Quick Navigation</h2>
+                                    <p className="text-sm text-slate-500">
+                                        Jump to the tools you use most during emergency response.
+                                    </p>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {quickLinks.map((link) => (
+                                        <QuickCard
+                                            key={link.title}
+                                            title={link.title}
+                                            desc={link.desc}
+                                            to={link.to}
+                                        />
+                                    ))}
+                                </div>
+                            </aside>
+                        </div>
+
                     </div>
-
-                    <div className="grid grid-cols-3 gap-8">
-                        <div className="col-span-2">
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Recent Alerts</h2>
-                                <button className="text-blue-900 hover:text-blue-800 font-semibold text-sm transition-colors duration-150">
-                                    View All →
-                                </button>
-                            </div>
-
-                            <div className="space-y-5">
-                                {alerts.map((alert, index) => (
-                                    <AlertCard key={index} alert={alert} />
-                                ))}
-                            </div>
-                        </div>
-
-                        <div>
-                            <h2 className="text-2xl font-bold text-slate-800 tracking-tight mb-6">Quick Navigation</h2>
-
-                            <div className="space-y-5">
-                                <QuickCard
-                                    title="My Reports"
-                                    desc="Track status of your reports"
-                                />
-
-                                <QuickCard
-                                    title="Safety Map"
-                                    desc="Explore safe zones and hazards"
-                                />
-
-                                <QuickCard
-                                    title="Resources"
-                                    desc="Guides, supply kits, and kits"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </main>
             </div>
         </div>
     );

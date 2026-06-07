@@ -1,6 +1,7 @@
+import { Link } from "react-router-dom";
 import { History, Map, BookOpen, ChevronRight } from "lucide-react";
 
-const QuickCard = ({ title, desc }) => {
+const QuickCard = ({ title, desc, to }) => {
     let Icon = BookOpen;
     let iconBg = "bg-amber-50";
     let iconColor = "text-amber-600";
@@ -9,33 +10,35 @@ const QuickCard = ({ title, desc }) => {
 
     if (titleLower.includes("report")) {
         Icon = History;
-        iconBg = "bg-indigo-50";
-        iconColor = "text-indigo-600";
+        iconBg = "bg-[#E8F2FF]";
+        iconColor = "text-[#2563EB]";
     } else if (titleLower.includes("map") || titleLower.includes("safety")) {
         Icon = Map;
-        iconBg = "bg-sky-50";
-        iconColor = "text-sky-600";
+        iconBg = "bg-[#E0F2FE]";
+        iconColor = "text-[#0EA5E9]";
     }
 
-    return (
-        <div className="bg-white rounded-2xl p-5 flex justify-between items-center shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 cursor-pointer hover:-translate-y-0.5">
-            <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-2xl ${iconBg} ${iconColor} flex items-center justify-center shrink-0`}>
+    const content = (
+        <div className="min-w-0 rounded-[22px] border border-slate-200 bg-white p-6 transition duration-300 hover:-translate-y-0.5 hover:shadow-lg">
+            <div className="flex items-start gap-4">
+                <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-3xl ${iconBg} ${iconColor}`}>
                     <Icon size={22} />
                 </div>
-
-                <div>
-                    <h3 className="text-lg font-bold text-slate-800 leading-tight">
-                        {title}
-                    </h3>
-                    <p className="text-slate-400 text-sm mt-1">
-                        {desc}
-                    </p>
+                <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-slate-900 break-words mb-1">{title}</h3>
+                    <p className="text-sm leading-6 text-slate-500 break-words">{desc}</p>
                 </div>
+                <ChevronRight className="mt-1 text-slate-400 shrink-0" />
             </div>
-
-            <ChevronRight className="text-slate-350 w-5 h-5 shrink-0" />
         </div>
+    );
+
+    return to ? (
+        <Link to={to} className="block">
+            {content}
+        </Link>
+    ) : (
+        content
     );
 };
 

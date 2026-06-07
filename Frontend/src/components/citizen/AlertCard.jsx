@@ -15,7 +15,7 @@ const AlertCard = ({ alert }) => {
     } else if (titleLower.includes("wind") || severityLower.includes("moderate")) {
         Icon = Wind;
         iconBg = "bg-orange-50";
-        iconColor = "text-orange-550";
+        iconColor = "text-orange-600";
     } else if (severityLower.includes("update") || titleLower.includes("clearance") || titleLower.includes("open")) {
         Icon = CheckCircle2;
         iconBg = "bg-teal-50";
@@ -23,21 +23,22 @@ const AlertCard = ({ alert }) => {
     }
 
     return (
-        <div className={`bg-white rounded-2xl p-6 border-l-8 ${alert.color} shadow-sm border border-gray-100 flex gap-5 items-start`}>
-            <div className={`p-4 rounded-2xl ${iconBg} ${iconColor} flex items-center justify-center shrink-0`}>
-                <Icon size={24} />
-            </div>
-
-            <div className="flex-1 flex justify-between items-start gap-4">
-                <div>
-                    <span className="text-xs font-bold tracking-widest text-slate-400 uppercase">
+        <div className="group flex min-w-0 gap-5 overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+            <div className={`${alert.color} min-w-[6px]`} />
+            <div className="flex-1 min-w-0 p-6">
+                <div className="flex items-center gap-4 mb-4">
+                    <div className={`flex h-12 w-12 items-center justify-center rounded-3xl ${iconBg} ${iconColor}`}>
+                        <Icon size={22} />
+                    </div>
+                    <span className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400 break-words">
                         {alert.severity}
                     </span>
-                    <h3 className="text-xl font-bold mt-1 text-slate-800">{alert.title}</h3>
-                    <p className="text-slate-500 mt-2 text-[15px] leading-relaxed">{alert.message}</p>
                 </div>
-
-                <span className="text-xs font-medium text-slate-400 whitespace-nowrap">{alert.time}</span>
+                <h3 className="text-xl font-semibold text-slate-900 break-words mb-3">{alert.title}</h3>
+                <p className="text-sm leading-6 text-slate-600 break-words">{alert.message}</p>
+            </div>
+            <div className="flex items-start pr-6 pt-6">
+                <span className="text-xs font-medium text-slate-400">{alert.time}</span>
             </div>
         </div>
     );
