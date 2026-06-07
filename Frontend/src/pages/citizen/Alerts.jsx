@@ -1,179 +1,203 @@
-import Sidebar from "../../components/citizen/Sidebar";
-import Topbar from "../../components/citizen/Topbar";
-import { Bell, Clock3, AlertTriangle, MapPinned, ShieldAlert } from "lucide-react";
+// frontend/src/pages/citizen/Alerts.jsx
+import { useState, useEffect } from 'react';
+import { Siren, Wind, CheckCircle2, Info, Search, Filter, BellOff, Check } from 'lucide-react';
+import { getAlerts, acknowledgeAlert } from '../../api/alertApi';
+import Loader from '../../components/common/Loader';
+
+/* ── Config ── */
+const SEV = {
+    CRITICAL: { label: 'Critical', color: '#e53e3e', bg: '#fff5f5', border: '#fed7d7', icon: Siren },
+    HIGH: { label: 'High', color: '#dd6b20', bg: '#fffaf0', border: '#fbd38d', icon: Wind },
+    MODERATE: { label: 'Moderate', color: '#d69e2e', bg: '#fffff0', border: '#faf089', icon: Info },
+    LOW: { label: 'Low', color: '#38a169', bg: '#f0fff4', border: '#c6f6d5', icon: CheckCircle2 },
+    UPDATE: { label: 'Update', color: '#38a169', bg: '#f0fff4', border: '#c6f6d5', icon: CheckCircle2 },
+    DEFAULT: { label: 'Info', color: '#3182ce', bg: '#ebf8ff', border: '#bee3f8', icon: Info },
+};
+
+const getSev = (s) => SEV[s?.toUpperCase()] || SEV.DEFAULT;
+
+const relTime = (iso) => {
+    const diff = Date.now() - new Date(iso);
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return 'Just now';
+    if (m < 60) return `${m}m ago`;
+    if (m < 1440) return `${Math.floor(m / 60)}h ago`;
+    return new Date(iso).toLocaleDateString();
+};
+
+/* ── Demo data (used when API empty) ── */
+const DEMO = [
+    { alert_id: 1, severity: 'CRITICAL', message: 'Flash Flood Warning: Zone B4 – Immediate evacuation required for coastal residents. Water levels rising rapidly at creek junction.', sent_at: new Date(Date.now() - 120000).toISOString(), acknowledged: false, channel: 'app', target_role: 'user' },
+    { alert_id: 2, severity: 'HIGH', message: 'High Wind Warning: Gusts up to 60mph expected between 2:00 PM and 6:00 PM today. Secure loose outdoor items and avoid travel.', sent_at: new Date(Date.now() - 2700000).toISOString(), acknowledged: false, channel: 'sms', target_role: 'user' },
+    { alert_id: 3, severity: 'MODERATE', message: 'Landslide Risk: Northern hill sectors remain at elevated risk following overnight rainfall. Residents advised to avoid roads through Sector 12.', sent_at: new Date(Date.now() - 7200000).toISOString(), acknowledged: true, channel: 'email', target_role: 'user' },
+    { alert_id: 4, severity: 'UPDATE', message: 'Road Clearance: Main Street is now open for public transit and emergency vehicles. Maintenance completed successfully.', sent_at: new Date(Date.now() - 10800000).toISOString(), acknowledged: true, channel: 'app', target_role: 'user' },
+    { alert_id: 5, severity: 'LOW', message: 'Weather Advisory: Light rain expected this evening. No major disruptions anticipated. Carry umbrellas if commuting after 7 PM.', sent_at: new Date(Date.now() - 86400000).toISOString(), acknowledged: true, channel: 'app', target_role: 'user' },
+];
+
+/* ─────────────── */
 
 const Alerts = () => {
-    const alerts = [
-        {
-            title: "Flash Flood Warning",
-            level: "CRITICAL",
-            time: "2 mins ago",
-            message: "Heavy rainfall has caused water levels to rise rapidly near coastal areas.",
-            instructions: [
-                "Move immediately to higher ground.",
-                "Avoid bridges and flooded roads.",
-                "Follow evacuation notices from authorities.",
-            ],
-            color: "border-red-500",
-            badge: "bg-red-100 text-red-700",
-            button: "Acknowledge Alert",
-            buttonColor: "bg-red-600 hover:bg-red-700",
-        },
-        {
-            title: "High Wind Advisory",
-            level: "MODERATE",
-            time: "18 mins ago",
-            message: "Strong winds expected between 2PM and 8PM in western districts.",
-            instructions: [
-                "Secure outdoor belongings.",
-                "Avoid unnecessary travel.",
-            ],
-            color: "border-yellow-400",
-            badge: "bg-yellow-100 text-yellow-700",
-            button: "Mark Safe",
-            buttonColor: "bg-yellow-500 hover:bg-yellow-600",
-        },
-        {
-            title: "Road Clearance Update",
-            level: "INFORMATION",
-            time: "1 hour ago",
-            message: "Main highway access has been restored for emergency transportation.",
-            instructions: ["Use approved travel routes only."],
-            color: "border-sky-500",
-            badge: "bg-sky-100 text-sky-700",
-            button: "Archive Alert",
-            buttonColor: "bg-sky-600 hover:bg-sky-700",
-        },
-    ];
+    const [alerts, setAlerts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState('ALL');
+    const [search, setSearch] = useState('');
+
+    useEffect(() => {
+        getAlerts()
+            .then(({ data }) => setAlerts(data.data?.length ? data.data : DEMO))
+            .catch(() => setAlerts(DEMO))
+            .finally(() => setLoading(false));
+    }, []);
+
+    const handleAck = async (id) => {
+        try {
+            await acknowledgeAlert(id);
+            setAlerts(prev => prev.map(a => a.alert_id === id ? { ...a, acknowledged: true } : a));
+        } catch (_) {
+            // Demo mode – just mark locally
+            setAlerts(prev => prev.map(a => a.alert_id === id ? { ...a, acknowledged: true } : a));
+        }
+    };
+
+    const FILTERS = ['ALL', 'CRITICAL', 'HIGH', 'MODERATE', 'UPDATE'];
+    const critical = alerts.filter(a => a.severity === 'CRITICAL' && !a.acknowledged).length;
+    const active = alerts.filter(a => !a.acknowledged).length;
+
+    const visible = alerts.filter(a => {
+        const matchFilter = filter === 'ALL' || a.severity === filter;
+        const matchSearch = !search || a.message.toLowerCase().includes(search.toLowerCase());
+        return matchFilter && matchSearch;
+    });
+
+    if (loading) return <Loader fullPage />;
 
     return (
-        <div className="min-h-screen bg-[#F5F7FA] text-slate-900 overflow-x-hidden">
-            <Topbar />
+        <div style={s.page}>
 
-            <div className="flex min-h-screen pt-20">
-                <Sidebar />
-
-                <div className="flex-1 px-4 py-10 sm:px-6 lg:px-10">
-                    <div className="mx-auto w-full max-w-[1400px] space-y-8">
-
-                        {/* Page Header */}
-                        <header className="rounded-[28px] border border-slate-200 bg-white/95 p-8 shadow-sm sm:p-10 mb-2">
-                            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                                <div className="max-w-3xl">
-                                    <div className="flex flex-wrap items-center gap-3 mb-4">
-                                        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">
-                                            Citizen Alerts
-                                        </h1>
-                                        <span className="rounded-full bg-red-100 px-4 py-1.5 text-sm font-semibold text-red-700">
-                                            2 Critical
-                                        </span>
-                                        <span className="rounded-full bg-sky-100 px-4 py-1.5 text-sm font-semibold text-sky-700">
-                                            4 Active
-                                        </span>
-                                    </div>
-                                    <p className="max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
-                                        Stay updated with emergency broadcasts, weather warnings, evacuation notices, and community safety updates.
-                                    </p>
-                                </div>
-                                <button className="inline-flex items-center justify-center rounded-3xl border border-slate-200 bg-slate-50 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100 hover:shadow-sm active:scale-[0.98]">
-                                    Filter Alerts
-                                </button>
-                            </div>
-                        </header>
-
-                        {/* Alert Cards */}
-                        <section className="space-y-6">
-                            {alerts.map((alert, index) => (
-                                <div key={index} className={`rounded-[28px] border-2 ${alert.color} bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-lg`}>
-                                    <div className="grid gap-6 xl:grid-cols-[1.4fr_0.9fr] xl:items-start">
-                                        <div>
-                                            <div className="flex flex-wrap items-center gap-3 mb-5">
-                                                <span className={`rounded-full px-4 py-1.5 text-xs font-semibold tracking-[0.24em] ${alert.badge}`}>
-                                                    {alert.level}
-                                                </span>
-                                                <div className="inline-flex items-center gap-2 text-sm text-slate-500">
-                                                    <Clock3 size={16} />
-                                                    {alert.time}
-                                                </div>
-                                            </div>
-
-                                            <h2 className="text-3xl font-semibold text-slate-900 mb-4">
-                                                {alert.title}
-                                            </h2>
-                                            <p className="text-base leading-7 text-slate-600 mb-7">
-                                                {alert.message}
-                                            </p>
-
-                                            <div>
-                                                <p className="text-sm uppercase tracking-[0.3em] text-slate-400 mb-4">Safety Instructions</p>
-                                                <div className="space-y-3">
-                                                    {alert.instructions.map((item, i) => (
-                                                        <div key={i} className="flex gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-slate-900 font-semibold shadow-sm">
-                                                                {i + 1}
-                                                            </div>
-                                                            <p className="text-slate-700 leading-7">{item}</p>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-6">
-                                            <div className="flex items-center gap-4 mb-8">
-                                                <div className="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-white text-[#0B1F6D] shadow-sm">
-                                                    <Bell size={24} />
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm uppercase tracking-[0.24em] text-slate-500 mb-1">Source</p>
-                                                    <p className="text-xl font-semibold text-slate-900">ResQLink HQ</p>
-                                                </div>
-                                            </div>
-                                            <button className={`inline-flex w-full items-center justify-center rounded-3xl px-5 py-3.5 text-sm font-semibold text-white transition hover:shadow-md active:scale-[0.98] ${alert.buttonColor}`}>
-                                                {alert.button}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </section>
-
-                        {/* Info Cards */}
-                        <div className="grid gap-5 lg:grid-cols-3">
-                            <button className="rounded-[28px] border border-slate-200 bg-white p-7 text-left transition hover:-translate-y-1 hover:shadow-lg active:scale-[0.98]">
-                                <div className="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-[#E8F4FF] text-[#0B1F6D] mb-5">
-                                    <MapPinned size={24} />
-                                </div>
-                                <h3 className="text-2xl font-semibold text-slate-900 mb-3">Safe Zones</h3>
-                                <p className="text-slate-600 leading-7">
-                                    Locate evacuation centers and nearby shelters instantly.
-                                </p>
-                            </button>
-                            <button className="rounded-[28px] border border-slate-200 bg-white p-7 text-left transition hover:-translate-y-1 hover:shadow-lg active:scale-[0.98]">
-                                <div className="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-[#E8F4FF] text-[#0B1F6D] mb-5">
-                                    <ShieldAlert size={24} />
-                                </div>
-                                <h3 className="text-2xl font-semibold text-slate-900 mb-3">Emergency Status</h3>
-                                <p className="text-slate-600 leading-7">
-                                    Track live emergency conditions and rescue coordination.
-                                </p>
-                            </button>
-                            <button className="rounded-[28px] border border-slate-200 bg-white p-7 text-left transition hover:-translate-y-1 hover:shadow-lg active:scale-[0.98]">
-                                <div className="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-[#E8F4FF] text-[#0B1F6D] mb-5">
-                                    <AlertTriangle size={24} />
-                                </div>
-                                <h3 className="text-2xl font-semibold text-slate-900 mb-3">Community Support</h3>
-                                <p className="text-slate-600 leading-7">
-                                    Access humanitarian resources and volunteer coordination tools.
-                                </p>
-                            </button>
-                        </div>
-
-                    </div>
+            {/* ── Page header ── */}
+            <div style={s.pageHead}>
+                <div>
+                    <h1 style={s.title}>Active Response Feed</h1>
+                    <p style={s.sub}>
+                        Real-time mission directives and critical updates. Acknowledge receipt immediately upon reading.
+                    </p>
+                </div>
+                <div style={s.counters}>
+                    {critical > 0 && <span style={s.critTag}>{critical} Critical</span>}
+                    <span style={s.activeTag}>{active} Active</span>
                 </div>
             </div>
+
+            {/* ── Search + filter ── */}
+            <div style={s.toolbar}>
+                <div style={s.searchWrap}>
+                    <Search size={15} color="#a0aec0" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+                    <input
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        placeholder="Search alerts..."
+                        style={s.searchInput}
+                    />
+                </div>
+                <div style={s.filterRow}>
+                    {FILTERS.map(f => (
+                        <button
+                            key={f}
+                            onClick={() => setFilter(f)}
+                            style={{ ...s.filterBtn, ...(filter === f ? s.filterActive : {}) }}
+                        >
+                            {f}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* ── Alert list ── */}
+            {visible.length === 0 ? (
+                <div style={s.empty}>
+                    <BellOff size={36} color="#cbd5e0" />
+                    <p style={{ marginTop: 12, color: '#a0aec0' }}>No alerts matching your filter.</p>
+                </div>
+            ) : (
+                <div style={s.list} className="stagger">
+                    {visible.map((alert) => {
+                        const cfg = getSev(alert.severity);
+                        const Icon = cfg.icon;
+                        const acked = alert.acknowledged;
+                        return (
+                            <div
+                                key={alert.alert_id}
+                                style={{
+                                    ...s.alertCard,
+                                    borderLeftColor: cfg.color,
+                                    opacity: acked ? .65 : 1,
+                                }}
+                                className="card fade-in"
+                            >
+                                {/* Icon */}
+                                <div style={{ ...s.alertIconWrap, background: cfg.bg }}>
+                                    <Icon size={20} color={cfg.color} />
+                                </div>
+
+                                {/* Content */}
+                                <div style={{ flex: 1 }}>
+                                    <div style={s.alertTop}>
+                                        <span style={{ ...s.sevBadge, color: cfg.color, background: cfg.bg, border: `1px solid ${cfg.border}` }}>
+                                            {cfg.label}
+                                        </span>
+                                        <span style={s.timeLabel}>{relTime(alert.sent_at)}</span>
+                                    </div>
+                                    <p style={s.alertMsg}>{alert.message}</p>
+                                    <div style={s.alertMeta2}>
+                                        <span style={s.metaChip}>via {alert.channel?.toUpperCase()}</span>
+                                    </div>
+                                </div>
+
+                                {/* Action */}
+                                <div>
+                                    {acked ? (
+                                        <div style={s.ackedBadge}><Check size={12} /> Acknowledged</div>
+                                    ) : (
+                                        <button onClick={() => handleAck(alert.alert_id)} style={s.ackBtn}>
+                                            Acknowledge
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
         </div>
     );
+};
+
+const s = {
+    page: { display: 'flex', flexDirection: 'column', gap: 24 },
+    pageHead: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 },
+    title: { fontFamily: "'Syne',sans-serif", fontSize: 28, fontWeight: 800, color: '#1a202c', marginBottom: 6 },
+    sub: { color: '#718096', fontSize: 14 },
+    counters: { display: 'flex', gap: 8, alignItems: 'center' },
+    critTag: { padding: '5px 12px', borderRadius: 999, background: '#fff5f5', color: '#e53e3e', fontSize: 12, fontWeight: 700, border: '1px solid #fed7d7' },
+    activeTag: { padding: '5px 12px', borderRadius: 999, background: '#ebf8ff', color: '#3182ce', fontSize: 12, fontWeight: 700, border: '1px solid #bee3f8' },
+    toolbar: { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' },
+    searchWrap: { position: 'relative', flex: 1, minWidth: 200 },
+    searchInput: { width: '100%', padding: '9px 12px 9px 36px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 14, background: '#fff', outline: 'none', fontFamily: "'DM Sans',sans-serif" },
+    filterRow: { display: 'flex', gap: 6 },
+    filterBtn: { padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, border: '1.5px solid #e2e8f0', background: '#fff', color: '#718096', cursor: 'pointer', transition: 'all .18s ease' },
+    filterActive: { background: '#1a2456', color: '#fff', borderColor: '#1a2456' },
+    list: { display: 'flex', flexDirection: 'column', gap: 14 },
+    alertCard: { display: 'flex', gap: 16, padding: 20, borderLeft: '4px solid transparent', alignItems: 'flex-start' },
+    alertIconWrap: { width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+    alertTop: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 },
+    sevBadge: { padding: '3px 10px', borderRadius: 999, fontSize: 10, fontWeight: 700, letterSpacing: '.5px', textTransform: 'uppercase' },
+    timeLabel: { fontSize: 12, color: '#a0aec0' },
+    alertMsg: { fontSize: 14, color: '#2d3748', lineHeight: 1.6, marginBottom: 8 },
+    alertMeta2: { display: 'flex', gap: 8 },
+    metaChip: { fontSize: 11, fontWeight: 600, color: '#718096', background: '#f7fafc', border: '1px solid #e2e8f0', padding: '2px 8px', borderRadius: 6 },
+    ackBtn: { padding: '8px 16px', background: '#1a2456', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' },
+    ackedBadge: { display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, color: '#38a169', background: '#f0fff4', border: '1px solid #c6f6d5', padding: '6px 12px', borderRadius: 8, whiteSpace: 'nowrap' },
+    empty: { padding: 60, textAlign: 'center' },
 };
 
 export default Alerts;
