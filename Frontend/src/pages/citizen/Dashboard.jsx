@@ -47,12 +47,16 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        Promise.all([getAlerts({ limit: 3 }), getMyReports()])
+        // Load data - if backend offline, just show demo data
+        Promise.allSettled([getAlerts({ limit: 3 }), getMyReports()])
             .then(([alertRes, repRes]) => {
-                setAlerts(alertRes.data.data || []);
-                setReports(repRes.data.data || []);
+                if (alertRes.status === 'fulfilled') {
+                    setAlerts(alertRes.value.data.data || []);
+                }
+                if (repRes.status === 'fulfilled') {
+                    setReports(repRes.value.data.data || []);
+                }
             })
-            .catch(() => { })
             .finally(() => setLoading(false));
     }, []);
 
