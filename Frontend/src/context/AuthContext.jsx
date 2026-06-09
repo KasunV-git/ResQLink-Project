@@ -1,14 +1,12 @@
 // frontend/src/context/AuthContext.jsx
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { getProfile, logoutUser } from '../api/authApi';
+import { createContext, useContext, useState } from 'react';
 
 const AuthContext = createContext(null);
 
-// Demo user - remove this when backend login is ready
 const DEMO_USER = {
     user_id: 1,
     name: 'Marcus Aurelius',
-    email: 'm.aurelius@resqlink.org',
+    email: 'kasu@gmail.com',
     phone_number: '+1 555-0123',
     role: 'user',
     primary_region: 'Metropolitan Sector 4',
@@ -20,35 +18,14 @@ const DEMO_USER = {
 };
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(DEMO_USER);
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) { setLoading(false); return; }
-        getProfile()
-            .then(({ data }) => setUser(data.data))
-            .catch(() => localStorage.removeItem('token'))
-            .finally(() => setLoading(false));
-    }, []);
-
-    const login = useCallback((token, userData) => {
-        localStorage.setItem('token', token);
-        setUser(userData);
-    }, []);
-
-    const logout = useCallback(async () => {
-        try { await logoutUser(); } catch (_) { }
-        localStorage.removeItem('token');
-        setUser(null);
-        window.location.href = '/login';
-    }, []);
-
-    const refreshUser = useCallback(() =>
-        getProfile().then(({ data }) => setUser(data.data)), []);
+    const login = (token, userData) => setUser(userData);
+    const logout = () => setUser(null);
+    const refreshUser = () => { };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout, refreshUser, setUser }}>
+        <AuthContext.Provider value={{ user, loading: false, login, logout, refreshUser, setUser }}>
             {children}
         </AuthContext.Provider>
     );
