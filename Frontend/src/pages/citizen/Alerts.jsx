@@ -43,10 +43,9 @@ const Alerts = () => {
     const [search, setSearch] = useState('');
 
     useEffect(() => {
-        getAlerts()
-            .then(({ data }) => setAlerts(data.data?.length ? data.data : DEMO))
-            .catch(() => setAlerts(DEMO))
-            .finally(() => setLoading(false));
+        // Use demo data directly - no backend needed
+        setAlerts(DEMO);
+        setLoading(false);
     }, []);
 
     const handleAck = async (id) => {

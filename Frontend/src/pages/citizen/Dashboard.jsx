@@ -47,17 +47,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Load data - if backend offline, just show demo data
-        Promise.allSettled([getAlerts({ limit: 3 }), getMyReports()])
-            .then(([alertRes, repRes]) => {
-                if (alertRes.status === 'fulfilled') {
-                    setAlerts(alertRes.value.data.data || []);
-                }
-                if (repRes.status === 'fulfilled') {
-                    setReports(repRes.value.data.data || []);
-                }
-            })
-            .finally(() => setLoading(false));
+        setLoading(false);
     }, []);
 
     const hour = new Date().getHours();
