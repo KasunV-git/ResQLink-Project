@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 import Footer from "../../components/Footer";
@@ -11,6 +12,7 @@ import Alerts from "./Alerts";
 import Profile from "./Profile";
 
 export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHome }) {
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem("resqlink_volunteer_user");
@@ -197,7 +199,7 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
           <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:14 }}>
             <div style={{ width:36, height:36, border:"3px solid #e2e8f0", borderTopColor:"#15803d",
               borderRadius:"50%", animation:"spin 0.7s linear infinite" }} />
-            <span style={{ color:"#64748b", fontWeight:500 }}>Loading portal data...</span>
+            <span style={{ color:"#64748b", fontWeight:500 }}>{t("common.loading")}</span>
           </div>
           <style>{`@keyframes spin { to { transform:rotate(360deg) } }`}</style>
         </div>
@@ -245,7 +247,7 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
         );
       default:
         return (
-          <div className="text-center text-slate-500 mt-10">Page not found.</div>
+          <div className="text-center text-slate-500 mt-10">{t("common.pageNotFound")}</div>
         );
     }
   };

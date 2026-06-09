@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { ArrowLeft, CheckCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import logo from "../../assets/Logo & Name Side-cropped.svg";
 
 export default function ForgotPasswordPage({ onBackToLogin, onRegister, onGoHome }) {
+  const { t } = useTranslation();
   const [email,     setEmail]     = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading,   setLoading]   = useState(false);
@@ -15,18 +17,23 @@ export default function ForgotPasswordPage({ onBackToLogin, onRegister, onGoHome
     const trimmed = email.trim().toLowerCase();
 
     if (!EMAIL_REGEX.test(trimmed)) {
-      setError("Please enter a valid email address.");
+      setError(t("auth.invalidEmail"));
       return;
     }
 
     setLoading(true);
     setError("");
 
-    // Simulate sending (no real email service yet)
     await new Promise(r => setTimeout(r, 1200));
     setLoading(false);
     setSubmitted(true);
   };
+
+  const tips = [
+    t("auth.checkSpam"),
+    t("auth.checkAddress"),
+    t("auth.tryAgain"),
+  ];
 
   /* ── SUCCESS STATE ── */
   if (submitted) {
@@ -34,7 +41,6 @@ export default function ForgotPasswordPage({ onBackToLogin, onRegister, onGoHome
       <div style={S.page}>
         <div className="anim-scale-in" style={{ ...S.card, textAlign:"center" }}>
 
-          {/* Green check icon */}
           <div style={{ display:"flex", justifyContent:"center", marginBottom:24 }}>
             <div style={{
               width:80, height:80, borderRadius:"50%",
@@ -46,40 +52,32 @@ export default function ForgotPasswordPage({ onBackToLogin, onRegister, onGoHome
             </div>
           </div>
 
-          {/* Heading */}
           <h2 style={{ fontSize:22, fontWeight:700, color:"#0f172a", margin:"0 0 10px" }}>
-            Check Your Email
+            {t("auth.checkEmail")}
           </h2>
 
-          {/* Subtext */}
           <p style={{ fontSize:14, color:"#64748b", lineHeight:1.7, margin:"0 0 28px" }}>
-            We've sent password reset instructions to{" "}
+            {t("auth.resetSent")}{" "}
             <strong style={{ color:"#0f172a" }}>{email.trim().toLowerCase()}</strong>
           </p>
 
-          {/* Tips box — left-aligned text inside */}
           <div style={{
             backgroundColor:"#f8fafc", border:"1px solid #e2e8f0",
             borderRadius:10, padding:"16px 18px", marginBottom:28,
             textAlign:"left",
           }}>
             <p style={{ fontSize:13, fontWeight:600, color:"#475569", margin:"0 0 10px" }}>
-              Didn't receive the email?
+              {t("auth.didntReceive")}
             </p>
             <ul style={{ listStyle:"disc", paddingLeft:18, margin:0, display:"flex", flexDirection:"column", gap:8 }}>
-              {[
-                "Check your spam or junk folder",
-                "Make sure the email address is correct",
-                "Wait a few minutes and try again",
-              ].map(tip => (
+              {tips.map(tip => (
                 <li key={tip} style={{ fontSize:13, color:"#64748b" }}>{tip}</li>
               ))}
             </ul>
           </div>
 
-          {/* Back to Login button */}
           <button onClick={onBackToLogin} className="btn-anim" style={S.btn}>
-            Back to Login
+            {t("auth.backToLogin")}
           </button>
 
         </div>
@@ -92,18 +90,16 @@ export default function ForgotPasswordPage({ onBackToLogin, onRegister, onGoHome
     <div style={S.page}>
       <div className="anim-scale-in" style={S.card}>
 
-        {/* Logo — click to go back to landing page */}
         <div style={{ display:"flex", justifyContent:"center", marginBottom:24 }}>
           <img
             src={logo}
             alt="ResQLink"
             onClick={onGoHome}
             style={{ height:42, width:"auto", cursor: onGoHome ? "pointer" : "default" }}
-            title="Back to Home"
+            title={t("common.backToHome")}
           />
         </div>
 
-        {/* Back to Login */}
         <button
           onClick={onBackToLogin}
           style={S.backBtn}
@@ -111,29 +107,26 @@ export default function ForgotPasswordPage({ onBackToLogin, onRegister, onGoHome
           onMouseLeave={e => e.currentTarget.style.color = "#64748b"}
         >
           <ArrowLeft size={15} />
-          Back to Login
+          {t("auth.backToLogin")}
         </button>
 
-        {/* Heading */}
         <div style={{ marginBottom:24 }}>
-          <h2 style={S.heading}>Reset Your Password</h2>
+          <h2 style={S.heading}>{t("auth.resetPassword")}</h2>
           <p style={{ fontSize:14, color:"#64748b", lineHeight:1.65, margin:0 }}>
-            Enter your email address and we'll send you instructions to reset your password
+            {t("auth.resetSubtitle")}
           </p>
         </div>
 
-        {/* Error */}
         {error && (
           <div style={S.errorBox}>{error}</div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} style={{ display:"flex", flexDirection:"column", gap:16, marginBottom:20 }}>
           <div style={S.fieldGroup}>
-            <label style={S.label}>Email Address</label>
+            <label style={S.label}>{t("auth.emailAddress")}</label>
             <input
               type="email"
-              placeholder="Enter your email"
+              placeholder={t("auth.emailPlaceholder")}
               value={email}
               onChange={e => setEmail(e.target.value)}
               style={S.input}
@@ -152,20 +145,19 @@ export default function ForgotPasswordPage({ onBackToLogin, onRegister, onGoHome
             {loading ? (
               <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
                 <span style={{ width:16, height:16, border:"2px solid rgba(255,255,255,0.4)", borderTopColor:"#fff", borderRadius:"50%", animation:"spin 0.7s linear infinite", display:"inline-block" }} />
-                Sending...
+                {t("auth.sending")}
               </span>
-            ) : "Send Reset Instructions"}
+            ) : t("auth.sendReset")}
           </button>
         </form>
 
-        {/* Register link */}
         <p style={{ textAlign:"center", fontSize:14, color:"#64748b", margin:0 }}>
-          Don't have an account?{" "}
+          {t("auth.noAccount")}{" "}
           <button
             onClick={onRegister}
             style={{ background:"none", border:"none", color:"#1e3a8a", fontWeight:700, fontSize:14, cursor:"pointer", padding:0, fontFamily:"inherit" }}
           >
-            Register here
+            {t("auth.registerHere")}
           </button>
         </p>
 
@@ -175,7 +167,6 @@ export default function ForgotPasswordPage({ onBackToLogin, onRegister, onGoHome
   );
 }
 
-/* ── styles ── */
 const S = {
   page:       { minHeight:"100vh", backgroundColor:"#f1f5f9", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 24px", fontFamily:"'Inter',-apple-system,sans-serif" },
   card:       { backgroundColor:"#fff", borderRadius:16, boxShadow:"0 4px 32px rgba(0,0,0,0.10)", width:"100%", maxWidth:460, padding:"40px 36px", boxSizing:"border-box" },

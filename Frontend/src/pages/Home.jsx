@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { MapPin, Brain, Users, Bell, Clock, Activity, UserCheck, Shield, Menu, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import logo from "../assets/Logo & Name Side-cropped.svg";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 function smoothScrollTo(id) {
   const el = document.getElementById(id);
@@ -20,83 +22,57 @@ function useScrollReveal() {
   }, []);
 }
 
-/* ── Sri Lanka–localised data ─────────────────────────────── */
-
-// Live incident preview shown in the hero card
-const incidents = [
-  { label: "Flood Alert – Kelani River Basin",   severity: "High",   dot: "#ef4444", badge: { bg:"#fef2f2", color:"#dc2626" }, time: "18 min ago" },
-  { label: "Landslide Warning – Kegalle District",severity: "Medium", dot: "#f59e0b", badge: { bg:"#fffbeb", color:"#d97706" }, time: "35 min ago" },
-  { label: "Coastal Storm Alert – Galle Shoreline",severity: "Low",   dot: "#22c55e", badge: { bg:"#f0fdf4", color:"#16a34a" }, time: "2 hrs ago"  },
-];
-
-const features = [
-  {
-    Icon: MapPin,
-    title: "Real-Time Incident Reporting",
-    desc:  "Citizens across Sri Lanka report floods, landslides, and storm damage with precise location, description, and media.",
-  },
-  {
-    Icon: Brain,
-    title: "AI-Assisted Severity Analysis",
-    desc:  "Intelligent risk assessment aligned with DMC and NBRO severity classification standards for accurate prioritisation.",
-  },
-  {
-    Icon: Users,
-    title: "Volunteer & Resource Coordination",
-    desc:  "Deploy NDRC volunteers and relief resources efficiently across Sri Lanka's 25 districts during active emergencies.",
-  },
-  {
-    Icon: Bell,
-    title: "DMC & NBRO Alert Integration",
-    desc:  "Real-time alerts from the Disaster Management Centre and NBRO delivered instantly to the right field responders.",
-  },
-];
-
-const steps = [
-  { Icon: Clock,     label: "1. Incident Reported",     desc: "Citizens submit disaster details with location and media via the platform" },
-  { Icon: Brain,     label: "2. Severity Assessed",     desc: "AI analyses impact and prioritises response in line with DMC guidelines"   },
-  { Icon: UserCheck, label: "3. Volunteers Deployed",   desc: "NDRC volunteers and district resources are coordinated and assigned"        },
-  { Icon: Activity,  label: "4. Continuous Monitoring", desc: "Real-time tracking and status updates until full resolution"               },
-];
-
-const roles = [
-  {
-    Icon:  Users,
-    title: "Citizen",
-    color: "#0d9488",
-    items: [
-      "Report flood, landslide, or storm incidents",
-      "Receive real-time DMC & NBRO alerts",
-      "Track local emergency response updates",
-    ],
-  },
-  {
-    Icon:  UserCheck,
-    title: "Volunteer",
-    color: "#15803d",
-    items: [
-      "Manage field deployment availability",
-      "Receive district-level task assignments",
-      "Complete disaster response operations",
-    ],
-  },
-  {
-    Icon:  Shield,
-    title: "Administrator",
-    color: "#1e3a8a",
-    items: [
-      "Review and verify DMC incident reports",
-      "Coordinate district resources and relief camps",
-      "Monitor island-wide response status",
-    ],
-  },
-];
-
-/* ══════════════════ COMPONENT ══════════════════════════════ */
-
 export default function Home({ onLogin, onRegister }) {
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   useScrollReveal();
+
+  const incidents = [
+    { labelKey: "home.incidents.flood",     severityKey: "home.severity_high",   dot: "#ef4444", badge: { bg:"#fef2f2", color:"#dc2626" }, time: "18 min ago" },
+    { labelKey: "home.incidents.landslide", severityKey: "home.severity_medium", dot: "#f59e0b", badge: { bg:"#fffbeb", color:"#d97706" }, time: "35 min ago" },
+    { labelKey: "home.incidents.storm",     severityKey: "home.severity_low",    dot: "#22c55e", badge: { bg:"#f0fdf4", color:"#16a34a" }, time: "2 hrs ago"  },
+  ];
+
+  const features = [
+    { Icon: MapPin,   titleKey: "home.features.incidentTitle", descKey: "home.features.incidentDesc" },
+    { Icon: Brain,    titleKey: "home.features.aiTitle",       descKey: "home.features.aiDesc"       },
+    { Icon: Users,    titleKey: "home.features.volunteerTitle",descKey: "home.features.volunteerDesc"},
+    { Icon: Bell,     titleKey: "home.features.alertTitle",    descKey: "home.features.alertDesc"    },
+  ];
+
+  const steps = [
+    { Icon: Clock,     labelKey: "home.steps.step1Label", descKey: "home.steps.step1Desc" },
+    { Icon: Brain,     labelKey: "home.steps.step2Label", descKey: "home.steps.step2Desc" },
+    { Icon: UserCheck, labelKey: "home.steps.step3Label", descKey: "home.steps.step3Desc" },
+    { Icon: Activity,  labelKey: "home.steps.step4Label", descKey: "home.steps.step4Desc" },
+  ];
+
+  const roles = [
+    {
+      Icon: Users,
+      titleKey: "home.rolesCitizen.title",
+      color: "#0d9488",
+      items: ["home.rolesCitizen.item1","home.rolesCitizen.item2","home.rolesCitizen.item3"],
+    },
+    {
+      Icon: UserCheck,
+      titleKey: "home.rolesVolunteer.title",
+      color: "#15803d",
+      items: ["home.rolesVolunteer.item1","home.rolesVolunteer.item2","home.rolesVolunteer.item3"],
+    },
+    {
+      Icon: Shield,
+      titleKey: "home.rolesAdmin.title",
+      color: "#1e3a8a",
+      items: ["home.rolesAdmin.item1","home.rolesAdmin.item2","home.rolesAdmin.item3"],
+    },
+  ];
+
+  const navLinks = [
+    ["features", t("nav.features")],
+    ["how",      t("nav.howItWorks")],
+    ["roles",    t("nav.roles")],
+  ];
 
   return (
     <div className="w-full min-h-screen bg-white">
@@ -108,30 +84,34 @@ export default function Home({ onLogin, onRegister }) {
           <img src={logo} alt="ResQLink" className="h-9 w-auto flex-shrink-0" />
 
           {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-8">
-            {[["features","Features"],["how","How It Works"],["roles","Roles"]].map(([id, label]) => (
+          <div className="hidden md:flex items-center gap-6">
+            {navLinks.map(([id, label]) => (
               <a key={id} href={`#${id}`}
                 onClick={e => { e.preventDefault(); smoothScrollTo(id); }}
                 className="text-sm font-medium text-slate-500 hover:text-[#1e3a8a] transition-colors no-underline">
                 {label}
               </a>
             ))}
+            <LanguageSwitcher />
             <button onClick={onLogin} className="btn-anim bg-[#1e3a8a] text-white border-none rounded-lg px-5 py-2.5 text-sm font-semibold cursor-pointer">
-              Login
+              {t("nav.login")}
             </button>
           </div>
 
           {/* Mobile hamburger */}
-          <button onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden bg-transparent border-none cursor-pointer p-1.5 rounded-md text-slate-500">
-            {menuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <LanguageSwitcher />
+            <button onClick={() => setMenuOpen(!menuOpen)}
+              className="bg-transparent border-none cursor-pointer p-1.5 rounded-md text-slate-500">
+              {menuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile dropdown */}
         {menuOpen && (
           <div className="md:hidden anim-fade-in-down bg-white border-t border-slate-100 px-4 py-4 flex flex-col gap-3">
-            {[["features","Features"],["how","How It Works"],["roles","Roles"]].map(([id, label]) => (
+            {navLinks.map(([id, label]) => (
               <a key={id} href={`#${id}`}
                 onClick={e => { e.preventDefault(); setMenuOpen(false); setTimeout(() => smoothScrollTo(id), 50); }}
                 className="text-[15px] font-medium text-slate-500 no-underline py-1">
@@ -140,7 +120,7 @@ export default function Home({ onLogin, onRegister }) {
             ))}
             <button onClick={() => { setMenuOpen(false); onLogin(); }}
               className="btn-anim bg-[#1e3a8a] text-white border-none rounded-lg py-3 text-sm font-semibold cursor-pointer mt-1">
-              Login
+              {t("nav.login")}
             </button>
           </div>
         )}
@@ -150,23 +130,20 @@ export default function Home({ onLogin, onRegister }) {
       <section className="w-full bg-white py-12 md:py-16 lg:py-20 px-4 md:px-6">
         <div className="max-w-[1200px] mx-auto flex flex-col lg:flex-row items-center gap-10 lg:gap-12">
 
-          {/* Left — headline & CTAs */}
           <div className="anim-fade-in-left w-full lg:flex-1">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight text-slate-900 mb-4 md:mb-5">
-              ResQLink – Sri Lanka's Intelligent Disaster Response Platform
+              {t("home.heroTitle")}
             </h1>
             <p className="text-base md:text-lg text-slate-500 leading-relaxed mb-7 md:mb-8">
-              Connecting citizens, volunteers, and authorities across Sri Lanka to report
-              incidents, coordinate relief efforts, and respond to floods, landslides,
-              and coastal emergencies in real time.
+              {t("home.heroSubtitle")}
             </p>
             <div className="flex flex-wrap gap-3 md:gap-4">
               <button className="btn-anim bg-[#1e3a8a] text-white border-none rounded-[9px] px-6 py-3 text-[15px] font-semibold cursor-pointer">
-                Report a Disaster
+                {t("home.reportDisaster")}
               </button>
               <button className="btn-anim bg-white text-[#1e3a8a] border-2 border-[#1e3a8a] rounded-[9px] px-6 py-3 text-[15px] font-semibold cursor-pointer"
                 onClick={onRegister}>
-                Join as Volunteer
+                {t("home.joinVolunteer")}
               </button>
             </div>
           </div>
@@ -176,35 +153,33 @@ export default function Home({ onLogin, onRegister }) {
             <div className="hover-card bg-white rounded-2xl border border-slate-100 p-5 md:p-6"
               style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.10)" }}>
 
-              {/* Stats row */}
               <div className="flex justify-between pb-4 mb-4 border-b border-slate-100">
                 {[
-                  { l: "Active Incidents", v: "18",    c: "text-slate-900"    },
-                  { l: "Volunteers",       v: "2,400", c: "text-slate-900"    },
-                  { l: "Resolved",         v: "87%",   c: "text-emerald-600"  },
+                  { lKey: "home.activeIncidents", v: "18",    c: "text-slate-900"    },
+                  { lKey: "home.volunteers",       v: "2,400", c: "text-slate-900"    },
+                  { lKey: "home.resolved",         v: "87%",   c: "text-emerald-600"  },
                 ].map(s => (
-                  <div key={s.l} className="text-center">
+                  <div key={s.lKey} className="text-center">
                     <div className={`text-2xl md:text-[26px] font-bold ${s.c}`}>{s.v}</div>
-                    <div className="text-[11px] md:text-xs text-slate-400 mt-0.5">{s.l}</div>
+                    <div className="text-[11px] md:text-xs text-slate-400 mt-0.5">{t(s.lKey)}</div>
                   </div>
                 ))}
               </div>
 
-              {/* Incident rows */}
               <div className="flex flex-col gap-2.5">
                 {incidents.map(inc => (
-                  <div key={inc.label}
+                  <div key={inc.labelKey}
                     className="flex items-center justify-between bg-slate-50 hover:bg-slate-100 rounded-[10px] px-3 py-2.5 transition-colors">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: inc.dot }} />
                       <div className="min-w-0">
-                        <div className="text-[13px] font-semibold text-slate-900 truncate">{inc.label}</div>
-                        <div className="text-[11px] text-slate-400 mt-0.5">{inc.severity} severity • {inc.time}</div>
+                        <div className="text-[13px] font-semibold text-slate-900 truncate">{t(inc.labelKey)}</div>
+                        <div className="text-[11px] text-slate-400 mt-0.5">{t(inc.severityKey)} {t("home.severity")} • {inc.time}</div>
                       </div>
                     </div>
                     <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full flex-shrink-0 ml-2"
                       style={{ backgroundColor: inc.badge.bg, color: inc.badge.color }}>
-                      {inc.severity}
+                      {t(inc.severityKey)}
                     </span>
                   </div>
                 ))}
@@ -218,20 +193,20 @@ export default function Home({ onLogin, onRegister }) {
       <section id="features" className="w-full bg-slate-50 py-12 md:py-16 lg:py-20 px-4 md:px-6">
         <div className="max-w-[1200px] mx-auto">
           <h2 className="reveal text-2xl md:text-3xl font-bold text-center text-slate-900 mb-3">
-            Platform Features
+            {t("home.featuresTitle")}
           </h2>
           <p className="reveal text-base md:text-[17px] text-slate-500 text-center mb-10 md:mb-12">
-            Purpose-built tools for Sri Lanka's disaster response ecosystem
+            {t("home.featuresSubtitle")}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
-            {features.map(({ Icon, title, desc }, i) => (
-              <div key={title} className={`reveal hover-card d-${(i+1)*100} bg-white rounded-[14px] p-6 md:p-7 border border-slate-100`}
+            {features.map(({ Icon, titleKey, descKey }, i) => (
+              <div key={titleKey} className={`reveal hover-card d-${(i+1)*100} bg-white rounded-[14px] p-6 md:p-7 border border-slate-100`}
                 style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.05)" }}>
                 <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4">
                   <Icon size={22} color="#1e3a8a" />
                 </div>
-                <h3 className="text-[15px] md:text-base font-bold text-slate-900 mb-2">{title}</h3>
-                <p className="text-sm md:text-[14px] text-slate-500 leading-relaxed">{desc}</p>
+                <h3 className="text-[15px] md:text-base font-bold text-slate-900 mb-2">{t(titleKey)}</h3>
+                <p className="text-sm md:text-[14px] text-slate-500 leading-relaxed">{t(descKey)}</p>
               </div>
             ))}
           </div>
@@ -242,20 +217,20 @@ export default function Home({ onLogin, onRegister }) {
       <section id="how" className="w-full bg-white py-12 md:py-16 lg:py-20 px-4 md:px-6">
         <div className="max-w-[1200px] mx-auto">
           <h2 className="reveal text-2xl md:text-3xl font-bold text-center text-slate-900 mb-3">
-            How It Works
+            {t("home.howTitle")}
           </h2>
           <p className="reveal text-base md:text-[17px] text-slate-500 text-center mb-10 md:mb-12">
-            A streamlined response workflow from incident to resolution
+            {t("home.howSubtitle")}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
-            {steps.map(({ Icon, label, desc }, i) => (
-              <div key={label} className={`reveal d-${(i+1)*100} flex flex-col items-center text-center gap-4`}>
+            {steps.map(({ Icon, labelKey, descKey }, i) => (
+              <div key={labelKey} className={`reveal d-${(i+1)*100} flex flex-col items-center text-center gap-4`}>
                 <div className="w-16 h-16 bg-[#1e3a8a] rounded-full flex items-center justify-center cursor-default transition-all duration-200 hover:scale-110"
                   style={{ boxShadow: "0 4px 18px rgba(30,58,138,0.3)" }}>
                   <Icon size={26} color="#fff" />
                 </div>
-                <h3 className="text-[15px] md:text-base font-bold text-slate-900">{label}</h3>
-                <p className="text-sm md:text-[14px] text-slate-500 leading-relaxed">{desc}</p>
+                <h3 className="text-[15px] md:text-base font-bold text-slate-900">{t(labelKey)}</h3>
+                <p className="text-sm md:text-[14px] text-slate-500 leading-relaxed">{t(descKey)}</p>
               </div>
             ))}
           </div>
@@ -266,27 +241,27 @@ export default function Home({ onLogin, onRegister }) {
       <section id="roles" className="w-full bg-slate-50 py-12 md:py-16 lg:py-20 px-4 md:px-6">
         <div className="max-w-[1200px] mx-auto">
           <h2 className="reveal text-2xl md:text-3xl font-bold text-center text-slate-900 mb-3">
-            Role-Based Access
+            {t("home.rolesTitle")}
           </h2>
           <p className="reveal text-base md:text-[17px] text-slate-500 text-center mb-10 md:mb-12">
-            Tailored experiences for every user in Sri Lanka's response network
+            {t("home.rolesSubtitle")}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-            {roles.map(({ Icon, title, color, items }, i) => (
-              <div key={title} className={`reveal hover-card d-${(i+1)*100} bg-white rounded-[14px] p-6 md:p-7`}
+            {roles.map(({ Icon, titleKey, color, items }, i) => (
+              <div key={titleKey} className={`reveal hover-card d-${(i+1)*100} bg-white rounded-[14px] p-6 md:p-7`}
                 style={{ border: `1.5px solid ${color}`, boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
                 <div className="flex items-center gap-2.5 mb-5">
                   <Icon size={20} color={color} />
-                  <h3 className="text-base font-bold text-slate-900">{title}</h3>
+                  <h3 className="text-base font-bold text-slate-900">{t(titleKey)}</h3>
                 </div>
                 <ul className="list-none p-0 m-0 flex flex-col gap-3">
-                  {items.map(item => (
-                    <li key={item} className="flex items-center gap-2.5 text-[15px] text-slate-600 font-medium">
+                  {items.map(itemKey => (
+                    <li key={itemKey} className="flex items-center gap-2.5 text-[15px] text-slate-600 font-medium">
                       <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="flex-shrink-0">
                         <circle cx="9" cy="9" r="9" fill={color} opacity="0.12"/>
                         <path d="M5.5 9l2.5 2.5 4.5-5" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
-                      {item}
+                      {t(itemKey)}
                     </li>
                   ))}
                 </ul>
@@ -300,20 +275,19 @@ export default function Home({ onLogin, onRegister }) {
       <section className="w-full bg-[#1e3a8a] py-12 md:py-16 lg:py-20 px-4 md:px-6">
         <div className="reveal max-w-[700px] mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 md:mb-4">
-            Protect Sri Lanka's Communities with ResQLink
+            {t("home.ctaTitle")}
           </h2>
           <p className="text-[15px] md:text-base text-blue-200 mb-8 md:mb-10 leading-relaxed">
-            Join the platform trusted by DMC partners, NDRC volunteers, and district
-            coordinators to coordinate relief and save lives during emergencies.
+            {t("home.ctaSubtitle")}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <button onClick={onLogin}
               className="btn-anim bg-transparent text-white border-2 border-white rounded-[9px] px-8 py-3 text-[15px] font-semibold cursor-pointer">
-              Login
+              {t("nav.login")}
             </button>
             <button onClick={onRegister}
               className="btn-anim bg-transparent text-white border-2 border-white rounded-[9px] px-8 py-3 text-[15px] font-semibold cursor-pointer">
-              Register
+              {t("nav.register")}
             </button>
           </div>
         </div>
@@ -326,20 +300,20 @@ export default function Home({ onLogin, onRegister }) {
             <div>
               <img src={logo} alt="ResQLink" className="h-8 w-auto mb-2" />
               <p className="text-[13px] text-slate-400 m-0">
-                Sri Lanka's unified disaster response and coordination platform
+                {t("home.footerTagline")}
               </p>
             </div>
             <div className="flex gap-6 md:gap-7">
-              {["Privacy", "Terms"].map(t => (
-                <a key={t} href="#"
+              {[["home.privacy", t("home.privacy")], ["home.terms", t("home.terms")]].map(([key, label]) => (
+                <a key={key} href="#"
                   className="text-sm text-slate-500 no-underline font-medium hover:text-[#1e3a8a] transition-colors">
-                  {t}
+                  {label}
                 </a>
               ))}
             </div>
           </div>
           <div className="border-t border-slate-100 pt-4 text-center text-[13px] text-slate-400">
-            © 2026 ResQLink. All rights reserved.
+            {t("home.copyright")}
           </div>
         </div>
       </footer>

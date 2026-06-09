@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import RegisterPage from "./RegisterPage";
 import ForgotPasswordPage from "./ForgotPasswordPage";
 import logo from "../../assets/Logo & Name Side-cropped.svg";
 
 export default function LoginPage({ onLoginSuccess, initialShowRegister = false, onGoHome }) {
+  const { t } = useTranslation();
   const [showRegister,       setShowRegister]       = useState(initialShowRegister);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [email,       setEmail]       = useState("");
@@ -42,7 +44,7 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
       const response = await axios.post("/api/auth/login", { email, password });
       onLoginSuccess(response.data);
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid email or password");
+      setError(err.response?.data?.message || t("auth.invalidCredentials"));
     } finally {
       setLoading(false);
     }
@@ -52,21 +54,21 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
     <div style={styles.page}>
       <div className="anim-scale-in" style={styles.card}>
 
-        {/* Logo — click to go back to landing page */}
+        {/* Logo */}
         <div style={styles.logoRow}>
           <img
             src={logo}
             alt="ResQLink"
             onClick={onGoHome}
             style={{ height: 44, width: "auto", cursor: onGoHome ? "pointer" : "default" }}
-            title="Back to Home"
+            title={t("common.backToHome")}
           />
         </div>
 
         {/* Heading */}
         <div style={styles.headingBlock}>
-          <h2 style={styles.heading}>Welcome Back</h2>
-          <p style={styles.subheading}>Sign in to your account to continue</p>
+          <h2 style={styles.heading}>{t("auth.welcomeBack")}</h2>
+          <p style={styles.subheading}>{t("auth.signInSubtitle")}</p>
         </div>
 
         {/* Error */}
@@ -75,10 +77,10 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
         {/* Form */}
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.fieldGroup}>
-            <label style={styles.label}>Email</label>
+            <label style={styles.label}>{t("auth.email")}</label>
             <input
               type="email"
-              placeholder="Enter your email"
+              placeholder={t("auth.emailPlaceholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={styles.input}
@@ -89,11 +91,11 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
           </div>
 
           <div style={styles.fieldGroup}>
-            <label style={styles.label}>Password</label>
+            <label style={styles.label}>{t("auth.password")}</label>
             <div style={{ position: "relative" }}>
               <input
                 type={showPwd ? "text" : "password"}
-                placeholder="Enter your password"
+                placeholder={t("auth.passwordPlaceholder")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 style={{ ...styles.input, paddingRight: 42 }}
@@ -120,15 +122,15 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
             className="btn-anim"
             style={{ ...styles.btn, ...(loading ? styles.btnDisabled : {}) }}
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? t("auth.signingIn") : t("auth.signIn")}
           </button>
         </form>
 
         {/* Links */}
         <p style={styles.linkLine}>
-          Don't have an account?{" "}
+          {t("auth.noAccount")}{" "}
           <button onClick={() => setShowRegister(true)} style={styles.linkBtn}>
-            Register here
+            {t("auth.registerHere")}
           </button>
         </p>
         <p style={styles.forgotLine}>
@@ -139,13 +141,13 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
             onMouseEnter={e => e.target.style.color = "#1e3a8a"}
             onMouseLeave={e => e.target.style.color = "#64748b"}
           >
-            Forgot password?
+            {t("auth.forgotPassword")}
           </button>
         </p>
 
         {/* Demo Credentials */}
         <div style={styles.demoBox}>
-          <p style={styles.demoTitle}>Demo Credentials (Kamal Perera):</p>
+          <p style={styles.demoTitle}>{t("auth.demoCredentials")}</p>
           <p style={styles.demoRow}><span style={styles.demoLabel}>Email:</span> volunteer@resqlink.com</p>
           <p style={styles.demoRow}><span style={styles.demoLabel}>Password:</span> demo123</p>
           <button
@@ -153,7 +155,7 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
             style={styles.fillBtn}
             onClick={() => { setEmail("volunteer@resqlink.com"); setPassword("demo123"); }}
           >
-            Fill Demo Credentials
+            {t("auth.fillDemo")}
           </button>
         </div>
 
@@ -200,12 +202,6 @@ const styles = {
     justifyContent: "center",
     gap: 10,
     marginBottom: 24,
-  },
-  logoText: {
-    fontSize: 22,
-    fontWeight: 700,
-    color: "#1e3a8a",
-    letterSpacing: "-0.3px",
   },
   headingBlock: {
     textAlign: "center",
@@ -312,10 +308,6 @@ const styles = {
   forgotLine: {
     textAlign: "center",
     margin: "0 0 20px",
-  },
-  forgotText: {
-    fontSize: 14,
-    color: "#94a3b8",
   },
   demoBox: {
     backgroundColor: "#f8fafc",

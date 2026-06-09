@@ -1,8 +1,12 @@
 import React from "react";
 import { Bell, User, Menu } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import logo from "../assets/Logo & Name Side-cropped.svg";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Header({ user, alertsCount, onTabChange, onMenuToggle }) {
+  const { t } = useTranslation();
+
   return (
     <header className="w-full h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6 flex-shrink-0 z-10"
       style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
@@ -12,7 +16,7 @@ export default function Header({ user, alertsCount, onTabChange, onMenuToggle })
         <button
           onClick={onMenuToggle}
           className="md:hidden bg-transparent border-none cursor-pointer p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
-          aria-label="Open menu"
+          aria-label={t("header.openMenu")}
         >
           <Menu size={20} />
         </button>
@@ -24,14 +28,19 @@ export default function Header({ user, alertsCount, onTabChange, onMenuToggle })
         />
       </div>
 
-      {/* Right: bell + profile */}
+      {/* Right: language switcher + bell + profile */}
       <div className="flex items-center gap-2 md:gap-3">
+
+        {/* Language Switcher */}
+        <div className="hidden sm:block">
+          <LanguageSwitcher />
+        </div>
 
         {/* Bell */}
         <button
           onClick={() => onTabChange("alerts")}
           className="relative bg-transparent border-none cursor-pointer p-2 rounded-full hover:bg-slate-100 transition-colors"
-          aria-label="Alerts"
+          aria-label={t("header.alertsLabel")}
         >
           <Bell size={20} color="#64748b" />
           {alertsCount > 0 && (
@@ -51,7 +60,7 @@ export default function Header({ user, alertsCount, onTabChange, onMenuToggle })
             <User size={15} color="#fff" />
           </div>
           <span className="hidden md:block text-sm font-semibold text-slate-900 whitespace-nowrap">
-            {user?.name || "Volunteer"}
+            {user?.name || t("header.volunteer")}
           </span>
         </button>
       </div>

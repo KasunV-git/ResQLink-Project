@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import logo from "../../assets/Logo & Name Side-cropped.svg";
 
 export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }) {
+  const { t } = useTranslation();
   const [firstName, setFirstName] = useState("");
   const [lastName,  setLastName]  = useState("");
   const [email,     setEmail]     = useState("");
@@ -17,11 +19,11 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!firstName.trim() || !lastName.trim()) {
-      setError("First name and last name are required.");
+      setError(t("auth.validationNameRequired"));
       return;
     }
     if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
+      setError(t("auth.validationPasswordLength"));
       return;
     }
     setLoading(true);
@@ -32,15 +34,15 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
       });
       onLoginSuccess(response.data);
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed. Please try again.");
+      setError(err.response?.data?.message || t("auth.registrationFailed"));
     } finally {
       setLoading(false);
     }
   };
 
   const roles = [
-    { value: "Citizen",   description: "Report disasters and receive alerts"   },
-    { value: "Volunteer", description: "Assist in disaster response efforts"   },
+    { value: "Citizen",   labelKey: "auth.citizenRole",   descKey: "auth.citizenDesc"   },
+    { value: "Volunteer", labelKey: "auth.volunteerRole",  descKey: "auth.volunteerDesc" },
   ];
 
   const inputStyle   = S.input;
@@ -50,21 +52,21 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
     <div style={S.page}>
       <div className="anim-scale-in" style={S.card}>
 
-        {/* Logo — click to go back to landing page */}
+        {/* Logo */}
         <div style={S.logoRow}>
           <img
             src={logo}
             alt="ResQLink"
             onClick={onGoHome}
             style={{ height: 44, width: "auto", cursor: onGoHome ? "pointer" : "default" }}
-            title="Back to Home"
+            title={t("common.backToHome")}
           />
         </div>
 
         {/* Heading */}
         <div style={S.headingBlock}>
-          <h2 style={S.heading}>Create Account</h2>
-          <p style={S.subheading}>Join ResQLink and help protect Sri Lanka's communities</p>
+          <h2 style={S.heading}>{t("auth.createAccount")}</h2>
+          <p style={S.subheading}>{t("auth.createSubtitle")}</p>
         </div>
 
         {/* Error */}
@@ -76,10 +78,10 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
           {/* First Name + Last Name — side by side */}
           <div style={{ display: "flex", gap: 12 }}>
             <div style={{ ...S.fieldGroup, flex: 1 }}>
-              <label style={S.label}>First Name</label>
+              <label style={S.label}>{t("auth.firstName")}</label>
               <input
                 type="text"
-                placeholder="First name"
+                placeholder={t("auth.firstNamePlaceholder")}
                 value={firstName}
                 onChange={e => setFirstName(e.target.value)}
                 style={inputStyle}
@@ -89,10 +91,10 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
               />
             </div>
             <div style={{ ...S.fieldGroup, flex: 1 }}>
-              <label style={S.label}>Last Name</label>
+              <label style={S.label}>{t("auth.lastName")}</label>
               <input
                 type="text"
-                placeholder="Last name"
+                placeholder={t("auth.lastNamePlaceholder")}
                 value={lastName}
                 onChange={e => setLastName(e.target.value)}
                 style={inputStyle}
@@ -105,10 +107,10 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
 
           {/* Email */}
           <div style={S.fieldGroup}>
-            <label style={S.label}>Email</label>
+            <label style={S.label}>{t("auth.email")}</label>
             <input
               type="email"
-              placeholder="Enter your email"
+              placeholder={t("auth.emailPlaceholder")}
               value={email}
               onChange={e => setEmail(e.target.value)}
               style={inputStyle}
@@ -120,11 +122,11 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
 
           {/* Password with eye toggle */}
           <div style={S.fieldGroup}>
-            <label style={S.label}>Password</label>
+            <label style={S.label}>{t("auth.password")}</label>
             <div style={{ position: "relative" }}>
               <input
                 type={showPwd ? "text" : "password"}
-                placeholder="Create a password (min. 6 characters)"
+                placeholder={t("auth.passwordCreate")}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 style={{ ...inputStyle, paddingRight: 42 }}
@@ -145,9 +147,9 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
             </div>
           </div>
 
-          {/* Mobile Number — after Password */}
+          {/* Mobile Number */}
           <div style={S.fieldGroup}>
-            <label style={S.label}>Mobile Number</label>
+            <label style={S.label}>{t("auth.mobileNumber")}</label>
             <input
               type="tel"
               placeholder="e.g. +94 77 123 4567"
@@ -161,7 +163,7 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
 
           {/* Select Role */}
           <div style={S.fieldGroup}>
-            <label style={S.label}>Select Role</label>
+            <label style={S.label}>{t("auth.selectRole")}</label>
             <div style={S.roleGroup}>
               {roles.map(r => (
                 <label
@@ -175,8 +177,8 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
                     </div>
                   </div>
                   <div style={S.roleText}>
-                    <span style={S.roleName}>{r.value}</span>
-                    <span style={S.roleDesc}>{r.description}</span>
+                    <span style={S.roleName}>{t(r.labelKey)}</span>
+                    <span style={S.roleDesc}>{t(r.descKey)}</span>
                   </div>
                 </label>
               ))}
@@ -189,14 +191,14 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
             className="btn-anim"
             style={{ ...S.btn, ...(loading ? S.btnDisabled : {}) }}
           >
-            {loading ? "Creating Account..." : "Create Account"}
+            {loading ? t("auth.creatingAccount") : t("auth.createAccount")}
           </button>
         </form>
 
         {/* Back to Login */}
         <p style={S.linkLine}>
-          Already have an account?{" "}
-          <button onClick={onBackToLogin} style={S.linkBtn}>Sign in here</button>
+          {t("auth.alreadyAccount")}{" "}
+          <button onClick={onBackToLogin} style={S.linkBtn}>{t("auth.signInHere")}</button>
         </p>
 
       </div>

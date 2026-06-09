@@ -1,7 +1,9 @@
 import React from "react";
 import { AlertCircle, MapPin, ClipboardList, CheckCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Dashboard({ user, onToggleAvailability, activeAssignments, completedAssignments, alerts, onTabChange }) {
+  const { t } = useTranslation();
   const isAvailable    = user?.isAvailable ?? true;
   const activeCount    = activeAssignments.length;
   const completedCount = completedAssignments.length;
@@ -12,9 +14,9 @@ export default function Dashboard({ user, onToggleAvailability, activeAssignment
 
       {/* Title */}
       <div className="anim-fade-in-up">
-        <h1 className="text-2xl md:text-[26px] font-bold text-slate-900 mb-1">Volunteer Dashboard</h1>
+        <h1 className="text-2xl md:text-[26px] font-bold text-slate-900 mb-1">{t("dashboard.title")}</h1>
         <p className="text-sm md:text-[14px] text-slate-500">
-          Welcome, {user?.name || "Volunteer"}! Manage your assignments and availability
+          {t("dashboard.subtitle", { name: user?.name || t("header.volunteer") })}
         </p>
       </div>
 
@@ -27,15 +29,15 @@ export default function Dashboard({ user, onToggleAvailability, activeAssignment
         }}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h2 className="text-[17px] font-semibold text-slate-900 mb-1">Availability Status</h2>
+            <h2 className="text-[17px] font-semibold text-slate-900 mb-1">{t("dashboard.availabilityStatus")}</h2>
             <p className="text-sm text-slate-500">
-              {isAvailable ? "You are currently available for assignments" : "You are currently unavailable for assignments"}
+              {isAvailable ? t("dashboard.availableDesc") : t("dashboard.unavailableDesc")}
             </p>
           </div>
           <div className="flex items-center gap-3 flex-shrink-0">
             <span className="text-sm font-semibold transition-colors duration-300"
               style={{ color: isAvailable ? "#15803d" : "#94a3b8" }}>
-              {isAvailable ? "Available" : "Unavailable"}
+              {isAvailable ? t("dashboard.available") : t("dashboard.unavailable")}
             </span>
             {/* Toggle switch */}
             <div onClick={onToggleAvailability}
@@ -55,7 +57,7 @@ export default function Dashboard({ user, onToggleAvailability, activeAssignment
         </div>
       </div>
 
-      {/* Cards row — 1 col mobile, 2 col desktop */}
+      {/* Cards row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
         {/* Active Assignments */}
@@ -64,18 +66,18 @@ export default function Dashboard({ user, onToggleAvailability, activeAssignment
           <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-3">
             <div className="flex items-center gap-2">
               <ClipboardList size={18} color="#15803d" />
-              <span className="text-[15px] font-semibold text-slate-900">Active Assignments</span>
+              <span className="text-[15px] font-semibold text-slate-900">{t("dashboard.activeAssignments")}</span>
             </div>
             <button onClick={() => onTabChange("assignments")}
               className="bg-transparent border-none cursor-pointer text-[13px] font-semibold text-[#15803d] hover:opacity-70 transition-opacity">
-              View All →
+              {t("dashboard.viewAll")}
             </button>
           </div>
           <div className="flex-1 overflow-y-auto flex flex-col gap-2.5">
             {activeAssignments.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center text-slate-400 gap-2 py-8">
                 <CheckCircle size={32} color="#e2e8f0" />
-                <span className="text-sm">No active assignments</span>
+                <span className="text-sm">{t("dashboard.noActiveAssignments")}</span>
               </div>
             ) : activeAssignments.slice(0, 2).map((item) => (
               <div key={item.id}
@@ -105,16 +107,16 @@ export default function Dashboard({ user, onToggleAvailability, activeAssignment
           <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-3">
             <div className="flex items-center gap-2">
               <AlertCircle size={18} color="#dc2626" />
-              <span className="text-[15px] font-semibold text-slate-900">Recent Alerts</span>
+              <span className="text-[15px] font-semibold text-slate-900">{t("dashboard.recentAlerts")}</span>
             </div>
             <button onClick={() => onTabChange("alerts")}
               className="bg-transparent border-none cursor-pointer text-[13px] font-semibold text-[#15803d] hover:opacity-70 transition-opacity">
-              View All →
+              {t("dashboard.viewAll")}
             </button>
           </div>
           <div className="flex-1 overflow-y-auto flex flex-col gap-2.5">
             {alerts.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center text-slate-400 text-sm py-8">No active alerts</div>
+              <div className="flex-1 flex items-center justify-center text-slate-400 text-sm py-8">{t("dashboard.noActiveAlerts")}</div>
             ) : alerts.slice(0, 3).map(alert => {
               const cfg = alert.priority === "high"
                 ? { bg: "#fef2f2", color: "#dc2626", border: "#fecaca" }
@@ -139,18 +141,18 @@ export default function Dashboard({ user, onToggleAvailability, activeAssignment
         </div>
       </div>
 
-      {/* Stats — always 3 columns */}
+      {/* Stats */}
       <div className="grid grid-cols-3 gap-3 md:gap-4">
         {[
-          { label: "Total Assignments", value: totalCount,    color: "#15803d" },
-          { label: "Active Tasks",      value: activeCount,   color: "#d97706" },
-          { label: "Completed",         value: completedCount, color: "#16a34a" },
-        ].map(({ label, value, color }, i) => (
-          <div key={label} className={`anim-fade-in-up hover-card d-${(i+2)*100} bg-white rounded-xl text-center`}
+          { labelKey: "dashboard.totalAssignments", value: totalCount,    color: "#15803d" },
+          { labelKey: "dashboard.activeTasks",      value: activeCount,   color: "#d97706" },
+          { labelKey: "dashboard.completed",        value: completedCount, color: "#16a34a" },
+        ].map(({ labelKey, value, color }, i) => (
+          <div key={labelKey} className={`anim-fade-in-up hover-card d-${(i+2)*100} bg-white rounded-xl text-center`}
             style={{ border: "1px solid #e2e8f0", padding: "18px 12px", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }}>
             <div className="text-3xl md:text-4xl font-bold mb-1" style={{ color }}>{value}</div>
             <div className="text-[10px] md:text-[11px] text-slate-400 font-semibold uppercase tracking-wider leading-tight">
-              {label}
+              {t(labelKey)}
             </div>
           </div>
         ))}
