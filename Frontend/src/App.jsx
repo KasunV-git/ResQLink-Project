@@ -17,6 +17,9 @@ export default function App() {
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem("resqlink_volunteer_user");
+    if (window.location.pathname !== '/') {
+      window.location.href = '/';
+    }
   };
 
   const handleUpdateUser = (updatedUser) => {

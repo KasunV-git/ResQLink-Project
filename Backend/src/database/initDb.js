@@ -44,19 +44,52 @@ async function initDb() {
     // 4. Seed Initial Data
     
     // A. Seed Users
-    const [existingUsers] = await connection.query('SELECT * FROM users WHERE email = ?', ['volunteer@resqlink.com']);
+    const usersToSeed = [
+      {
+        name: 'Kasun Volunteer',
+        email: 'volunteer@resqlink.com',
+        phone: '+1 234 567 8901',
+        role: 'Volunteer',
+        is_available: true,
+        password: 'demo123'
+      },
+      {
+        name: 'ResQLink Admin',
+        email: 'admin@resqlink.com',
+        phone: '+1 000 000 0000',
+        role: 'Admin',
+        is_available: false,
+        password: 'demo123'
+      },
+      {
+        name: 'Jane Citizen',
+        email: 'citizen@resqlink.com',
+        phone: '+1 555 555 5555',
+        role: 'Citizen',
+        is_available: false,
+        password: 'demo123'
+      }
+    ];
+
     let volunteerId;
-    if (existingUsers.length === 0) {
-      const [insertUser] = await connection.query(
-        `INSERT INTO users (name, email, phone, role, is_available, password) 
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        ['Kasun Volunteer', 'volunteer@resqlink.com', '+1 234 567 8901', 'Volunteer', true, 'demo123']
-      );
-      volunteerId = insertUser.insertId;
-      console.log('Volunteer Kasun seeded successfully.');
-    } else {
-      volunteerId = existingUsers[0].id;
-      console.log('Volunteer Kasun already exists.');
+    for (const u of usersToSeed) {
+      const [existing] = await connection.query('SELECT * FROM users WHERE email = ?', [u.email]);
+      if (existing.length === 0) {
+        const [insert] = await connection.query(
+          `INSERT INTO users (name, email, phone, role, is_available, password) 
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [u.name, u.email, u.phone, u.role, u.is_available, u.password]
+        );
+        if (u.role === 'Volunteer') {
+          volunteerId = insert.insertId;
+        }
+        console.log(`${u.role} user '${u.name}' seeded successfully.`);
+      } else {
+        if (u.role === 'Volunteer') {
+          volunteerId = existing[0].id;
+        }
+        console.log(`${u.role} user '${u.name}' already exists.`);
+      }
     }
 
     // B. Seed Skills
@@ -198,7 +231,10 @@ async function initDb() {
 if (require.main === module) {
   initDb()
     .then(() => process.exit(0))
-    .catch(() => process.exit(1));
+    .catch((err) => {
+      console.error('Database initialization failed:', err);
+      process.exit(1);
+    });
 }
 
 module.exports = initDb;
