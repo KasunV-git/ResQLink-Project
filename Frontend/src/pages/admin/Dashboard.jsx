@@ -1,5 +1,5 @@
 import { ClipboardList, Users, ShieldAlert, CheckCircle } from "lucide-react";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label } from "recharts";
 
 export default function Dashboard({ volunteers, assignments, alerts, onTabChange, isDarkMode }) {
   const totalVolunteers = volunteers.length;
@@ -109,7 +109,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
         </div>
         <div className="flex-1 w-full h-full min-h-[180px]">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 15, bottom: 20 }}>
               <defs>
                 <linearGradient id="colorDispatches" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
@@ -117,8 +117,32 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#334155" : "#e2e8f0"} />
-              <XAxis dataKey="date" stroke={isDarkMode ? "#94a3b8" : "#64748b"} fontSize={11} />
-              <YAxis stroke={isDarkMode ? "#94a3b8" : "#64748b"} fontSize={11} />
+              <XAxis dataKey="date" stroke={isDarkMode ? "#94a3b8" : "#64748b"} fontSize={11}>
+                <Label
+                  value="Date"
+                  offset={-5}
+                  position="insideBottom"
+                  style={{
+                    fill: isDarkMode ? "#94a3b8" : "#64748b",
+                    fontSize: 11,
+                    fontWeight: 600
+                  }}
+                />
+              </XAxis>
+              <YAxis stroke={isDarkMode ? "#94a3b8" : "#64748b"} fontSize={11}>
+                <Label
+                  value="Dispatches"
+                  angle={-90}
+                  position="insideLeft"
+                  offset={0}
+                  style={{
+                    textAnchor: "middle",
+                    fill: isDarkMode ? "#94a3b8" : "#64748b",
+                    fontSize: 11,
+                    fontWeight: 600
+                  }}
+                />
+              </YAxis>
               <Tooltip
                 contentStyle={{
                   backgroundColor: isDarkMode ? "#0f172a" : "#ffffff",
