@@ -140,4 +140,40 @@ router.put('/profile/:id', async (req, res) => {
   }
 });
 
+// Get all volunteers list (for admin)
+router.get('/volunteers', async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT u.id, u.name, u.email, u.phone, u.is_available,
+             (SELECT COUNT(*) FROM assignments a WHERE a.user_id = u.id AND a.status != 'completed') AS active_assignments_count
+      FROM users u
+      WHERE u.role = 'Volunteer'
+      ORDER BY u.name ASC
+    `);
+
+    // Fetch skills for each volunteer
+    const volunteers = await Promise.all(rows.map(async (v) => {
+      const [skillsRows] = await db.query(`
+        SELECT s.name FROM skills s
+        JOIN user_skills us ON s.id = us.skill_id
+        WHERE us.user_id = ?
+      `, [v.id]);
+      return {
+        id: v.id,
+        name: v.name,
+        email: v.email,
+        phone: v.phone,
+        isAvailable: Boolean(v.is_available),
+        activeAssignmentsCount: v.active_assignments_count,
+        skills: skillsRows.map(row => row.name)
+      };
+    }));
+
+    res.json(volunteers);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
 module.exports = router;
