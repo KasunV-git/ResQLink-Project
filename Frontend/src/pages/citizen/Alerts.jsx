@@ -1,72 +1,188 @@
 // frontend/src/pages/citizen/Alerts.jsx
-import { useState, useEffect } from 'react';
-import { Siren, Wind, CheckCircle2, Info, Search, Filter, BellOff, Check } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import {
+    Siren, Wind, CheckCircle2, Info, Search, BellOff,
+    Check, RefreshCw, ChevronDown, ChevronUp, Copy,
+    AlertOctagon, Clock, Radio, Mail, Smartphone, Bell,
+    CheckCheck, SlidersHorizontal,
+} from 'lucide-react';
 import { getAlerts, acknowledgeAlert } from '../../api/alertApi';
 import Loader from '../../components/common/Loader';
 
-/* ── Config ── */
+/* ── Severity config ── */
 const SEV = {
-    CRITICAL: { label: 'Critical', color: '#e53e3e', bg: '#fff5f5', border: '#fed7d7', icon: Siren },
-    HIGH: { label: 'High', color: '#dd6b20', bg: '#fffaf0', border: '#fbd38d', icon: Wind },
-    MODERATE: { label: 'Moderate', color: '#d69e2e', bg: '#fffff0', border: '#faf089', icon: Info },
-    LOW: { label: 'Low', color: '#38a169', bg: '#f0fff4', border: '#c6f6d5', icon: CheckCircle2 },
-    UPDATE: { label: 'Update', color: '#38a169', bg: '#f0fff4', border: '#c6f6d5', icon: CheckCircle2 },
-    DEFAULT: { label: 'Info', color: '#3182ce', bg: '#ebf8ff', border: '#bee3f8', icon: Info },
+    CRITICAL: { label: 'Critical', color: '#e53e3e', bg: '#fff5f5', border: '#fed7d7', icon: AlertOctagon,  priority: 1 },
+    HIGH:     { label: 'High',     color: '#dd6b20', bg: '#fffaf0', border: '#fbd38d', icon: Siren,         priority: 2 },
+    MODERATE: { label: 'Moderate', color: '#d69e2e', bg: '#fffff0', border: '#faf089', icon: Wind,          priority: 3 },
+    LOW:      { label: 'Low',      color: '#38a169', bg: '#f0fff4', border: '#c6f6d5', icon: CheckCircle2,  priority: 4 },
+    UPDATE:   { label: 'Update',   color: '#38a169', bg: '#f0fff4', border: '#c6f6d5', icon: CheckCircle2,  priority: 5 },
+    DEFAULT:  { label: 'Info',     color: '#3182ce', bg: '#ebf8ff', border: '#bee3f8', icon: Info,          priority: 6 },
+};
+const getSev = (s) => SEV[s?.toUpperCase()] ?? SEV.DEFAULT;
+
+/* ── Channel icon map ── */
+const ChannelIcon = ({ ch }) => {
+    if (ch === 'sms')   return <Smartphone size={12} />;
+    if (ch === 'email') return <Mail size={12} />;
+    if (ch === 'radio') return <Radio size={12} />;
+    return <Bell size={12} />;
 };
 
-const getSev = (s) => SEV[s?.toUpperCase()] || SEV.DEFAULT;
-
+/* ── Time helpers ── */
 const relTime = (iso) => {
     const diff = Date.now() - new Date(iso);
     const m = Math.floor(diff / 60000);
-    if (m < 1) return 'Just now';
-    if (m < 60) return `${m}m ago`;
+    if (m < 1)   return 'Just now';
+    if (m < 60)  return `${m}m ago`;
     if (m < 1440) return `${Math.floor(m / 60)}h ago`;
-    return new Date(iso).toLocaleDateString();
+    return `${Math.floor(m / 1440)}d ago`;
 };
 
-/* ── Demo data (used when API empty) ── */
+const fullTime = (iso) =>
+    new Date(iso).toLocaleString('en-US', {
+        weekday: 'short', month: 'short', day: 'numeric',
+        year: 'numeric', hour: '2-digit', minute: '2-digit',
+    });
+
+/* ── Demo data ── */
 const DEMO = [
-    { alert_id: 1, severity: 'CRITICAL', message: 'Flash Flood Warning: Zone B4 – Immediate evacuation required for coastal residents. Water levels rising rapidly at creek junction.', sent_at: new Date(Date.now() - 120000).toISOString(), acknowledged: false, channel: 'app', target_role: 'user' },
-    { alert_id: 2, severity: 'HIGH', message: 'High Wind Warning: Gusts up to 60mph expected between 2:00 PM and 6:00 PM today. Secure loose outdoor items and avoid travel.', sent_at: new Date(Date.now() - 2700000).toISOString(), acknowledged: false, channel: 'sms', target_role: 'user' },
-    { alert_id: 3, severity: 'MODERATE', message: 'Landslide Risk: Northern hill sectors remain at elevated risk following overnight rainfall. Residents advised to avoid roads through Sector 12.', sent_at: new Date(Date.now() - 7200000).toISOString(), acknowledged: true, channel: 'email', target_role: 'user' },
-    { alert_id: 4, severity: 'UPDATE', message: 'Road Clearance: Main Street is now open for public transit and emergency vehicles. Maintenance completed successfully.', sent_at: new Date(Date.now() - 10800000).toISOString(), acknowledged: true, channel: 'app', target_role: 'user' },
-    { alert_id: 5, severity: 'LOW', message: 'Weather Advisory: Light rain expected this evening. No major disruptions anticipated. Carry umbrellas if commuting after 7 PM.', sent_at: new Date(Date.now() - 86400000).toISOString(), acknowledged: true, channel: 'app', target_role: 'user' },
+    {
+        alert_id: 1, severity: 'CRITICAL',
+        message: 'Flash Flood Warning: Zone B4 – Immediate evacuation required for coastal residents. Water levels rising rapidly at creek junction. All Zone B4 residents must move to the Kandy Primary School evacuation center immediately.',
+        sent_at: new Date(Date.now() - 120000).toISOString(),
+        acknowledged: false, channel: 'app', target_role: 'user',
+        location: 'Zone B4, Coastal District',
+        instructions: 'Evacuate immediately via Main Road North. Do not use bridge access roads. Emergency shelters open at Kandy Primary School and Community Hall.',
+    },
+    {
+        alert_id: 2, severity: 'HIGH',
+        message: 'High Wind Warning: Gusts up to 60mph expected between 2:00 PM and 6:00 PM today. Secure loose outdoor items and avoid unnecessary travel.',
+        sent_at: new Date(Date.now() - 2700000).toISOString(),
+        acknowledged: false, channel: 'sms', target_role: 'user',
+        location: 'City-wide',
+        instructions: 'Secure all outdoor furniture and equipment. Avoid driving high-profile vehicles. Stay indoors during peak gusts.',
+    },
+    {
+        alert_id: 3, severity: 'MODERATE',
+        message: 'Landslide Risk: Northern hill sectors remain at elevated risk following overnight rainfall. Residents advised to avoid roads through Sector 12.',
+        sent_at: new Date(Date.now() - 7200000).toISOString(),
+        acknowledged: true, channel: 'email', target_role: 'user',
+        location: 'Sector 12, Northern Hills',
+        instructions: 'Avoid hill roads in Sector 12. Monitor official channels for updates. Report any ground movement to emergency services.',
+    },
+    {
+        alert_id: 4, severity: 'UPDATE',
+        message: 'Road Clearance Complete: Main Street is now open for public transit and emergency vehicles. Maintenance has been completed successfully.',
+        sent_at: new Date(Date.now() - 10800000).toISOString(),
+        acknowledged: true, channel: 'app', target_role: 'user',
+        location: 'Main Street',
+        instructions: 'Normal traffic flow has resumed. Emergency vehicles have priority access.',
+    },
+    {
+        alert_id: 5, severity: 'LOW',
+        message: 'Weather Advisory: Light rain expected this evening from 6 PM onward. No major disruptions anticipated. Carry umbrellas if commuting after 7 PM.',
+        sent_at: new Date(Date.now() - 86400000).toISOString(),
+        acknowledged: true, channel: 'app', target_role: 'user',
+        location: 'District-wide',
+        instructions: 'No action required. Stay updated via local weather services.',
+    },
+    {
+        alert_id: 6, severity: 'HIGH',
+        message: 'Chemical Plant Incident: Controlled fire reported at industrial complex near Zone C2. 500m exclusion zone enforced. Emergency teams on site.',
+        sent_at: new Date(Date.now() - 5400000).toISOString(),
+        acknowledged: false, channel: 'radio', target_role: 'user',
+        location: 'Zone C2, Industrial Area',
+        instructions: 'Stay at least 500m away from the industrial complex. Close windows and doors if in the vicinity. Follow instructions from emergency personnel.',
+    },
 ];
 
-/* ─────────────── */
+/* ── Sort options ── */
+const SORT_OPTIONS = [
+    { value: 'newest',   label: 'Newest First' },
+    { value: 'oldest',   label: 'Oldest First' },
+    { value: 'severity', label: 'By Severity' },
+];
+
+/* ─────────────────────── */
 
 const Alerts = () => {
-    const [alerts, setAlerts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('ALL');
-    const [search, setSearch] = useState('');
+    const [alerts, setAlerts]     = useState([]);
+    const [loading, setLoading]   = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [tab, setTab]           = useState('ALL');       // ALL | UNREAD | ACKNOWLEDGED
+    const [sevFilter, setSevFilter] = useState('ALL');
+    const [search, setSearch]     = useState('');
+    const [sort, setSort]         = useState('newest');
+    const [expanded, setExpanded] = useState(null);        // alert_id
+    const [copied, setCopied]     = useState(null);
+    const [showSort, setShowSort] = useState(false);
 
-    useEffect(() => {
-        // Use demo data directly - no backend needed
-        setAlerts(DEMO);
-        setLoading(false);
+    const fetchAlerts = useCallback(async (isRefresh = false) => {
+        if (isRefresh) setRefreshing(true);
+        try {
+            const res = await getAlerts({ limit: 50 });
+            const data = res.data?.data ?? res.data;
+            if (Array.isArray(data) && data.length > 0) {
+                setAlerts(data);
+            } else {
+                setAlerts(DEMO);
+            }
+        } catch {
+            setAlerts(DEMO);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
     }, []);
 
-    const handleAck = async (id) => {
-        try {
-            await acknowledgeAlert(id);
-            setAlerts(prev => prev.map(a => a.alert_id === id ? { ...a, acknowledged: true } : a));
-        } catch (_) {
-            // Demo mode – just mark locally
-            setAlerts(prev => prev.map(a => a.alert_id === id ? { ...a, acknowledged: true } : a));
-        }
+    useEffect(() => { fetchAlerts(); }, [fetchAlerts]);
+
+    /* ── Acknowledge single ── */
+    const handleAck = async (id, e) => {
+        e.stopPropagation();
+        try { await acknowledgeAlert(id); } catch { /* demo mode */ }
+        setAlerts(prev => prev.map(a => a.alert_id === id ? { ...a, acknowledged: true } : a));
     };
 
-    const FILTERS = ['ALL', 'CRITICAL', 'HIGH', 'MODERATE', 'UPDATE'];
-    const critical = alerts.filter(a => a.severity === 'CRITICAL' && !a.acknowledged).length;
-    const active = alerts.filter(a => !a.acknowledged).length;
+    /* ── Acknowledge all visible unread ── */
+    const handleAckAll = async () => {
+        const unread = visible.filter(a => !a.acknowledged);
+        await Promise.allSettled(unread.map(a => acknowledgeAlert(a.alert_id)));
+        const ids = new Set(unread.map(a => a.alert_id));
+        setAlerts(prev => prev.map(a => ids.has(a.alert_id) ? { ...a, acknowledged: true } : a));
+    };
 
-    const visible = alerts.filter(a => {
-        const matchFilter = filter === 'ALL' || a.severity === filter;
-        const matchSearch = !search || a.message.toLowerCase().includes(search.toLowerCase());
-        return matchFilter && matchSearch;
-    });
+    /* ── Copy message ── */
+    const handleCopy = (alert, e) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(`[${alert.severity}] ${alert.message}`);
+        setCopied(alert.alert_id);
+        setTimeout(() => setCopied(null), 2000);
+    };
+
+    /* ── Counts ── */
+    const total       = alerts.length;
+    const unreadCount = alerts.filter(a => !a.acknowledged).length;
+    const critCount   = alerts.filter(a => a.severity === 'CRITICAL' && !a.acknowledged).length;
+    const highCount   = alerts.filter(a => a.severity === 'HIGH' && !a.acknowledged).length;
+
+    /* ── Filter + sort pipeline ── */
+    const visible = alerts
+        .filter(a => {
+            if (tab === 'UNREAD')        return !a.acknowledged;
+            if (tab === 'ACKNOWLEDGED')  return  a.acknowledged;
+            return true;
+        })
+        .filter(a => sevFilter === 'ALL' || a.severity === sevFilter)
+        .filter(a => !search || a.message.toLowerCase().includes(search.toLowerCase()) || a.location?.toLowerCase().includes(search.toLowerCase()))
+        .sort((a, b) => {
+            if (sort === 'newest')   return new Date(b.sent_at) - new Date(a.sent_at);
+            if (sort === 'oldest')   return new Date(a.sent_at) - new Date(b.sent_at);
+            if (sort === 'severity') return getSev(a.severity).priority - getSev(b.severity).priority;
+            return 0;
+        });
+
+    const unreadVisible = visible.filter(a => !a.acknowledged).length;
 
     if (loading) return <Loader fullPage />;
 
@@ -76,127 +192,438 @@ const Alerts = () => {
             {/* ── Page header ── */}
             <div style={s.pageHead}>
                 <div>
-                    <h1 style={s.title}>Active Response Feed</h1>
-                    <p style={s.sub}>
-                        Real-time mission directives and critical updates. Acknowledge receipt immediately upon reading.
-                    </p>
+                    <h1 style={s.title}>Alert Feed</h1>
+                    <p style={s.sub}>Real-time emergency alerts and directives for your area.</p>
                 </div>
-                <div style={s.counters}>
-                    {critical > 0 && <span style={s.critTag}>{critical} Critical</span>}
-                    <span style={s.activeTag}>{active} Active</span>
+                <div style={s.headerActions}>
+                    {unreadVisible > 0 && (
+                        <button onClick={handleAckAll} style={s.ackAllBtn}>
+                            <CheckCheck size={14} />
+                            Acknowledge All
+                        </button>
+                    )}
+                    <button
+                        onClick={() => fetchAlerts(true)}
+                        style={s.refreshBtn}
+                        disabled={refreshing}
+                    >
+                        <RefreshCw size={14} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
+                        {refreshing ? 'Refreshing…' : 'Refresh'}
+                    </button>
                 </div>
             </div>
 
-            {/* ── Search + filter ── */}
+            {/* ── Stats summary bar ── */}
+            <div style={s.statsBar} className="card">
+                {[
+                    { label: 'Total',    value: total,      color: '#4a5568', bg: 'transparent' },
+                    { label: 'Unread',   value: unreadCount, color: '#3182ce', bg: '#ebf8ff' },
+                    { label: 'Critical', value: critCount,   color: '#e53e3e', bg: '#fff5f5' },
+                    { label: 'High',     value: highCount,   color: '#dd6b20', bg: '#fffaf0' },
+                ].map(({ label, value, color, bg }) => (
+                    <div key={label} style={{ ...s.statItem, background: bg }}>
+                        <span style={{ ...s.statVal, color }}>{value}</span>
+                        <span style={s.statLbl}>{label}</span>
+                    </div>
+                ))}
+            </div>
+
+            {/* ── Tabs ── */}
+            <div style={s.tabs}>
+                {[
+                    { key: 'ALL',          label: 'All Alerts',     count: total },
+                    { key: 'UNREAD',       label: 'Unread',         count: unreadCount },
+                    { key: 'ACKNOWLEDGED', label: 'Acknowledged',   count: total - unreadCount },
+                ].map(({ key, label, count }) => (
+                    <button
+                        key={key}
+                        onClick={() => setTab(key)}
+                        style={{ ...s.tab, ...(tab === key ? s.tabActive : {}) }}
+                    >
+                        {label}
+                        <span style={{ ...s.tabCount, ...(tab === key ? s.tabCountActive : {}) }}>
+                            {count}
+                        </span>
+                    </button>
+                ))}
+            </div>
+
+            {/* ── Toolbar: search + severity filter + sort ── */}
             <div style={s.toolbar} className="alerts-toolbar">
+                {/* Search */}
                 <div style={s.searchWrap}>
-                    <Search size={15} color="#a0aec0" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+                    <Search size={14} color="#a0aec0" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
                     <input
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        placeholder="Search alerts..."
+                        placeholder="Search alerts or locations…"
                         style={s.searchInput}
                     />
+                    {search && (
+                        <button onClick={() => setSearch('')} style={s.clearBtn}>✕</button>
+                    )}
                 </div>
+
+                {/* Severity filter pills */}
                 <div style={s.filterRow} className="alerts-filter-row">
-                    {FILTERS.map(f => (
-                        <button
-                            key={f}
-                            onClick={() => setFilter(f)}
-                            style={{ ...s.filterBtn, ...(filter === f ? s.filterActive : {}) }}
-                        >
-                            {f}
-                        </button>
-                    ))}
+                    {['ALL', 'CRITICAL', 'HIGH', 'MODERATE', 'LOW', 'UPDATE'].map(f => {
+                        const cfg = f !== 'ALL' ? getSev(f) : null;
+                        return (
+                            <button
+                                key={f}
+                                onClick={() => setSevFilter(f)}
+                                style={{
+                                    ...s.filterBtn,
+                                    ...(sevFilter === f ? {
+                                        background: cfg ? cfg.color : '#1a2456',
+                                        color: '#fff',
+                                        borderColor: cfg ? cfg.color : '#1a2456',
+                                    } : {}),
+                                }}
+                            >
+                                {f}
+                            </button>
+                        );
+                    })}
                 </div>
+
+                {/* Sort dropdown */}
+                <div style={{ position: 'relative' }}>
+                    <button
+                        onClick={() => setShowSort(v => !v)}
+                        style={s.sortBtn}
+                    >
+                        <SlidersHorizontal size={13} />
+                        {SORT_OPTIONS.find(o => o.value === sort)?.label}
+                        <ChevronDown size={12} />
+                    </button>
+                    {showSort && (
+                        <div style={s.sortDropdown}>
+                            {SORT_OPTIONS.map(o => (
+                                <button
+                                    key={o.value}
+                                    onClick={() => { setSort(o.value); setShowSort(false); }}
+                                    style={{ ...s.sortOption, ...(sort === o.value ? s.sortOptionActive : {}) }}
+                                >
+                                    {o.value === sort && <Check size={12} />}
+                                    {o.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* ── Results count ── */}
+            <div style={s.resultsRow}>
+                <span style={s.resultsCount}>
+                    {visible.length} alert{visible.length !== 1 ? 's' : ''} shown
+                    {search && ` for "${search}"`}
+                </span>
+                {(search || sevFilter !== 'ALL' || tab !== 'ALL') && (
+                    <button
+                        onClick={() => { setSearch(''); setSevFilter('ALL'); setTab('ALL'); }}
+                        style={s.clearFilters}
+                    >
+                        Clear filters
+                    </button>
+                )}
             </div>
 
             {/* ── Alert list ── */}
             {visible.length === 0 ? (
                 <div style={s.empty}>
-                    <BellOff size={36} color="#cbd5e0" />
-                    <p style={{ marginTop: 12, color: '#a0aec0' }}>No alerts matching your filter.</p>
+                    <BellOff size={40} color="#cbd5e0" />
+                    <p style={s.emptyTitle}>No alerts found</p>
+                    <p style={s.emptySub}>
+                        {search ? `No results for "${search}"` : 'No alerts in this category.'}
+                    </p>
                 </div>
             ) : (
-                <div style={s.list} className="stagger">
+                <div style={s.list}>
                     {visible.map((alert) => {
-                        const cfg = getSev(alert.severity);
+                        const cfg  = getSev(alert.severity);
                         const Icon = cfg.icon;
-                        const acked = alert.acknowledged;
+                        const acked   = alert.acknowledged;
+                        const isOpen  = expanded === alert.alert_id;
+
                         return (
                             <div
                                 key={alert.alert_id}
                                 style={{
                                     ...s.alertCard,
-                                    borderLeftColor: cfg.color,
-                                    opacity: acked ? .65 : 1,
+                                    borderLeftColor: acked ? '#cbd5e0' : cfg.color,
+                                    opacity: acked ? 0.72 : 1,
                                 }}
-                                className="card fade-in alerts-alert-card"
+                                className="card"
                             >
-                                {/* Icon */}
-                                <div style={{ ...s.alertIconWrap, background: cfg.bg }}>
-                                    <Icon size={20} color={cfg.color} />
-                                </div>
-
-                                {/* Content */}
-                                <div style={{ flex: 1 }}>
-                                    <div style={s.alertTop}>
-                                        <span style={{ ...s.sevBadge, color: cfg.color, background: cfg.bg, border: `1px solid ${cfg.border}` }}>
-                                            {cfg.label}
-                                        </span>
-                                        <span style={s.timeLabel}>{relTime(alert.sent_at)}</span>
+                                {/* ── Main row ── */}
+                                <div
+                                    style={s.alertMain}
+                                    onClick={() => setExpanded(isOpen ? null : alert.alert_id)}
+                                    role="button"
+                                >
+                                    {/* Icon */}
+                                    <div style={{ ...s.alertIconWrap, background: acked ? 'var(--bg-hover)' : cfg.bg }}>
+                                        <Icon size={20} color={acked ? '#a0aec0' : cfg.color} />
                                     </div>
-                                    <p style={s.alertMsg}>{alert.message}</p>
-                                    <div style={s.alertMeta2}>
-                                        <span style={s.metaChip}>via {alert.channel?.toUpperCase()}</span>
-                                    </div>
-                                </div>
 
-                                {/* Action */}
-                                <div>
-                                    {acked ? (
-                                        <div style={s.ackedBadge}><Check size={12} /> Acknowledged</div>
-                                    ) : (
-                                        <button onClick={() => handleAck(alert.alert_id)} style={s.ackBtn}>
-                                            Acknowledge
+                                    {/* Content */}
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={s.alertTopRow}>
+                                            <span style={{
+                                                ...s.sevBadge,
+                                                color: acked ? '#718096' : cfg.color,
+                                                background: acked ? 'var(--bg-hover)' : cfg.bg,
+                                                border: `1px solid ${acked ? 'var(--border)' : cfg.border}`,
+                                            }}>
+                                                {cfg.label}
+                                            </span>
+                                            <span style={s.channelChip}>
+                                                <ChannelIcon ch={alert.channel} />
+                                                {alert.channel?.toUpperCase() ?? 'APP'}
+                                            </span>
+                                            <span style={s.timeLabel}>
+                                                <Clock size={11} />
+                                                {relTime(alert.sent_at)}
+                                            </span>
+                                        </div>
+                                        <p style={s.alertMsg}>{alert.message}</p>
+                                        {alert.location && (
+                                            <p style={s.locationLabel}>📍 {alert.location}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Actions */}
+                                    <div style={s.alertActions} onClick={e => e.stopPropagation()}>
+                                        {/* Copy */}
+                                        <button
+                                            onClick={(e) => handleCopy(alert, e)}
+                                            style={s.iconBtn}
+                                            title="Copy alert"
+                                        >
+                                            {copied === alert.alert_id
+                                                ? <Check size={14} color="#38a169" />
+                                                : <Copy size={14} color="#a0aec0" />}
                                         </button>
-                                    )}
+
+                                        {/* Acknowledge */}
+                                        {acked ? (
+                                            <div style={s.ackedBadge}>
+                                                <Check size={12} /> Done
+                                            </div>
+                                        ) : (
+                                            <button
+                                                onClick={(e) => handleAck(alert.alert_id, e)}
+                                                style={s.ackBtn}
+                                            >
+                                                Acknowledge
+                                            </button>
+                                        )}
+
+                                        {/* Expand toggle */}
+                                        <button
+                                            style={s.iconBtn}
+                                            onClick={() => setExpanded(isOpen ? null : alert.alert_id)}
+                                            title={isOpen ? 'Collapse' : 'Expand'}
+                                        >
+                                            {isOpen
+                                                ? <ChevronUp size={16} color="#718096" />
+                                                : <ChevronDown size={16} color="#718096" />}
+                                        </button>
+                                    </div>
                                 </div>
+
+                                {/* ── Expanded detail panel ── */}
+                                {isOpen && (
+                                    <div style={s.expandPanel}>
+                                        <div style={s.expandGrid}>
+                                            {/* Full timestamp */}
+                                            <div style={s.expandItem}>
+                                                <span style={s.expandLabel}>Issued At</span>
+                                                <span style={s.expandValue}>{fullTime(alert.sent_at)}</span>
+                                            </div>
+
+                                            {/* Channel */}
+                                            <div style={s.expandItem}>
+                                                <span style={s.expandLabel}>Delivery Channel</span>
+                                                <span style={s.expandValue} className="flex items-center gap-1">
+                                                    <ChannelIcon ch={alert.channel} /> {alert.channel?.toUpperCase() ?? 'APP'}
+                                                </span>
+                                            </div>
+
+                                            {/* Location */}
+                                            {alert.location && (
+                                                <div style={s.expandItem}>
+                                                    <span style={s.expandLabel}>Affected Area</span>
+                                                    <span style={s.expandValue}>{alert.location}</span>
+                                                </div>
+                                            )}
+
+                                            {/* Status */}
+                                            <div style={s.expandItem}>
+                                                <span style={s.expandLabel}>Status</span>
+                                                <span style={{
+                                                    ...s.expandValue,
+                                                    color: acked ? '#38a169' : cfg.color,
+                                                    fontWeight: 700,
+                                                }}>
+                                                    {acked ? 'Acknowledged' : 'Awaiting Acknowledgement'}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Safety instructions */}
+                                        {alert.instructions && (
+                                            <div style={s.instructionBox}>
+                                                <div style={s.instructionTitle}>
+                                                    📋 Safety Instructions
+                                                </div>
+                                                <p style={s.instructionText}>{alert.instructions}</p>
+                                            </div>
+                                        )}
+
+                                        {/* Bottom actions */}
+                                        <div style={s.expandActions}>
+                                            <button
+                                                onClick={(e) => handleCopy(alert, e)}
+                                                style={s.expandCopyBtn}
+                                            >
+                                                {copied === alert.alert_id ? <Check size={13} /> : <Copy size={13} />}
+                                                {copied === alert.alert_id ? 'Copied!' : 'Copy Alert Text'}
+                                            </button>
+                                            {!acked && (
+                                                <button
+                                                    onClick={(e) => handleAck(alert.alert_id, e)}
+                                                    style={s.expandAckBtn}
+                                                >
+                                                    <CheckCheck size={13} />
+                                                    Mark as Acknowledged
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         );
                     })}
                 </div>
             )}
+
+            {/* Spin keyframe */}
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
     );
 };
 
+/* ── Styles ── */
 const s = {
-    page: { display: 'flex', flexDirection: 'column', gap: 24 },
-    pageHead: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 },
-    title: { fontFamily: "'Inter',sans-serif", fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 800, color: 'var(--text-dark)', marginBottom: 6 },
+    page: { display: 'flex', flexDirection: 'column', gap: 20 },
+
+    pageHead: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 },
+    title: { fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 800, color: 'var(--text-dark)', marginBottom: 4 },
     sub: { color: 'var(--text-muted)', fontSize: 14 },
-    counters: { display: 'flex', gap: 8, alignItems: 'center' },
-    critTag: { padding: '5px 12px', borderRadius: 999, background: 'var(--danger-bg)', color: '#e53e3e', fontSize: 12, fontWeight: 700, border: '1px solid rgba(229,62,62,.3)' },
-    activeTag: { padding: '5px 12px', borderRadius: 999, background: 'var(--info-bg)', color: '#3182ce', fontSize: 12, fontWeight: 700, border: '1px solid rgba(49,130,206,.3)' },
-    toolbar: { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' },
-    searchWrap: { position: 'relative', flex: 1, minWidth: 200 },
-    searchInput: { width: '100%', padding: '9px 12px 9px 36px', border: '1.5px solid var(--border)', borderRadius: 10, fontSize: 14, background: 'var(--bg-input)', color: 'var(--text-dark)', outline: 'none', fontFamily: "'Inter',sans-serif" },
-    filterRow: { display: 'flex', gap: 6 },
-    filterBtn: { padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, border: '1.5px solid var(--border)', background: 'var(--bg-card)', color: 'var(--text-muted)', cursor: 'pointer', transition: 'all .18s ease' },
-    filterActive: { background: '#1a2456', color: '#fff', borderColor: '#1a2456' },
-    list: { display: 'flex', flexDirection: 'column', gap: 14 },
-    alertCard: { display: 'flex', gap: 16, padding: 20, borderLeft: '4px solid transparent', alignItems: 'flex-start' },
+    headerActions: { display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' },
+
+    ackAllBtn: {
+        display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px',
+        background: '#1a9e7a', color: '#fff', border: 'none', borderRadius: 10,
+        fontSize: 13, fontWeight: 700, cursor: 'pointer',
+    },
+    refreshBtn: {
+        display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px',
+        background: 'var(--bg-card)', color: 'var(--text-mid)', border: '1.5px solid var(--border)',
+        borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+    },
+
+    statsBar: { display: 'flex', gap: 0, padding: 0, overflow: 'hidden' },
+    statItem: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '14px 8px', borderRight: '1px solid var(--border)' },
+    statVal: { fontSize: 22, fontWeight: 800, lineHeight: 1, marginBottom: 4 },
+    statLbl: { fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.4px' },
+
+    tabs: { display: 'flex', borderBottom: '2px solid var(--border)', gap: 0 },
+    tab: {
+        padding: '10px 20px', background: 'none', border: 'none', borderBottom: '2px solid transparent',
+        marginBottom: -2, fontSize: 14, fontWeight: 600, color: 'var(--text-muted)', cursor: 'pointer',
+        display: 'flex', alignItems: 'center', gap: 8, transition: 'all .15s ease',
+    },
+    tabActive: { color: '#1a2456', borderBottomColor: '#1a2456' },
+    tabCount: { padding: '1px 7px', borderRadius: 99, fontSize: 11, fontWeight: 700, background: 'var(--bg-hover)', color: 'var(--text-muted)' },
+    tabCountActive: { background: '#1a2456', color: '#fff' },
+
+    toolbar: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
+    searchWrap: { position: 'relative', flex: 1, minWidth: 220 },
+    searchInput: {
+        width: '100%', padding: '9px 36px 9px 36px', border: '1.5px solid var(--border)',
+        borderRadius: 10, fontSize: 14, background: 'var(--bg-input)', color: 'var(--text-dark)', outline: 'none',
+    },
+    clearBtn: {
+        position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
+        background: 'none', border: 'none', cursor: 'pointer', color: '#a0aec0', fontSize: 14, padding: 2,
+    },
+    filterRow: { display: 'flex', gap: 6, flexWrap: 'wrap' },
+    filterBtn: {
+        padding: '7px 12px', borderRadius: 8, fontSize: 11, fontWeight: 700, letterSpacing: '.3px',
+        border: '1.5px solid var(--border)', background: 'var(--bg-card)', color: 'var(--text-muted)',
+        cursor: 'pointer', transition: 'all .15s ease', textTransform: 'uppercase',
+    },
+    sortBtn: {
+        display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px',
+        background: 'var(--bg-card)', border: '1.5px solid var(--border)', borderRadius: 10,
+        fontSize: 13, fontWeight: 600, color: 'var(--text-mid)', cursor: 'pointer', whiteSpace: 'nowrap',
+    },
+    sortDropdown: {
+        position: 'absolute', right: 0, top: 'calc(100% + 6px)', background: 'var(--bg-card)',
+        border: '1px solid var(--border)', borderRadius: 12, padding: 6, zIndex: 100,
+        boxShadow: 'var(--shadow-md)', minWidth: 160,
+    },
+    sortOption: {
+        display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '9px 14px',
+        background: 'none', border: 'none', borderRadius: 8, fontSize: 13, color: 'var(--text-mid)',
+        cursor: 'pointer', textAlign: 'left', fontWeight: 500,
+    },
+    sortOptionActive: { background: 'var(--bg-hover)', color: 'var(--text-dark)', fontWeight: 700 },
+
+    resultsRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
+    resultsCount: { fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 },
+    clearFilters: { fontSize: 13, fontWeight: 600, color: '#1a9e7a', background: 'none', border: 'none', cursor: 'pointer', padding: 0 },
+
+    list: { display: 'flex', flexDirection: 'column', gap: 12 },
+
+    alertCard: { borderLeft: '4px solid transparent', overflow: 'hidden', transition: 'opacity .2s' },
+    alertMain: { display: 'flex', gap: 14, padding: 18, alignItems: 'flex-start', cursor: 'pointer' },
     alertIconWrap: { width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-    alertTop: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 },
-    sevBadge: { padding: '3px 10px', borderRadius: 999, fontSize: 10, fontWeight: 700, letterSpacing: '.5px', textTransform: 'uppercase' },
-    timeLabel: { fontSize: 12, color: 'var(--text-light)' },
-    alertMsg: { fontSize: 14, color: 'var(--text-mid)', lineHeight: 1.6, marginBottom: 8 },
-    alertMeta2: { display: 'flex', gap: 8 },
-    metaChip: { fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', background: 'var(--bg-hover)', border: '1px solid var(--border)', padding: '2px 8px', borderRadius: 6 },
-    ackBtn: { padding: '8px 16px', background: '#1a2456', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' },
-    ackedBadge: { display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, color: '#38a169', background: 'var(--success-bg)', border: '1px solid rgba(56,161,105,.3)', padding: '6px 12px', borderRadius: 8, whiteSpace: 'nowrap' },
-    empty: { padding: 60, textAlign: 'center' },
+    alertTopRow: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' },
+    sevBadge: { padding: '3px 10px', borderRadius: 99, fontSize: 10, fontWeight: 700, letterSpacing: '.5px', textTransform: 'uppercase' },
+    channelChip: {
+        display: 'flex', alignItems: 'center', gap: 4,
+        padding: '3px 8px', borderRadius: 6, fontSize: 10, fontWeight: 700,
+        background: 'var(--bg-hover)', color: 'var(--text-muted)', border: '1px solid var(--border)',
+    },
+    timeLabel: { display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--text-light)' },
+    alertMsg: { fontSize: 14, color: 'var(--text-mid)', lineHeight: 1.6, margin: '0 0 6px' },
+    locationLabel: { fontSize: 12, color: 'var(--text-light)', margin: 0 },
+
+    alertActions: { display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, flexWrap: 'wrap' },
+    iconBtn: { width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-hover)', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer' },
+    ackBtn: { padding: '7px 14px', background: '#1a2456', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' },
+    ackedBadge: { display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, color: '#38a169', background: 'var(--success-bg)', border: '1px solid rgba(56,161,105,.3)', padding: '6px 10px', borderRadius: 8, whiteSpace: 'nowrap' },
+
+    expandPanel: { borderTop: '1px solid var(--border)', padding: '16px 18px', background: 'var(--bg-hover)' },
+    expandGrid: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px 24px', marginBottom: 14 },
+    expandItem: { display: 'flex', flexDirection: 'column', gap: 3 },
+    expandLabel: { fontSize: 10, fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '.5px' },
+    expandValue: { fontSize: 13, fontWeight: 600, color: 'var(--text-dark)' },
+    instructionBox: { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 16px', marginBottom: 14 },
+    instructionTitle: { fontSize: 12, fontWeight: 700, color: 'var(--text-dark)', marginBottom: 6 },
+    instructionText: { fontSize: 13, color: 'var(--text-mid)', lineHeight: 1.6, margin: 0 },
+    expandActions: { display: 'flex', gap: 10 },
+    expandCopyBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: 'var(--bg-card)', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: 12, fontWeight: 600, color: 'var(--text-mid)', cursor: 'pointer' },
+    expandAckBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: '#1a9e7a', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer' },
+
+    empty: { padding: '60px 20px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 },
+    emptyTitle: { fontSize: 16, fontWeight: 700, color: 'var(--text-dark)', margin: 0 },
+    emptySub: { fontSize: 13, color: 'var(--text-muted)', margin: 0 },
 };
 
 export default Alerts;

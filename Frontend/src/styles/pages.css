@@ -48,12 +48,7 @@
 }
 
 /* ── Alerts ── */
-@media (max-width: 600px) {
-    .alerts-alert-card {
-        flex-direction: column !important;
-        gap: 10px !important;
-    }
-
+@media (max-width: 768px) {
     .alerts-toolbar {
         flex-direction: column !important;
         align-items: stretch !important;
@@ -61,6 +56,21 @@
 
     .alerts-filter-row {
         flex-wrap: wrap !important;
+    }
+
+    .alerts-expand-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .alerts-stats-bar {
+        flex-wrap: wrap !important;
+    }
+
+    .alerts-stats-bar > div {
+        min-width: 50% !important;
+        border-bottom: 1px solid var(--border) !important;
     }
 }
 
