@@ -86,14 +86,20 @@
 }
 
 /* ── Map ── */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .map-layout {
         flex-direction: column !important;
         height: auto !important;
     }
 
-    .map-layout .map-sidebar {
+    .map-layout > div:first-child {
         width: 100% !important;
-        max-height: 260px !important;
+        height: 220px !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border) !important;
+    }
+
+    .map-layout > div:last-child {
+        height: 420px !important;
     }
 }
