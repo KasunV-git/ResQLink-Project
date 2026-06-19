@@ -1,6 +1,6 @@
 /* ===== ResQLink Design Tokens ===== */
 :root {
-    /* Primary Colors - from UI screenshots */
+    /* Primary Colors */
     --navy: #1a2456;
     --navy-dark: #111a3e;
     --navy-mid: #1e2d6b;
@@ -18,10 +18,13 @@
     --success: #38a169;
     --success-bg: #f0fff4;
 
-    /* Neutrals */
+    /* Neutrals – Light Mode */
     --bg: #f0f4f8;
     --bg-card: #ffffff;
     --bg-sidebar: #ffffff;
+    --bg-navbar: #ffffff;
+    --bg-input: #ffffff;
+    --bg-hover: #f7fafc;
     --border: #e2e8f0;
     --border-mid: #cbd5e0;
     --text-dark: #1a202c;
@@ -43,4 +46,29 @@
     /* Transitions */
     --transition: all .2s ease;
     --transition-slow: all .35s ease;
+}
+
+/* ===== Dark Mode Overrides ===== */
+[data-theme="dark"] {
+    --bg: #0f1117;
+    --bg-card: #1a1d27;
+    --bg-sidebar: #13161f;
+    --bg-navbar: #13161f;
+    --bg-input: #1f2330;
+    --bg-hover: #1f2330;
+    --border: #2a2f42;
+    --border-mid: #3a4055;
+    --text-dark: #e8eaf0;
+    --text-mid: #9ba3b8;
+    --text-muted: #6b7590;
+    --text-light: #4a5270;
+
+    --danger-bg: rgba(229, 62, 62, .12);
+    --warning-bg: rgba(221, 107, 32, .12);
+    --info-bg: rgba(49, 130, 206, .12);
+    --success-bg: rgba(56, 161, 105, .12);
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, .3), 0 1px 2px rgba(0, 0, 0, .2);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, .4);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, .5);
 }

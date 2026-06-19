@@ -70,7 +70,7 @@ const Dashboard = () => {
             </section>
 
             {/* ── Action strip ── */}
-            <div style={s.actionStrip}>
+            <div style={s.actionStrip} className="dash-action-strip">
                 {/* Report disaster CTA */}
                 <div style={s.reportCard} className="card">
                     <div>
@@ -94,7 +94,7 @@ const Dashboard = () => {
                         <div style={{ fontSize: 12, fontWeight: 600, color: '#718096', letterSpacing: '.5px', marginBottom: 2 }}>
                             Verified Identity
                         </div>
-                        <div style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 15, color: '#1a202c' }}>
+                        <div style={{ fontFamily: "Inter,sans-serif", fontWeight: 700, fontSize: 15, color: '#1a202c' }}>
                             {user?.name ?? 'Marcus Aurelius'}
                         </div>
                         <div style={s.trustBar}>
@@ -108,7 +108,7 @@ const Dashboard = () => {
             </div>
 
             {/* ── Bottom grid: alerts + quick nav ── */}
-            <div style={s.grid}>
+            <div style={s.grid} className="dash-grid">
 
                 {/* Recent Alerts */}
                 <section>
@@ -196,10 +196,10 @@ const Dashboard = () => {
 const s = {
     page: { display: 'flex', flexDirection: 'column', gap: 24 },
     hero: {},
-    heroTitle: { fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, color: '#1a202c', marginBottom: 8 },
-    heroSub: { color: '#718096', fontSize: 15, maxWidth: 560 },
+    heroTitle: { fontFamily: "'Syne',sans-serif", fontSize: 'clamp(22px, 5vw, 32px)', fontWeight: 800, color: 'var(--text-dark)', marginBottom: 8 },
+    heroSub: { color: 'var(--text-muted)', fontSize: 15, maxWidth: 560 },
     actionStrip: { display: 'grid', gridTemplateColumns: '1fr auto', gap: 20 },
-    reportCard: { padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' },
+    reportCard: { padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap', background: 'var(--bg-card)' },
     reportBtn: {
         display: 'flex', alignItems: 'center', gap: 8, padding: '13px 24px',
         background: 'linear-gradient(135deg, #1a9e7a, #147a5f)', color: '#fff',
@@ -209,24 +209,24 @@ const s = {
     },
     identityCard: { padding: 24, display: 'flex', gap: 16, alignItems: 'flex-start', minWidth: 240 },
     identityIcon: { width: 48, height: 48, borderRadius: 12, background: 'rgba(26,36,86,.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-    trustBar: { height: 3, background: '#e2e8f0', borderRadius: 99, marginTop: 6, overflow: 'hidden' },
+    trustBar: { height: 3, background: 'var(--border)', borderRadius: 99, marginTop: 6, overflow: 'hidden' },
     trustFill: { height: '100%', width: '78%', background: 'linear-gradient(90deg, #1a2456, #1a9e7a)', borderRadius: 99 },
     grid: { display: 'grid', gridTemplateColumns: '1fr 340px', gap: 28, alignItems: 'start' },
     sectionHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
-    sectionTitle: { fontFamily: "'Syne',sans-serif", fontSize: 18, fontWeight: 700, color: '#1a202c' },
+    sectionTitle: { fontFamily: "'Syne',sans-serif", fontSize: 18, fontWeight: 700, color: 'var(--text-dark)' },
     viewAll: { fontSize: 13, fontWeight: 600, color: '#1a9e7a' },
     alertCard: { display: 'flex', gap: 14, padding: 16, borderLeft: '4px solid transparent', alignItems: 'flex-start' },
     alertIconWrap: { width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
     alertMeta: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
     severityLabel: { fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' },
-    alertTime: { fontSize: 12, color: '#a0aec0' },
-    alertTitle: { fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 14, color: '#1a202c', marginBottom: 4 },
-    alertBody: { fontSize: 13, color: '#718096', lineHeight: 1.5 },
+    alertTime: { fontSize: 12, color: 'var(--text-light)' },
+    alertTitle: { fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--text-dark)', marginBottom: 4 },
+    alertBody: { fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 },
     quickCard: { display: 'flex', alignItems: 'center', gap: 14, padding: 16 },
     quickIcon: { width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-    quickLabel: { fontWeight: 600, fontSize: 14, color: '#1a202c', marginBottom: 2 },
-    quickSub: { fontSize: 12, color: '#718096' },
-    empty: { padding: 20, textAlign: 'center', color: '#a0aec0', fontSize: 14 },
+    quickLabel: { fontWeight: 600, fontSize: 14, color: 'var(--text-dark)', marginBottom: 2 },
+    quickSub: { fontSize: 12, color: 'var(--text-muted)' },
+    empty: { padding: 20, textAlign: 'center', color: 'var(--text-light)', fontSize: 14 },
 };
 
 export default Dashboard;

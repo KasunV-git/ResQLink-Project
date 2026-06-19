@@ -1,0 +1,75 @@
+/* frontend/src/styles/pages.css */
+/* Responsive overrides for all citizen pages */
+
+/* ── Dashboard ── */
+@media (max-width: 900px) {
+    .dash-action-strip {
+        grid-template-columns: 1fr !important;
+    }
+
+    .dash-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ── Profile ── */
+@media (max-width: 900px) {
+    .profile-page {
+        grid-template-columns: 1fr !important;
+    }
+
+    .profile-info-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .profile-stats-row {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-stats-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ── Alerts ── */
+@media (max-width: 600px) {
+    .alerts-alert-card {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    .alerts-toolbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .alerts-filter-row {
+        flex-wrap: wrap !important;
+    }
+}
+
+/* ── Report ── */
+@media (max-width: 768px) {
+    .report-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    .report-info-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ── Map ── */
+@media (max-width: 768px) {
+    .map-layout {
+        flex-direction: column !important;
+        height: auto !important;
+    }
+
+    .map-layout .map-sidebar {
+        width: 100% !important;
+        max-height: 260px !important;
+    }
+}

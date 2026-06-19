@@ -111,15 +111,14 @@ const Report = () => {
                 {/* Form card */}
                 <div style={s.formCard} className="card">
                     {/* Row 1: type + location */}
-                    <div style={s.row}>
+                    <div style={s.row} className="report-row">
                         <div className="form-group" style={{ flex: 1 }}>
                             <label className="form-label">Disaster Type</label>
                             <select
                                 name="type"
                                 value={form.type}
                                 onChange={onChange}
-                                className="form-input"
-                                style={{ appearance: 'none', background: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23718096' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E\") no-repeat right 14px center / 10px, #fff" }}
+                                className="form-input form-select"
                             >
                                 <option value="">Select emergency type</option>
                                 {DISASTER_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
@@ -211,7 +210,7 @@ const Report = () => {
                 </div>
 
                 {/* Info cards */}
-                <div style={s.infoGrid}>
+                <div style={s.infoGrid} className="report-info-grid">
                     {[
                         { icon: Phone, color: '#3182ce', bg: '#ebf8ff', title: 'Need Immediate Help?', body: 'If you are in life-threatening danger, call 119 immediately.' },
                         { icon: ShieldAlert, color: '#38a169', bg: '#f0fff4', title: 'Safe Zones', body: 'View the nearest evacuation centers and medical outposts.' },
@@ -237,11 +236,11 @@ const s = {
     page: { display: 'flex', justifyContent: 'center' },
     inner: { width: '100%', maxWidth: 760, display: 'flex', flexDirection: 'column', gap: 24 },
     header: { textAlign: 'center', paddingBottom: 8 },
-    title: { fontFamily: "'Syne',sans-serif", fontSize: 28, fontWeight: 800, color: '#1a202c', marginBottom: 8 },
-    sub: { color: '#718096', fontSize: 14, maxWidth: 480, margin: '0 auto', lineHeight: 1.6 },
+    title: { fontFamily: "'Syne',sans-serif", fontSize: 'clamp(22px, 4vw, 28px)', fontWeight: 800, color: 'var(--text-dark)', marginBottom: 8 },
+    sub: { color: 'var(--text-muted)', fontSize: 14, maxWidth: 480, margin: '0 auto', lineHeight: 1.6 },
     banner: { display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', borderRadius: 10, fontSize: 14, fontWeight: 500 },
-    bannerSuccess: { background: '#f0fff4', border: '1px solid #c6f6d5', color: '#276749' },
-    bannerError: { background: '#fff5f5', border: '1px solid #fed7d7', color: '#9b2335' },
+    bannerSuccess: { background: 'var(--success-bg)', border: '1px solid rgba(56,161,105,.3)', color: '#276749' },
+    bannerError: { background: 'var(--danger-bg)', border: '1px solid rgba(229,62,62,.3)', color: '#9b2335' },
     formCard: { padding: 28, display: 'flex', flexDirection: 'column', gap: 20 },
     row: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 },
     mapPinBtn: {
@@ -250,15 +249,15 @@ const s = {
         letterSpacing: '.5px', justifyContent: 'center'
     },
     dropZone: {
-        border: '2px dashed #cbd5e0', borderRadius: 12, padding: '36px 20px', textAlign: 'center',
-        cursor: 'pointer', transition: 'all .2s ease', background: '#fafbfc'
+        border: '2px dashed var(--border-mid)', borderRadius: 12, padding: '36px 20px', textAlign: 'center',
+        cursor: 'pointer', transition: 'all .2s ease', background: 'var(--bg-hover)'
     },
     uploadIcon: {
-        width: 52, height: 52, borderRadius: 14, background: 'linear-gradient(135deg, #e2e8f0, #edf2f7)',
+        width: 52, height: 52, borderRadius: 14, background: 'var(--bg)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px'
     },
-    uploadText: { fontWeight: 600, fontSize: 14, color: '#4a5568', marginBottom: 4 },
-    uploadHint: { fontSize: 12, color: '#a0aec0' },
+    uploadText: { fontWeight: 600, fontSize: 14, color: 'var(--text-mid)', marginBottom: 4 },
+    uploadHint: { fontSize: 12, color: 'var(--text-light)' },
     previewWrap: { position: 'relative', display: 'inline-block' },
     previewImg: { width: '100%', maxHeight: 200, objectFit: 'cover', borderRadius: 10 },
     removeBtn: {
@@ -272,12 +271,12 @@ const s = {
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
         fontFamily: "'DM Sans',sans-serif", boxShadow: '0 4px 14px rgba(26,158,122,.3)'
     },
-    privacyNote: { textAlign: 'center', fontSize: 11, color: '#a0aec0', letterSpacing: '.5px', fontWeight: 600 },
+    privacyNote: { textAlign: 'center', fontSize: 11, color: 'var(--text-light)', letterSpacing: '.5px', fontWeight: 600 },
     infoGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 },
     infoCard: { padding: 16, display: 'flex', gap: 12, alignItems: 'flex-start' },
     infoIcon: { width: 38, height: 38, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-    infoTitle: { fontWeight: 700, fontSize: 13, color: '#1a202c', marginBottom: 4 },
-    infoBody: { fontSize: 12, color: '#718096', lineHeight: 1.5 },
+    infoTitle: { fontWeight: 700, fontSize: 13, color: 'var(--text-dark)', marginBottom: 4 },
+    infoBody: { fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 },
 };
 
 export default Report;

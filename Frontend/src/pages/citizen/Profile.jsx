@@ -76,7 +76,7 @@ const Profile = () => {
     ];
 
     return (
-        <div style={s.page}>
+        <div style={s.page} className="profile-page">
 
             {/* ── Left column ── */}
             <div style={s.left}>
@@ -138,7 +138,7 @@ const Profile = () => {
                     )}
 
                     {/* Info grid */}
-                    <div style={s.infoGrid}>
+                    <div style={s.infoGrid} className="profile-info-grid">
                         {[
                             { icon: Mail, label: 'EMAIL ADDRESS', field: 'email', value: form.email },
                             { icon: Phone, label: 'CONTACT NUMBER', field: 'phone_number', value: form.phone_number },
@@ -176,7 +176,7 @@ const Profile = () => {
             <div style={s.right}>
 
                 {/* Stats row */}
-                <div style={s.statsRow}>
+                <div style={s.statsRow} className="profile-stats-row">
                     {stats.map(({ icon: Icon, label, value, color, bg }) => (
                         <div key={label} style={s.statCard} className="card">
                             <div style={{ ...s.statIcon, background: bg }}>
@@ -284,40 +284,40 @@ const s = {
         background: '#f0fff4', border: '1px solid #c6f6d5', borderRadius: 8, padding: '8px 12px', fontSize: 13, color: '#276749'
     },
     infoGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, padding: '16px 24px' },
-    infoTile: { background: '#f7fafc', borderRadius: 12, padding: '12px 14px', border: '1px solid #e2e8f0' },
+    infoTile: { background: 'var(--bg-hover)', borderRadius: 12, padding: '12px 14px', border: '1px solid var(--border)' },
     tileMeta: { display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 },
-    tileLabel: { fontSize: 10, fontWeight: 700, color: '#a0aec0', letterSpacing: '.5px' },
-    tileValue: { fontSize: 14, fontWeight: 600, color: '#1a202c' },
+    tileLabel: { fontSize: 10, fontWeight: 700, color: 'var(--text-light)', letterSpacing: '.5px' },
+    tileValue: { fontSize: 14, fontWeight: 600, color: 'var(--text-dark)' },
     tileInput: {
-        fontSize: 14, fontWeight: 500, color: '#1a202c', border: 'none', background: 'transparent',
+        fontSize: 14, fontWeight: 500, color: 'var(--text-dark)', border: 'none', background: 'transparent',
         borderBottom: '1.5px solid #1a9e7a', outline: 'none', width: '100%', padding: '2px 0',
         fontFamily: "'DM Sans',sans-serif"
     },
     logoutBtn: {
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%',
-        padding: '14px', background: 'none', border: 'none', borderTop: '1px solid #e2e8f0',
-        color: '#718096', fontSize: 14, fontWeight: 500, cursor: 'pointer', transition: 'color .2s'
+        padding: '14px', background: 'none', border: 'none', borderTop: '1px solid var(--border)',
+        color: 'var(--text-muted)', fontSize: 14, fontWeight: 500, cursor: 'pointer', transition: 'color .2s'
     },
-    version: { textAlign: 'center', fontSize: 11, color: '#a0aec0', padding: '4px 0 16px', letterSpacing: '.3px' },
+    version: { textAlign: 'center', fontSize: 11, color: 'var(--text-light)', padding: '4px 0 16px', letterSpacing: '.3px' },
     statsRow: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 },
     statCard: { padding: 20, textAlign: 'center' },
     statIcon: { width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px' },
     statValue: { fontFamily: "'Syne',sans-serif", fontSize: 28, fontWeight: 800, marginBottom: 4 },
-    statLabel: { fontSize: 12, color: '#718096', fontWeight: 500 },
+    statLabel: { fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 },
     trustCard: { padding: 24 },
     trustHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
-    trustTitle: { fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 15, color: '#1a202c' },
-    trustNum: { fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 28, color: '#1a202c' },
-    trustBarWrap: { height: 8, background: '#e2e8f0', borderRadius: 99, overflow: 'hidden', marginBottom: 8 },
+    trustTitle: { fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 15, color: 'var(--text-dark)' },
+    trustNum: { fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 28, color: 'var(--text-dark)' },
+    trustBarWrap: { height: 8, background: 'var(--border)', borderRadius: 99, overflow: 'hidden', marginBottom: 8 },
     trustBarFill: { height: '100%', background: 'linear-gradient(90deg, #1a2456, #1a9e7a)', borderRadius: 99, transition: 'width .5s ease' },
     trustTiers: { display: 'flex', justifyContent: 'space-between', marginBottom: 8 },
     tier: { fontSize: 10, fontWeight: 600 },
-    trustNote: { fontSize: 12, color: '#a0aec0', lineHeight: 1.5 },
+    trustNote: { fontSize: 12, color: 'var(--text-light)', lineHeight: 1.5 },
     actCard: { padding: 24 },
-    actItem: { display: 'flex', alignItems: 'flex-start', gap: 12, paddingBottom: 14, borderBottom: '1px solid #f7fafc', marginBottom: 14 },
+    actItem: { display: 'flex', alignItems: 'flex-start', gap: 12, paddingBottom: 14, borderBottom: '1px solid var(--border)', marginBottom: 14 },
     actDot: { width: 10, height: 10, borderRadius: '50%', flexShrink: 0, marginTop: 4 },
-    actLabel: { fontSize: 13, fontWeight: 500, color: '#2d3748', marginBottom: 2 },
-    actTime: { fontSize: 12, color: '#a0aec0' },
+    actLabel: { fontSize: 13, fontWeight: 500, color: 'var(--text-dark)', marginBottom: 2 },
+    actTime: { fontSize: 12, color: 'var(--text-light)' },
 };
 
 export default Profile;
