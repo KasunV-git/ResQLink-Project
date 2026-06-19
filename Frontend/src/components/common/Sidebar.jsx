@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
     LayoutDashboard, FileText, Bell, Map,
-    User, HelpCircle, LogOut, ShieldAlert,
+    User, HelpCircle, LogOut, ShieldAlert, X,
 } from 'lucide-react';
 
 const navItems = [
@@ -14,148 +14,61 @@ const navItems = [
     { to: '/citizen/profile', icon: User, label: 'Profile' },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ open, onClose }) => {
     const { user, logout } = useAuth();
 
     return (
-        <aside style={styles.sidebar}>
-            {/* Brand */}
-            <div style={styles.brand}>
-                <div style={styles.brandIcon}><ShieldAlert size={20} color="#fff" /></div>
-                <div>
-                    <div style={styles.brandName}>ResQLink</div>
-                    <div style={styles.brandSub}>CITIZEN PORTAL</div>
+        <>
+            {/* Overlay on mobile */}
+            {open && (
+                <div className="sidebar-overlay" onClick={onClose} />
+            )}
+
+            <aside className={`sidebar ${open ? 'sidebar-open' : ''}`}>
+                {/* Brand + mobile close */}
+                <div className="sidebar-brand">
+                    <div className="sidebar-brand-icon"><ShieldAlert size={20} color="#fff" /></div>
+                    <div className="sidebar-brand-text">
+                        <div className="sidebar-brand-name">ResQLink</div>
+                        <div className="sidebar-brand-sub">CITIZEN PORTAL</div>
+                    </div>
+                    {/* Close button – mobile only */}
+                    <button className="sidebar-close-btn" onClick={onClose} aria-label="Close sidebar">
+                        <X size={18} />
+                    </button>
                 </div>
-            </div>
 
-            {/* Nav */}
-            <nav style={styles.nav}>
-                {navItems.map(({ to, icon: Icon, label }) => (
-                    <NavLink
-                        key={to}
-                        to={to}
-                        style={({ isActive }) => ({
-                            ...styles.navItem,
-                            ...(isActive ? styles.navItemActive : {}),
-                        })}
-                    >
-                        <Icon size={18} />
-                        <span>{label}</span>
+                {/* Nav items */}
+                <nav className="sidebar-nav">
+                    {navItems.map(({ to, icon: Icon, label }) => (
+                        <NavLink
+                            key={to}
+                            to={to}
+                            className={({ isActive }) =>
+                                `sidebar-nav-item${isActive ? ' sidebar-nav-active' : ''}`
+                            }
+                            onClick={onClose}
+                        >
+                            <Icon size={18} />
+                            <span>{label}</span>
+                        </NavLink>
+                    ))}
+                </nav>
+
+                {/* Bottom actions */}
+                <div className="sidebar-bottom">
+                    <NavLink to="/citizen/support" className="sidebar-nav-item" onClick={onClose}>
+                        <HelpCircle size={18} />
+                        <span>Support</span>
                     </NavLink>
-                ))}
-            </nav>
-
-            {/* Bottom actions */}
-            <div style={styles.bottom}>
-                <NavLink to="/citizen/support" style={styles.navItem}>
-                    <HelpCircle size={18} />
-                    <span>Support</span>
-                </NavLink>
-                <button onClick={logout} style={styles.logoutBtn}>
-                    <LogOut size={18} />
-                    <span>Sign Out</span>
-                </button>
-            </div>
-        </aside>
+                    <button onClick={logout} className="sidebar-logout-btn">
+                        <LogOut size={18} />
+                        <span>Sign Out</span>
+                    </button>
+                </div>
+            </aside>
+        </>
     );
-};
-
-const styles = {
-    sidebar: {
-        width: 230,
-        minHeight: '100vh',
-        background: '#fff',
-        borderRight: '1px solid #e2e8f0',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '24px 0',
-        position: 'sticky',
-        top: 0,
-        flexShrink: 0,
-    },
-    brand: {
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        padding: '0 20px 24px',
-        borderBottom: '1px solid #e2e8f0',
-        marginBottom: 12,
-    },
-    brandIcon: {
-        width: 36,
-        height: 36,
-        borderRadius: 10,
-        background: 'linear-gradient(135deg, #1a2456, #1a9e7a)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
-    },
-    brandName: {
-        fontFamily: "'Syne', sans-serif",
-        fontWeight: 700,
-        fontSize: 15,
-        color: '#1a2456',
-        lineHeight: 1.2,
-    },
-    brandSub: {
-        fontSize: 9,
-        fontWeight: 600,
-        color: '#718096',
-        letterSpacing: '1px',
-    },
-    nav: {
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
-        padding: '0 12px',
-    },
-    navItem: {
-        display: 'flex',
-        alignItems: 'center',
-        gap: 10,
-        padding: '10px 12px',
-        borderRadius: 10,
-        fontSize: 14,
-        fontWeight: 500,
-        color: '#4a5568',
-        transition: 'all .18s ease',
-        border: 'none',
-        background: 'none',
-        width: '100%',
-        cursor: 'pointer',
-        fontFamily: "'DM Sans', sans-serif",
-    },
-    navItemActive: {
-        background: 'linear-gradient(135deg, rgba(26,36,86,.08), rgba(26,158,122,.08))',
-        color: '#1a2456',
-        fontWeight: 600,
-    },
-    bottom: {
-        padding: '12px 12px 0',
-        borderTop: '1px solid #e2e8f0',
-        marginTop: 8,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
-    },
-    logoutBtn: {
-        display: 'flex',
-        alignItems: 'center',
-        gap: 10,
-        padding: '10px 12px',
-        borderRadius: 10,
-        fontSize: 14,
-        fontWeight: 500,
-        color: '#e53e3e',
-        transition: 'all .18s ease',
-        border: 'none',
-        background: 'none',
-        cursor: 'pointer',
-        fontFamily: "'DM Sans', sans-serif",
-        width: '100%',
-    },
 };
 
 export default Sidebar;

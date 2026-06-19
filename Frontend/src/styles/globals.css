@@ -1,5 +1,7 @@
 /* frontend/src/styles/globals.css */
 @import './variables.css';
+@import './layout.css';
+@import './pages.css';
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap');
 
 *,
@@ -16,6 +18,7 @@ body {
     color: var(--text-dark);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    transition: background .25s ease, color .25s ease;
 }
 
 h1,
@@ -26,6 +29,7 @@ h5,
 h6 {
     font-family: 'Syne', sans-serif;
     line-height: 1.2;
+    color: var(--text-dark);
 }
 
 a {
@@ -65,6 +69,7 @@ select {
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--border);
+    transition: background .25s ease, border-color .25s ease;
 }
 
 .badge {
@@ -174,7 +179,7 @@ select {
     border-radius: var(--radius-md);
     font-size: 14px;
     color: var(--text-dark);
-    background: #fff;
+    background: var(--bg-input);
     transition: var(--transition);
 }
 
@@ -187,7 +192,26 @@ select {
     color: var(--text-light);
 }
 
-/* Page layout */
+/* Select dropdown – dark-mode aware */
+.form-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23718096' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 10px;
+    background-color: var(--bg-input);
+    padding-right: 36px;
+    cursor: pointer;
+}
+
+.form-select option {
+    background: var(--bg-input);
+    color: var(--text-dark);
+}
+
+
+/* ── Page layout ── */
 .page-wrapper {
     display: flex;
     min-height: 100vh;
@@ -198,6 +222,7 @@ select {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-width: 0;
 }
 
 .page-body {
@@ -206,9 +231,29 @@ select {
     overflow-y: auto;
 }
 
-/* Responsive */
+/* ── Sidebar overlay for mobile ── */
+.sidebar-overlay {
+    display: none;
+}
+
+/* ── Responsive breakpoints ── */
+@media (max-width: 1024px) {
+    .page-body {
+        padding: 24px 20px;
+    }
+}
+
 @media (max-width: 768px) {
     .page-body {
         padding: 16px;
+    }
+
+    .sidebar-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .5);
+        z-index: 149;
+        backdrop-filter: blur(2px);
     }
 }

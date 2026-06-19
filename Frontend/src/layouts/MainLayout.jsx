@@ -1,18 +1,23 @@
 // frontend/src/layouts/MainLayout.jsx
+import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/common/Sidebar';
 import Navbar from '../components/common/Navbar';
 
-const MainLayout = () => (
-    <div className="page-wrapper">
-        <Sidebar />
-        <div className="main-content">
-            <Navbar />
-            <main className="page-body">
-                <Outlet />
-            </main>
+const MainLayout = () => {
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    return (
+        <div className="page-wrapper">
+            <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+            <div className="main-content">
+                <Navbar onMenuClick={() => setSidebarOpen(prev => !prev)} />
+                <main className="page-body">
+                    <Outlet />
+                </main>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 export default MainLayout;

@@ -135,7 +135,7 @@ const MapPage = () => {
             </div>
 
             {/* ── Map + sidebar ── */}
-            <div style={s.mapWrapper}>
+            <div style={s.mapWrapper} className="map-layout">
                 {/* Leaflet map */}
                 <div style={s.mapContainer}>
                     <MapContainer
@@ -233,48 +233,48 @@ const MapPage = () => {
 
 const s = {
     page: { display: 'flex', flexDirection: 'column', gap: 20 },
-    pageHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
-    title: { fontFamily: "'Syne',sans-serif", fontSize: 28, fontWeight: 800, color: '#1a202c', marginBottom: 4 },
-    sub: { color: '#718096', fontSize: 14 },
+    pageHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 },
+    title: { fontFamily: "'Syne',sans-serif", fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 800, color: 'var(--text-dark)', marginBottom: 4 },
+    sub: { color: 'var(--text-muted)', fontSize: 14 },
     locateBtn: {
         display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px',
         background: '#1a2456', color: '#fff', border: 'none', borderRadius: 10,
         fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'DM Sans',sans-serif"
     },
-    filterBar: { display: 'flex', gap: 8 },
+    filterBar: { display: 'flex', gap: 8, flexWrap: 'wrap' },
     layerBtn: {
         display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px',
-        borderRadius: 8, fontSize: 12, fontWeight: 600, border: '1.5px solid #e2e8f0',
-        background: '#fff', color: '#718096', cursor: 'pointer', transition: 'all .18s ease'
+        borderRadius: 8, fontSize: 12, fontWeight: 600, border: '1.5px solid var(--border)',
+        background: 'var(--bg-card)', color: 'var(--text-muted)', cursor: 'pointer', transition: 'all .18s ease'
     },
     layerActive: { background: '#1a2456', color: '#fff', borderColor: '#1a2456' },
-    mapWrapper: { display: 'flex', height: 520, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,.12)' },
-    mapContainer: { flex: 1 },
+    mapWrapper: { display: 'flex', height: 520, borderRadius: 16, overflow: 'hidden', boxShadow: 'var(--shadow-md)' },
+    mapContainer: { flex: 1, minWidth: 0 },
     detailPanel: {
-        width: 280, background: '#fff', padding: 24, display: 'flex', flexDirection: 'column',
-        gap: 12, borderLeft: '1px solid #e2e8f0', position: 'relative', overflowY: 'auto'
+        width: 280, background: 'var(--bg-card)', padding: 24, display: 'flex', flexDirection: 'column',
+        gap: 12, borderLeft: '1px solid var(--border)', position: 'relative', overflowY: 'auto', flexShrink: 0
     },
     closeBtn: {
-        position: 'absolute', top: 12, right: 12, background: '#f7fafc', border: '1px solid #e2e8f0',
-        borderRadius: 8, cursor: 'pointer', padding: 4, display: 'flex'
+        position: 'absolute', top: 12, right: 12, background: 'var(--bg-hover)', border: '1px solid var(--border)',
+        borderRadius: 8, cursor: 'pointer', padding: 4, display: 'flex', color: 'var(--text-mid)'
     },
     detailSev: {
         display: 'inline-block', padding: '4px 12px', borderRadius: 999, fontSize: 11,
         fontWeight: 700, letterSpacing: '.5px', textTransform: 'uppercase', width: 'fit-content'
     },
-    detailTitle: { fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800, color: '#1a202c' },
-    detailDesc: { fontSize: 13, color: '#718096', lineHeight: 1.6 },
-    detailCoords: { fontSize: 12, color: '#a0aec0', fontFamily: 'monospace' },
+    detailTitle: { fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800, color: 'var(--text-dark)' },
+    detailDesc: { fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 },
+    detailCoords: { fontSize: 12, color: 'var(--text-light)', fontFamily: 'monospace' },
     navBtn: {
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 0',
         background: 'linear-gradient(135deg, #1a9e7a, #147a5f)', color: '#fff', border: 'none',
         borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: 'pointer', marginTop: 'auto'
     },
     legend: { padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' },
-    legendTitle: { fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 13, color: '#1a202c', marginRight: 8 },
+    legendTitle: { fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 13, color: 'var(--text-dark)', marginRight: 8 },
     legendItem: { display: 'flex', alignItems: 'center', gap: 6 },
     legendDot: { width: 22, height: 22, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 },
-    legendLabel: { fontSize: 12, color: '#4a5568' },
+    legendLabel: { fontSize: 12, color: 'var(--text-mid)' },
 };
 
 export default MapPage;

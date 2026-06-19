@@ -88,7 +88,7 @@ const Alerts = () => {
             </div>
 
             {/* ── Search + filter ── */}
-            <div style={s.toolbar}>
+            <div style={s.toolbar} className="alerts-toolbar">
                 <div style={s.searchWrap}>
                     <Search size={15} color="#a0aec0" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
                     <input
@@ -98,7 +98,7 @@ const Alerts = () => {
                         style={s.searchInput}
                     />
                 </div>
-                <div style={s.filterRow}>
+                <div style={s.filterRow} className="alerts-filter-row">
                     {FILTERS.map(f => (
                         <button
                             key={f}
@@ -131,7 +131,7 @@ const Alerts = () => {
                                     borderLeftColor: cfg.color,
                                     opacity: acked ? .65 : 1,
                                 }}
-                                className="card fade-in"
+                                className="card fade-in alerts-alert-card"
                             >
                                 {/* Icon */}
                                 <div style={{ ...s.alertIconWrap, background: cfg.bg }}>
@@ -174,28 +174,28 @@ const Alerts = () => {
 const s = {
     page: { display: 'flex', flexDirection: 'column', gap: 24 },
     pageHead: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 },
-    title: { fontFamily: "'Syne',sans-serif", fontSize: 28, fontWeight: 800, color: '#1a202c', marginBottom: 6 },
-    sub: { color: '#718096', fontSize: 14 },
+    title: { fontFamily: "'Syne',sans-serif", fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 800, color: 'var(--text-dark)', marginBottom: 6 },
+    sub: { color: 'var(--text-muted)', fontSize: 14 },
     counters: { display: 'flex', gap: 8, alignItems: 'center' },
-    critTag: { padding: '5px 12px', borderRadius: 999, background: '#fff5f5', color: '#e53e3e', fontSize: 12, fontWeight: 700, border: '1px solid #fed7d7' },
-    activeTag: { padding: '5px 12px', borderRadius: 999, background: '#ebf8ff', color: '#3182ce', fontSize: 12, fontWeight: 700, border: '1px solid #bee3f8' },
+    critTag: { padding: '5px 12px', borderRadius: 999, background: 'var(--danger-bg)', color: '#e53e3e', fontSize: 12, fontWeight: 700, border: '1px solid rgba(229,62,62,.3)' },
+    activeTag: { padding: '5px 12px', borderRadius: 999, background: 'var(--info-bg)', color: '#3182ce', fontSize: 12, fontWeight: 700, border: '1px solid rgba(49,130,206,.3)' },
     toolbar: { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' },
     searchWrap: { position: 'relative', flex: 1, minWidth: 200 },
-    searchInput: { width: '100%', padding: '9px 12px 9px 36px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: 14, background: '#fff', outline: 'none', fontFamily: "'DM Sans',sans-serif" },
+    searchInput: { width: '100%', padding: '9px 12px 9px 36px', border: '1.5px solid var(--border)', borderRadius: 10, fontSize: 14, background: 'var(--bg-input)', color: 'var(--text-dark)', outline: 'none', fontFamily: "'DM Sans',sans-serif" },
     filterRow: { display: 'flex', gap: 6 },
-    filterBtn: { padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, border: '1.5px solid #e2e8f0', background: '#fff', color: '#718096', cursor: 'pointer', transition: 'all .18s ease' },
+    filterBtn: { padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, border: '1.5px solid var(--border)', background: 'var(--bg-card)', color: 'var(--text-muted)', cursor: 'pointer', transition: 'all .18s ease' },
     filterActive: { background: '#1a2456', color: '#fff', borderColor: '#1a2456' },
     list: { display: 'flex', flexDirection: 'column', gap: 14 },
     alertCard: { display: 'flex', gap: 16, padding: 20, borderLeft: '4px solid transparent', alignItems: 'flex-start' },
     alertIconWrap: { width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
     alertTop: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 },
     sevBadge: { padding: '3px 10px', borderRadius: 999, fontSize: 10, fontWeight: 700, letterSpacing: '.5px', textTransform: 'uppercase' },
-    timeLabel: { fontSize: 12, color: '#a0aec0' },
-    alertMsg: { fontSize: 14, color: '#2d3748', lineHeight: 1.6, marginBottom: 8 },
+    timeLabel: { fontSize: 12, color: 'var(--text-light)' },
+    alertMsg: { fontSize: 14, color: 'var(--text-mid)', lineHeight: 1.6, marginBottom: 8 },
     alertMeta2: { display: 'flex', gap: 8 },
-    metaChip: { fontSize: 11, fontWeight: 600, color: '#718096', background: '#f7fafc', border: '1px solid #e2e8f0', padding: '2px 8px', borderRadius: 6 },
+    metaChip: { fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', background: 'var(--bg-hover)', border: '1px solid var(--border)', padding: '2px 8px', borderRadius: 6 },
     ackBtn: { padding: '8px 16px', background: '#1a2456', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' },
-    ackedBadge: { display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, color: '#38a169', background: '#f0fff4', border: '1px solid #c6f6d5', padding: '6px 12px', borderRadius: 8, whiteSpace: 'nowrap' },
+    ackedBadge: { display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, color: '#38a169', background: 'var(--success-bg)', border: '1px solid rgba(56,161,105,.3)', padding: '6px 12px', borderRadius: 8, whiteSpace: 'nowrap' },
     empty: { padding: 60, textAlign: 'center' },
 };
 
