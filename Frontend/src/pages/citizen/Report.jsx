@@ -236,7 +236,7 @@ const s = {
     page: { display: 'flex', justifyContent: 'center' },
     inner: { width: '100%', maxWidth: 760, display: 'flex', flexDirection: 'column', gap: 24 },
     header: { textAlign: 'center', paddingBottom: 8 },
-    title: { fontFamily: "'Syne',sans-serif", fontSize: 'clamp(22px, 4vw, 28px)', fontWeight: 800, color: 'var(--text-dark)', marginBottom: 8 },
+    title: { fontFamily: "'Inter',sans-serif", fontSize: 'clamp(22px, 4vw, 28px)', fontWeight: 800, color: 'var(--text-dark)', marginBottom: 8 },
     sub: { color: 'var(--text-muted)', fontSize: 14, maxWidth: 480, margin: '0 auto', lineHeight: 1.6 },
     banner: { display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', borderRadius: 10, fontSize: 14, fontWeight: 500 },
     bannerSuccess: { background: 'var(--success-bg)', border: '1px solid rgba(56,161,105,.3)', color: '#276749' },
@@ -269,7 +269,7 @@ const s = {
         padding: '15px 0', background: 'linear-gradient(135deg, #1a9e7a, #147a5f)', color: '#fff',
         border: 'none', borderRadius: 12, fontWeight: 700, fontSize: 15, cursor: 'pointer',
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        fontFamily: "'DM Sans',sans-serif", boxShadow: '0 4px 14px rgba(26,158,122,.3)'
+        fontFamily: "'Inter',sans-serif", boxShadow: '0 4px 14px rgba(26,158,122,.3)'
     },
     privacyNote: { textAlign: 'center', fontSize: 11, color: 'var(--text-light)', letterSpacing: '.5px', fontWeight: 600 },
     infoGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 },

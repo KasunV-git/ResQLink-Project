@@ -234,12 +234,12 @@ const MapPage = () => {
 const s = {
     page: { display: 'flex', flexDirection: 'column', gap: 20 },
     pageHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 },
-    title: { fontFamily: "'Syne',sans-serif", fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 800, color: 'var(--text-dark)', marginBottom: 4 },
+    title: { fontFamily: "'Inter',sans-serif", fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 800, color: 'var(--text-dark)', marginBottom: 4 },
     sub: { color: 'var(--text-muted)', fontSize: 14 },
     locateBtn: {
         display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px',
         background: '#1a2456', color: '#fff', border: 'none', borderRadius: 10,
-        fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'DM Sans',sans-serif"
+        fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Inter',sans-serif"
     },
     filterBar: { display: 'flex', gap: 8, flexWrap: 'wrap' },
     layerBtn: {
@@ -262,7 +262,7 @@ const s = {
         display: 'inline-block', padding: '4px 12px', borderRadius: 999, fontSize: 11,
         fontWeight: 700, letterSpacing: '.5px', textTransform: 'uppercase', width: 'fit-content'
     },
-    detailTitle: { fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800, color: 'var(--text-dark)' },
+    detailTitle: { fontFamily: "'Inter',sans-serif", fontSize: 16, fontWeight: 800, color: 'var(--text-dark)' },
     detailDesc: { fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 },
     detailCoords: { fontSize: 12, color: 'var(--text-light)', fontFamily: 'monospace' },
     navBtn: {
@@ -271,7 +271,7 @@ const s = {
         borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: 'pointer', marginTop: 'auto'
     },
     legend: { padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' },
-    legendTitle: { fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 13, color: 'var(--text-dark)', marginRight: 8 },
+    legendTitle: { fontFamily: "'Inter',sans-serif", fontWeight: 700, fontSize: 13, color: 'var(--text-dark)', marginRight: 8 },
     legendItem: { display: 'flex', alignItems: 'center', gap: 6 },
     legendDot: { width: 22, height: 22, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 },
     legendLabel: { fontSize: 12, color: 'var(--text-mid)' },
