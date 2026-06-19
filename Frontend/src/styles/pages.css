@@ -10,6 +10,20 @@
     .dash-grid {
         grid-template-columns: 1fr !important;
     }
+
+    .dash-stats-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .dash-main-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .dash-stats-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
 }
 
 /* ── Profile ── */
