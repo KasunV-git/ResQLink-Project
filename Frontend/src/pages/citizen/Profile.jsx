@@ -248,7 +248,7 @@ const s = {
         width: 96, height: 96, borderRadius: '50%',
         background: 'linear-gradient(135deg, #1a2456, #1a9e7a)', color: '#fff',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 32,
+        fontFamily: "'Inter',sans-serif", fontWeight: 800, fontSize: 32,
         border: '4px solid #fff'
     },
     cameraBtn: {
@@ -260,7 +260,7 @@ const s = {
         display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
         padding: '12px 24px 0', flexWrap: 'wrap', gap: 12
     },
-    userName: { fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, color: '#1a202c', marginBottom: 6 },
+    userName: { fontFamily: "'Inter',sans-serif", fontSize: 22, fontWeight: 800, color: '#1a202c', marginBottom: 6 },
     roleRow: { display: 'flex', alignItems: 'center', gap: 8 },
     roleBadge: {
         padding: '3px 10px', borderRadius: 999, background: 'rgba(26,36,86,.1)', color: '#1a2456',
@@ -291,7 +291,7 @@ const s = {
     tileInput: {
         fontSize: 14, fontWeight: 500, color: 'var(--text-dark)', border: 'none', background: 'transparent',
         borderBottom: '1.5px solid #1a9e7a', outline: 'none', width: '100%', padding: '2px 0',
-        fontFamily: "'DM Sans',sans-serif"
+        fontFamily: "'Inter',sans-serif"
     },
     logoutBtn: {
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%',
@@ -302,12 +302,12 @@ const s = {
     statsRow: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 },
     statCard: { padding: 20, textAlign: 'center' },
     statIcon: { width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px' },
-    statValue: { fontFamily: "'Syne',sans-serif", fontSize: 28, fontWeight: 800, marginBottom: 4 },
+    statValue: { fontFamily: "'Inter',sans-serif", fontSize: 28, fontWeight: 800, marginBottom: 4 },
     statLabel: { fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 },
     trustCard: { padding: 24 },
     trustHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
-    trustTitle: { fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 15, color: 'var(--text-dark)' },
-    trustNum: { fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 28, color: 'var(--text-dark)' },
+    trustTitle: { fontFamily: "'Inter',sans-serif", fontWeight: 700, fontSize: 15, color: 'var(--text-dark)' },
+    trustNum: { fontFamily: "'Inter',sans-serif", fontWeight: 800, fontSize: 28, color: 'var(--text-dark)' },
     trustBarWrap: { height: 8, background: 'var(--border)', borderRadius: 99, overflow: 'hidden', marginBottom: 8 },
     trustBarFill: { height: '100%', background: 'linear-gradient(90deg, #1a2456, #1a9e7a)', borderRadius: 99, transition: 'width .5s ease' },
     trustTiers: { display: 'flex', justifyContent: 'space-between', marginBottom: 8 },

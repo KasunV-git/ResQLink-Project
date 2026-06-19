@@ -125,7 +125,7 @@
     justify-content: center;
     font-weight: 700;
     font-size: 14px;
-    font-family: 'Syne', sans-serif;
+    font-family: 'Inter', sans-serif;
     border: 2px solid var(--teal);
 }
 
@@ -191,7 +191,7 @@
 }
 
 .sidebar-brand-name {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-weight: 700;
     font-size: 15px;
     color: var(--navy);
@@ -249,7 +249,7 @@
     background: none;
     width: 100%;
     cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     text-decoration: none;
 }
 
@@ -291,7 +291,7 @@
     border: none;
     background: none;
     cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     width: 100%;
 }
 

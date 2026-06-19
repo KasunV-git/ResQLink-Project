@@ -62,13 +62,13 @@ const styles = {
         marginBottom: 48,
     },
     logoText: {
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "'Inter', sans-serif",
         fontWeight: 800,
         fontSize: 24,
         color: '#fff',
     },
     heroText: {
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "'Inter', sans-serif",
         fontSize: 36,
         fontWeight: 800,
         color: '#fff',
