@@ -75,6 +75,12 @@
 }
 
 /* ── Report ── */
+@media (max-width: 900px) {
+    .report-layout {
+        grid-template-columns: 1fr !important;
+    }
+}
+
 @media (max-width: 768px) {
     .report-row {
         grid-template-columns: 1fr !important;
@@ -82,6 +88,20 @@
 
     .report-info-grid {
         grid-template-columns: 1fr !important;
+    }
+
+    .report-type-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+
+    .report-info-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .report-type-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
     }
 }
 

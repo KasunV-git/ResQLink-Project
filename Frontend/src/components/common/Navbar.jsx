@@ -1,12 +1,27 @@
 // frontend/src/components/common/Navbar.jsx
 import { Link } from 'react-router-dom';
 import { Bell, Sun, Moon, Menu } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { getAlerts } from '../../api/alertApi';
 
 const Navbar = ({ tabs = [], onMenuClick }) => {
     const { user } = useAuth();
     const { isDark, toggleTheme } = useTheme();
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        getAlerts({ limit: 50 })
+            .then(res => {
+                const alerts = res.data?.data ?? res.data ?? [];
+                const count = Array.isArray(alerts)
+                    ? alerts.filter(a => a.status !== 'ACKNOWLEDGED' && a.status !== 'acknowledged').length
+                    : 0;
+                setUnreadCount(count);
+            })
+            .catch(() => setUnreadCount(0));
+    }, []);
 
     return (
         <header className="navbar-header">
@@ -45,7 +60,9 @@ const Navbar = ({ tabs = [], onMenuClick }) => {
                 {/* Notification bell */}
                 <Link to="/citizen/alerts" className="navbar-icon-btn" aria-label="Alerts">
                     <Bell size={18} />
-                    <span className="navbar-badge">3</span>
+                    {unreadCount > 0 && (
+                        <span className="navbar-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
+                    )}
                 </Link>
 
                 {/* Profile avatar – navigates to profile page */}
