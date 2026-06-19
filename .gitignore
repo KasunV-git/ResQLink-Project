@@ -1,21 +1,23 @@
 # Dependencies
 node_modules/
-**/node_modules/
+*/node_modules/
 
 # Environment files
 .env
 .env.local
+.env.production
 
-# Build folders
-build/
+# Build output
 dist/
+build/
 
 # Logs
 *.log
-
-# VS Code
-.vscode/
+npm-debug.log*
 
 # OS files
 .DS_Store
 Thumbs.db
+
+# Vite cache
+.vite/
