@@ -9,9 +9,14 @@ export default function ProtectedRoute({ allowedRoles, children }) {
     return <Navigate to="/login" replace />;
   }
 
-  const normalizedUserRole = (role || user.role || 'Volunteer').toLowerCase();
+  const rawRole = (role || user.role || 'Volunteer').toLowerCase().trim();
+  const normalizedUserRole = (rawRole === 'administrator' || rawRole === 'admin') ? 'admin' : rawRole;
+
   const normalizedAllowed = allowedRoles
-    ? allowedRoles.map(r => r.toLowerCase())
+    ? allowedRoles.map(r => {
+        const str = r.toLowerCase().trim();
+        return (str === 'administrator' || str === 'admin') ? 'admin' : str;
+      })
     : [];
 
   if (allowedRoles && !normalizedAllowed.includes(normalizedUserRole)) {

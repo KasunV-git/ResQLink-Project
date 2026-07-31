@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(() => localStorage.getItem('resqlink_token') || null);
+  const [token, setToken] = useState(() => localStorage.getItem('resqlink_token') || localStorage.getItem('token') || null);
   const [user, setUser]   = useState(() => {
     try {
       const saved = localStorage.getItem('resqlink_user') || localStorage.getItem('resqlink_volunteer_user');
@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
   // On initial mount: verify existing session with /api/auth/me if token exists
   useEffect(() => {
     const verifyToken = async () => {
-      const savedToken = localStorage.getItem('resqlink_token');
+      const savedToken = localStorage.getItem('resqlink_token') || localStorage.getItem('token');
       if (!savedToken) return;
 
       setLoading(true);
@@ -60,6 +60,7 @@ export const AuthProvider = ({ children }) => {
     if (jwtToken) {
       setToken(jwtToken);
       localStorage.setItem('resqlink_token', jwtToken);
+      localStorage.setItem('token', jwtToken);
     }
     localStorage.setItem('resqlink_user', JSON.stringify(userObj));
     localStorage.setItem('resqlink_volunteer_user', JSON.stringify(userObj));
@@ -73,6 +74,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('resqlink_token');
+    localStorage.removeItem('token');
     localStorage.removeItem('resqlink_user');
     localStorage.removeItem('resqlink_volunteer_user');
     delete axios.defaults.headers.common['Authorization'];
@@ -89,7 +91,7 @@ export const AuthProvider = ({ children }) => {
 
   const role = user?.role ? (
     user.role.toLowerCase() === 'citizen' ? 'Citizen' :
-    user.role.toLowerCase() === 'admin' ? 'Admin' : 'Volunteer'
+    (user.role.toLowerCase() === 'admin' || user.role.toLowerCase() === 'administrator') ? 'Admin' : 'Volunteer'
   ) : null;
 
   return (
@@ -119,4 +121,4 @@ export const useAuth = () => {
   return context;
 };
 
-export default AuthContext;
+export default AuthProvider;
