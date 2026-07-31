@@ -43,9 +43,9 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
   const bgList = isDarkMode ? "bg-slate-950 border-slate-800" : "bg-slate-50 border-slate-100";
 
   return (
-    <div className="w-full flex flex-col gap-6" data-name="AdminDashboard">
+    <div className="w-full max-w-[1000px] flex flex-col gap-8 items-center" data-name="AdminDashboard">
       {/* Title */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 text-center">
         <h1 className={`font-semibold text-3xl tracking-tight transition-colors ${headingColor}`}>
           System Overview
         </h1>
@@ -55,8 +55,8 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className={cardClass}>
+      <div className="flex flex-wrap justify-center gap-6 w-full">
+        <div className={`w-[220px] ${cardClass}`}>
           <div className={`rounded-lg p-3 ${isDarkMode ? "bg-emerald-950/40 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>
             <Users className="w-6 h-6" />
           </div>
@@ -66,7 +66,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
           </div>
         </div>
 
-        <div className={cardClass}>
+        <div className={`w-[220px] ${cardClass}`}>
           <div className={`rounded-lg p-3 ${isDarkMode ? "bg-blue-950/40 text-blue-400" : "bg-blue-50 text-blue-600"}`}>
             <CheckCircle className="w-6 h-6" />
           </div>
@@ -76,7 +76,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
           </div>
         </div>
 
-        <div className={cardClass}>
+        <div className={`w-[220px] ${cardClass}`}>
           <div className={`rounded-lg p-3 ${isDarkMode ? "bg-amber-950/40 text-amber-400" : "bg-amber-50 text-amber-600"}`}>
             <ClipboardList className="w-6 h-6" />
           </div>
@@ -86,7 +86,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
           </div>
         </div>
 
-        <div className={cardClass}>
+        <div className={`w-[220px] ${cardClass}`}>
           <div className={`rounded-lg p-3 ${isDarkMode ? "bg-red-950/40 text-red-400" : "bg-red-50 text-red-600"}`}>
             <ShieldAlert className="w-6 h-6" />
           </div>
@@ -98,7 +98,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
       </div>
 
       {/* Overview Analytics Chart */}
-      <div className={`border rounded-xl p-6 shadow-sm h-[320px] flex flex-col transition-colors duration-200 ${
+      <div className={`w-full max-w-[900px] border rounded-xl p-6 shadow-sm h-[320px] flex flex-col transition-colors duration-200 ${
         isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-900"
       }`}>
         <div className="mb-4">
@@ -157,9 +157,9 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="flex flex-wrap justify-center gap-6 w-full max-w-[900px]">
         {/* Recent Assignments */}
-        <div className={`border rounded-xl p-6 shadow-sm flex flex-col h-[400px] transition-colors duration-200 ${
+        <div className={`flex-1 min-w-[320px] border rounded-xl p-6 shadow-sm flex flex-col h-[400px] transition-colors duration-200 ${
           isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-900"
         }`}>
           <div className={`flex justify-between items-center pb-4 border-b ${borderMuted} mb-4`}>
@@ -200,7 +200,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
         </div>
 
         {/* Recent Broadcasts */}
-        <div className={`border rounded-xl p-6 shadow-sm flex flex-col h-[400px] transition-colors duration-200 ${
+        <div className={`flex-1 min-w-[320px] border rounded-xl p-6 shadow-sm flex flex-col h-[400px] transition-colors duration-200 ${
           isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-900"
         }`}>
           <div className={`flex justify-between items-center pb-4 border-b ${borderMuted} mb-4`}>

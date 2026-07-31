@@ -339,8 +339,8 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
           )}
         </AnimatePresence>
 
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 lg:p-10 min-w-0">
-          <div className="max-w-[1100px] mx-auto pb-12 w-full">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 lg:p-10 min-w-0 flex justify-center">
+          <div className="max-w-[1100px] w-full pb-12 flex flex-col items-center">
             {renderContent()}
           </div>
         </div>
