@@ -11,67 +11,74 @@ import CitizenProfile from "./pages/citizen/Profile";
 import LoginPage from "./pages/auth/LoginPage";
 import { useAuth } from "./context/AuthContext";
 
+const getNormalizedRole = (role) => {
+  if (!role) return "volunteer";
+  const str = String(role).toLowerCase().trim();
+  if (str === "admin" || str === "administrator") return "admin";
+  if (str === "citizen") return "citizen";
+  return "volunteer";
+};
+
 export default function App() {
-  const { user, login, logout, updateUser, isAuthenticated, role: userRole } = useAuth();
+  const { user, login, logout, updateUser, isAuthenticated } = useAuth();
 
   const getInitialView = () => {
     const hash = (window.location.hash || "").toLowerCase();
 
+    // If logged in, prioritize user role dashboard unless accessing authorized sub-routes
+    if (user) {
+      const normRole = getNormalizedRole(user.role);
+      if (hash.startsWith("#/citizen") && normRole === "citizen") {
+        return { mode: "citizen", subTab: hash.replace("#/citizen/", "") || "dashboard" };
+      }
+      if (hash.startsWith("#/admin") && normRole === "admin") {
+        return { mode: "admin" };
+      }
+      if (hash.startsWith("#/volunteer") && normRole === "volunteer") {
+        return { mode: "volunteer" };
+      }
+
+      // Default redirect for logged-in users visiting /login, /signup, or /home
+      if (normRole === "admin") return { mode: "admin" };
+      if (normRole === "citizen") return { mode: "citizen", subTab: "dashboard" };
+      return { mode: "volunteer" };
+    }
+
+    // Unauthenticated initial view
     if (hash === "#/login") return { mode: "login" };
     if (hash === "#/signup" || hash === "#/register") return { mode: "signup" };
     if (hash.startsWith("#/citizen")) return { mode: "citizen", subTab: hash.replace("#/citizen/", "") || "dashboard" };
     if (hash.startsWith("#/admin")) return { mode: "admin" };
     if (hash.startsWith("#/volunteer")) return { mode: "volunteer" };
 
-    if (user) {
-      const r = (user.role || "").toLowerCase();
-      if (r === "admin") return { mode: "admin" };
-      if (r === "citizen") return { mode: "citizen", subTab: "dashboard" };
-      return { mode: "volunteer" };
-    }
     return { mode: "home" };
   };
 
   const [viewState, setViewState] = useState(getInitialView);
 
+  // Sync window.location.hash changes to viewState
   useEffect(() => {
     const handleHashChange = () => {
       const hash = (window.location.hash || "").toLowerCase();
 
-      if (hash === "#/login") {
-        setViewState({ mode: "login" });
-      } else if (hash === "#/signup" || hash === "#/register") {
-        setViewState({ mode: "signup" });
-      } else if (hash.startsWith("#/citizen")) {
-        // Guard route: if logged in as another role, redirect to own dashboard
-        if (user && (user.role || "").toLowerCase() !== "citizen") {
-          const authorizedHash = (user.role || "").toLowerCase() === "admin" ? "#/admin/dashboard" : "#/volunteer/dashboard";
-          window.location.hash = authorizedHash;
-          setViewState({ mode: (user.role || "").toLowerCase() === "admin" ? "admin" : "volunteer" });
-        } else {
+      if (!user) {
+        if (hash === "#/login") {
+          setViewState({ mode: "login" });
+        } else if (hash === "#/signup" || hash === "#/register") {
+          setViewState({ mode: "signup" });
+        } else if (hash.startsWith("#/citizen")) {
           setViewState({ mode: "citizen", subTab: hash.replace("#/citizen/", "") || "dashboard" });
-        }
-      } else if (hash.startsWith("#/admin")) {
-        // Guard route: if logged in as non-admin, redirect
-        if (user && (user.role || "").toLowerCase() !== "admin") {
-          const authorizedHash = (user.role || "").toLowerCase() === "citizen" ? "#/citizen/dashboard" : "#/volunteer/dashboard";
-          window.location.hash = authorizedHash;
-          setViewState({ mode: (user.role || "").toLowerCase() === "citizen" ? "citizen" : "volunteer" });
-        } else {
-          setViewState({ mode: "admin" });
-        }
-      } else if (hash.startsWith("#/volunteer")) {
-        // Guard route: if logged in as non-volunteer, redirect
-        if (user && (user.role || "").toLowerCase() !== "volunteer") {
-          const authorizedHash = (user.role || "").toLowerCase() === "admin" ? "#/admin/dashboard" : "#/citizen/dashboard";
-          window.location.hash = authorizedHash;
-          setViewState({ mode: (user.role || "").toLowerCase() === "admin" ? "admin" : "citizen" });
-        } else {
-          setViewState({ mode: "volunteer" });
-        }
-      } else if (hash === "#/home" || hash === "#/" || hash === "") {
-        if (!user) {
+        } else if (hash === "#/home" || hash === "#/" || hash === "") {
           setViewState({ mode: "home" });
+        }
+      } else {
+        const normRole = getNormalizedRole(user.role);
+        if (hash.startsWith("#/citizen") && normRole === "citizen") {
+          setViewState({ mode: "citizen", subTab: hash.replace("#/citizen/", "") || "dashboard" });
+        } else if (hash.startsWith("#/admin") && normRole === "admin") {
+          setViewState({ mode: "admin" });
+        } else if (hash.startsWith("#/volunteer") && normRole === "volunteer") {
+          setViewState({ mode: "volunteer" });
         }
       }
     };
@@ -80,16 +87,43 @@ export default function App() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, [user]);
 
+  // Route guard side effect: automatically redirect logged-in users away from /login or unauthorized paths
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+
+    const normRole = getNormalizedRole(user.role);
+    const targetHash =
+      normRole === "admin" ? "#/admin/dashboard" :
+      normRole === "citizen" ? "#/citizen/dashboard" : "#/volunteer/dashboard";
+
+    if (viewState.mode === "login" || viewState.mode === "signup" || viewState.mode === "home") {
+      window.location.hash = targetHash;
+      setViewState({
+        mode: normRole,
+        subTab: normRole === "citizen" ? "dashboard" : undefined
+      });
+    } else if (viewState.mode === "admin" && normRole !== "admin") {
+      window.location.hash = targetHash;
+      setViewState({ mode: normRole, subTab: normRole === "citizen" ? "dashboard" : undefined });
+    } else if (viewState.mode === "citizen" && normRole !== "citizen") {
+      window.location.hash = targetHash;
+      setViewState({ mode: normRole });
+    } else if (viewState.mode === "volunteer" && normRole !== "volunteer") {
+      window.location.hash = targetHash;
+      setViewState({ mode: normRole, subTab: normRole === "citizen" ? "dashboard" : undefined });
+    }
+  }, [isAuthenticated, user, viewState.mode]);
+
   const handleLoginSuccess = (data) => {
     const userObj = data.user || data;
     login(userObj);
 
-    const userRoleStr = (userObj.role || "").toLowerCase();
+    const normRole = getNormalizedRole(userObj.role);
 
-    if (userRoleStr === "admin") {
+    if (normRole === "admin") {
       window.location.hash = "#/admin/dashboard";
       setViewState({ mode: "admin" });
-    } else if (userRoleStr === "citizen") {
+    } else if (normRole === "citizen") {
       window.location.hash = "#/citizen/dashboard";
       setViewState({ mode: "citizen", subTab: "dashboard" });
     } else {
@@ -118,25 +152,13 @@ export default function App() {
 
   // 1. Logged-in user routing
   if (isAuthenticated && user) {
-    const currentRole = (user.role || "").toLowerCase();
+    const normRole = getNormalizedRole(user.role);
 
-    // Check if user is attempting to access an unauthorized section
-    if (viewState.mode === "admin" && currentRole !== "admin") {
-      const targetHash = currentRole === "citizen" ? "#/citizen/dashboard" : "#/volunteer/dashboard";
-      window.location.hash = targetHash;
-    } else if (viewState.mode === "citizen" && currentRole !== "citizen") {
-      const targetHash = currentRole === "admin" ? "#/admin/dashboard" : "#/volunteer/dashboard";
-      window.location.hash = targetHash;
-    } else if (viewState.mode === "volunteer" && currentRole !== "volunteer") {
-      const targetHash = currentRole === "admin" ? "#/admin/dashboard" : "#/citizen/dashboard";
-      window.location.hash = targetHash;
-    }
-
-    if (currentRole === "admin") {
+    if (normRole === "admin") {
       return <AdminApp user={user} onLogout={handleLogout} onUpdateUser={updateUser} />;
     }
 
-    if (currentRole === "citizen") {
+    if (normRole === "citizen") {
       return (
         <MainLayout user={user} onLogout={handleLogout}>
           {viewState.subTab === "report" && <CitizenReport />}

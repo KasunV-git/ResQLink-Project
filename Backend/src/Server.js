@@ -7,13 +7,18 @@ const authRouter        = require('./routes/auth');
 const skillsRouter      = require('./routes/skills');
 const alertsRouter      = require('./routes/alerts');
 const assignmentsRouter = require('./routes/assignments');
+const disasterRouter    = require('./routes/disasterRoutes');
 
 const app = express();
 
-// Ensure uploads/avatars directory exists
+// Ensure uploads directories exist
 const uploadsDir = path.join(__dirname, 'uploads/avatars');
+const reportsDir = path.join(__dirname, 'uploads/reports');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
+}
+if (!fs.existsSync(reportsDir)) {
+  fs.mkdirSync(reportsDir, { recursive: true });
 }
 
 // ── Middleware ──
@@ -33,6 +38,7 @@ app.use('/api/auth',        authRouter);
 app.use('/api/skills',      skillsRouter);
 app.use('/api/alerts',      alertsRouter);
 app.use('/api/assignments', assignmentsRouter);
+app.use('/api/disasters',   disasterRouter);
 
 // ── Health check ──
 app.get('/health', (req, res) => {
