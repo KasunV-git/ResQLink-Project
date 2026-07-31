@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+<<<<<<< HEAD
   darkMode: "class",
   content: [
     "./index.html",
@@ -17,6 +18,14 @@ export default {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
       }
+=======
+  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      },
+>>>>>>> kasuni-development
     },
   },
   plugins: [],

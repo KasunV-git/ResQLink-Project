@@ -1,7 +1,13 @@
 {
+<<<<<<< HEAD
   "name": "resqlink-frontend",
   "private": true,
   "version": "1.0.0",
+=======
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+>>>>>>> kasuni-development
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,6 +16,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@tailwindcss/vite": "^4.3.0",
     "axios": "^1.6.8",
     "i18next": "^26.3.1",
@@ -19,6 +26,15 @@
     "react-dom": "^19.2.6",
     "react-i18next": "^17.0.8",
     "tailwindcss": "^4.3.0"
+=======
+    "axios": "^1.17.0",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^1.17.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-leaflet": "^5.0.0",
+    "react-router-dom": "^7.17.0"
+>>>>>>> kasuni-development
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

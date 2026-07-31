@@ -1,0 +1,125 @@
+/* frontend/src/styles/pages.css */
+/* Responsive overrides for all citizen pages */
+
+/* ── Dashboard ── */
+@media (max-width: 900px) {
+    .dash-action-strip {
+        grid-template-columns: 1fr !important;
+    }
+
+    .dash-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .dash-stats-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .dash-main-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .dash-stats-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* ── Profile ── */
+@media (max-width: 900px) {
+    .profile-page {
+        grid-template-columns: 1fr !important;
+    }
+
+    .profile-info-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .profile-stats-row {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-stats-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ── Alerts ── */
+@media (max-width: 768px) {
+    .alerts-toolbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .alerts-filter-row {
+        flex-wrap: wrap !important;
+    }
+
+    .alerts-expand-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .alerts-stats-bar {
+        flex-wrap: wrap !important;
+    }
+
+    .alerts-stats-bar > div {
+        min-width: 50% !important;
+        border-bottom: 1px solid var(--border) !important;
+    }
+}
+
+/* ── Report ── */
+@media (max-width: 900px) {
+    .report-layout {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .report-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    .report-info-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .report-type-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+
+    .report-info-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .report-type-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+/* ── Map ── */
+@media (max-width: 900px) {
+    .map-layout {
+        flex-direction: column !important;
+        height: auto !important;
+    }
+
+    .map-layout > div:first-child {
+        width: 100% !important;
+        height: 220px !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border) !important;
+    }
+
+    .map-layout > div:last-child {
+        height: 420px !important;
+    }
+}

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
@@ -5,12 +6,19 @@ import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 import Footer from "../../components/Footer";
 import LoginPage from "../auth/LoginPage";
+=======
+import { useState, useEffect } from "react";
+import axios from "axios";
+import Header from "../../components/Header";
+import Sidebar from "../../components/Sidebar";
+>>>>>>> kasuni-development
 import Dashboard from "./Dashboard";
 import Assignments from "./Assignments";
 import Skills from "./Skills";
 import Alerts from "./Alerts";
 import Profile from "./Profile";
 
+<<<<<<< HEAD
 export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHome }) {
   const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -22,6 +30,13 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
   const [activeTab, setActiveTab] = useState("dashboard");
   // Single source of truth for all assignments (active + completed merged)
   const [assignments, setAssignments] = useState([]);
+=======
+export default function VolunteerApp({ user, onLogout, onUpdateUser }) {
+
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeAssignments, setActiveAssignments] = useState([]);
+  const [completedAssignments, setCompletedAssignments] = useState([]);
+>>>>>>> kasuni-development
   const [currentSkills, setCurrentSkills] = useState([]);
   const [suggestedSkills, setSuggestedSkills] = useState([]);
   const [alerts, setAlerts] = useState([]);
@@ -39,6 +54,7 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
       ]);
 
       const updatedUser = userRes.data;
+<<<<<<< HEAD
       setUser(updatedUser);
       localStorage.setItem("resqlink_volunteer_user", JSON.stringify(updatedUser));
 
@@ -46,6 +62,12 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
         ...assignRes.data.activeAssignments,
         ...assignRes.data.completedAssignments,
       ]);
+=======
+      onUpdateUser(updatedUser);
+
+      setActiveAssignments(assignRes.data.activeAssignments);
+      setCompletedAssignments(assignRes.data.completedAssignments);
+>>>>>>> kasuni-development
       setCurrentSkills(skillsRes.data.currentSkills);
       setSuggestedSkills(skillsRes.data.suggestedSkills);
       setAlerts(alertsRes.data);
@@ -58,6 +80,7 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
 
   useEffect(() => {
     if (user?.id) {
+<<<<<<< HEAD
       fetchPortalData(user.id);
     }
   }, [user?.id]);
@@ -76,21 +99,40 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
     setSuggestedSkills([]);
     setAlerts([]);
     if (onLogout) onLogout();
+=======
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      fetchPortalData(user.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  const handleLogout = () => {
+    setActiveAssignments([]);
+    setCompletedAssignments([]);
+    setCurrentSkills([]);
+    setSuggestedSkills([]);
+    setAlerts([]);
+    onLogout();
+>>>>>>> kasuni-development
   };
 
   const handleToggleAvailability = async () => {
     if (!user) return;
     const nextAvailability = !user.isAvailable;
+<<<<<<< HEAD
 
     // ── Optimistic update — change UI immediately before API responds ──
     const optimisticUser = { ...user, isAvailable: nextAvailability };
     setUser(optimisticUser);
     localStorage.setItem("resqlink_volunteer_user", JSON.stringify(optimisticUser));
 
+=======
+>>>>>>> kasuni-development
     try {
       const response = await axios.put(`/api/auth/profile/${user.id}`, {
         isAvailable: nextAvailability,
       });
+<<<<<<< HEAD
       // Confirm with actual server response
       const confirmed = response.data;
       setUser(confirmed);
@@ -149,6 +191,23 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
     } catch (error) {
       console.error("Failed to save skills:", error);
       throw error;
+=======
+      const updated = response.data;
+      onUpdateUser(updated);
+    } catch (error) {
+      console.error("Failed to toggle availability:", error);
+    }
+  };
+
+  const handleCompleteAssignment = async (assignmentId) => {
+    try {
+      await axios.post(`/api/assignments/${assignmentId}/complete`);
+      const assignRes = await axios.get(`/api/assignments/${user.id}`);
+      setActiveAssignments(assignRes.data.activeAssignments);
+      setCompletedAssignments(assignRes.data.completedAssignments);
+    } catch (error) {
+      console.error("Failed to complete assignment:", error);
+>>>>>>> kasuni-development
     }
   };
 
@@ -176,6 +235,7 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
     }
   };
 
+<<<<<<< HEAD
   const handleUpdateProfile = async (profileData) => {
     if (!user) return;
     try {
@@ -184,12 +244,21 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
       setUser(updated);
       localStorage.setItem("resqlink_volunteer_user", JSON.stringify(updated));
       return updated;
+=======
+  const handleUpdateProfile = async ({ name, phone }) => {
+    if (!user) return;
+    try {
+      const response = await axios.put(`/api/auth/profile/${user.id}`, { name, phone });
+      const updated = response.data;
+      onUpdateUser(updated);
+>>>>>>> kasuni-development
     } catch (error) {
       console.error("Failed to update profile:", error);
       throw error;
     }
   };
 
+<<<<<<< HEAD
   if (!user) {
     return (
       <LoginPage
@@ -216,6 +285,18 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
             <span style={{ color:"#64748b", fontWeight:500 }}>{t("common.loading")}</span>
           </div>
           <style>{`@keyframes spin { to { transform:rotate(360deg) } }`}</style>
+=======
+  const highAlertCount = alerts.filter((a) => a.priority === "high").length;
+
+  const renderContent = () => {
+    if (loading && activeAssignments.length === 0) {
+      return (
+        <div className="flex-1 flex items-center justify-center text-slate-500 font-medium">
+          <div className="flex flex-col items-center gap-3">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#15803d]"></div>
+            <span>Loading portal data...</span>
+          </div>
+>>>>>>> kasuni-development
         </div>
       );
     }
@@ -235,8 +316,13 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
       case "assignments":
         return (
           <Assignments
+<<<<<<< HEAD
             assignments={assignments}
             onStartAssignment={handleStartAssignment}
+=======
+            activeAssignments={activeAssignments}
+            completedAssignments={completedAssignments}
+>>>>>>> kasuni-development
             onCompleteAssignment={handleCompleteAssignment}
           />
         );
@@ -247,7 +333,10 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
             suggestedSkills={suggestedSkills}
             onAddSkill={handleAddSkill}
             onRemoveSkill={handleRemoveSkill}
+<<<<<<< HEAD
             onSaveSkills={handleSaveSkills}
+=======
+>>>>>>> kasuni-development
           />
         );
       case "alerts":
@@ -262,11 +351,16 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
         );
       default:
         return (
+<<<<<<< HEAD
           <div className="text-center text-slate-500 mt-10">{t("common.pageNotFound")}</div>
+=======
+          <div className="text-center text-slate-500 mt-10">Page not found.</div>
+>>>>>>> kasuni-development
         );
     }
   };
 
+<<<<<<< HEAD
   const closeTab = (tab) => { setActiveTab(tab); setSidebarOpen(false); };
 
   return (
@@ -322,6 +416,23 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
       </div>
 
 
+=======
+  return (
+    <div className="flex flex-col h-screen overflow-hidden bg-slate-100 font-sans">
+      <Header
+        user={user}
+        alertsCount={highAlertCount}
+        onTabChange={setActiveTab}
+      />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        <div className="flex-1 overflow-y-auto p-8">
+          <div className="max-w-[1000px] mx-auto pb-12">
+            {renderContent()}
+          </div>
+        </div>
+      </div>
+>>>>>>> kasuni-development
     </div>
   );
 }

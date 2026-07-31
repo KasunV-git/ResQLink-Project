@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import Home from './pages/Home';
 import VolunteerApp from './pages/volunteer/VolunteerApp';
@@ -67,3 +68,24 @@ export default function App() {
 
   return <Home onLogin={handleLogin} onRegister={handleRegister} />;
 }
+=======
+// frontend/src/App.jsx
+import { BrowserRouter } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext'
+import { ThemeProvider } from './context/ThemeContext'
+import AppRoutes from './routes/AppRoutes'
+
+function App() {
+  return (
+    <BrowserRouter>
+      <ThemeProvider>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </ThemeProvider>
+    </BrowserRouter>
+  )
+}
+
+export default App
+>>>>>>> kasuni-development
