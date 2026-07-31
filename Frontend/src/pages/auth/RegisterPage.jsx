@@ -8,43 +8,60 @@ import LanguageSwitcher from "../../components/LanguageSwitcher";
 
 export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }) {
   const { t } = useTranslation();
-  const [firstName, setFirstName] = useState("");
-  const [lastName,  setLastName]  = useState("");
-  const [email,     setEmail]     = useState("");
-  const [phone,     setPhone]     = useState("");
-  const [password,  setPassword]  = useState("");
-  const [showPwd,   setShowPwd]   = useState(false);
-  const [role,      setRole]      = useState("Volunteer");
-  const [loading,   setLoading]   = useState(false);
-  const [error,     setError]     = useState("");
+  const [firstName,       setFirstName]       = useState("");
+  const [lastName,        setLastName]        = useState("");
+  const [email,           setEmail]           = useState("");
+  const [phone,           setPhone]           = useState("");
+  const [password,        setPassword]        = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPwd,         setShowPwd]         = useState(false);
+  const [role,            setRole]            = useState("Volunteer");
+  const [loading,         setLoading]         = useState(false);
+  const [error,           setError]           = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!firstName.trim() || !lastName.trim()) {
-      setError(t("auth.validationNameRequired"));
+      setError(t("auth.validationNameRequired") || "First and last name are required.");
       return;
     }
     if (password.length < 6) {
-      setError(t("auth.validationPasswordLength"));
+      setError(t("auth.validationPasswordLength") || "Password must be at least 6 characters.");
       return;
     }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     setLoading(true);
     setError("");
     try {
-      const response = await axios.post("/api/auth/register", {
-        firstName, lastName, email, phone, password, role,
+      const response = await axios.post("/api/auth/signup", {
+        name: `${firstName} ${lastName}`.trim(),
+        firstName,
+        lastName,
+        email,
+        phone,
+        password,
+        confirmPassword,
+        role,
       });
-      onLoginSuccess(response.data);
+      if (onLoginSuccess) {
+        onLoginSuccess(response.data);
+      } else if (onBackToLogin) {
+        onBackToLogin();
+      }
     } catch (err) {
-      setError(err.response?.data?.message || t("auth.registrationFailed"));
+      setError(err.response?.data?.message || t("auth.registrationFailed") || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   const roles = [
-    { value: "Citizen",   labelKey: "auth.citizenRole",   descKey: "auth.citizenDesc"   },
-    { value: "Volunteer", labelKey: "auth.volunteerRole",  descKey: "auth.volunteerDesc" },
+    { value: "Citizen",   labelKey: "auth.citizenRole",   fallbackLabel: "Citizen",   descKey: "auth.citizenDesc",   fallbackDesc: "Report disasters and request emergency relief" },
+    { value: "Volunteer", labelKey: "auth.volunteerRole",  fallbackLabel: "Volunteer", descKey: "auth.volunteerDesc", fallbackDesc: "Accept deployment tasks and assist response teams" },
   ];
 
   return (
@@ -64,14 +81,14 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
             alt="ResQLink"
             onClick={onGoHome}
             className="h-11 w-auto cursor-pointer brightness-100 dark:brightness-110"
-            title={t("common.backToHome")}
+            title={t("common.backToHome") || "Back to Home"}
           />
         </div>
 
         {/* Heading */}
         <div className="text-center mb-6">
-          <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-1">{t("auth.createAccount")}</h2>
-          <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400">{t("auth.createSubtitle")}</p>
+          <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-1">{t("auth.createAccount") || "Create Account"}</h2>
+          <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400">{t("auth.createSubtitle") || "Join ResQLink Disaster Management"}</p>
         </div>
 
         {/* Error */}
@@ -84,13 +101,13 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-          {/* First Name + Last Name — side by side */}
+          {/* First Name + Last Name */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.firstName")}</label>
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.firstName") || "First Name"}</label>
               <input
                 type="text"
-                placeholder={t("auth.firstNamePlaceholder")}
+                placeholder={t("auth.firstNamePlaceholder") || "First name"}
                 value={firstName}
                 onChange={e => setFirstName(e.target.value)}
                 className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
@@ -98,10 +115,10 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.lastName")}</label>
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.lastName") || "Last Name"}</label>
               <input
                 type="text"
-                placeholder={t("auth.lastNamePlaceholder")}
+                placeholder={t("auth.lastNamePlaceholder") || "Last name"}
                 value={lastName}
                 onChange={e => setLastName(e.target.value)}
                 className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
@@ -112,10 +129,10 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
 
           {/* Email */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.email")}</label>
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.email") || "Email"}</label>
             <input
               type="email"
-              placeholder={t("auth.emailPlaceholder")}
+              placeholder={t("auth.emailPlaceholder") || "Enter your email"}
               value={email}
               onChange={e => setEmail(e.target.value)}
               className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
@@ -123,13 +140,13 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
             />
           </div>
 
-          {/* Password with eye toggle */}
+          {/* Password */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.password")}</label>
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.password") || "Password"}</label>
             <div className="relative">
               <input
                 type={showPwd ? "text" : "password"}
-                placeholder={t("auth.passwordCreate")}
+                placeholder={t("auth.passwordCreate") || "Create password"}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-3.5 pr-10 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
@@ -141,16 +158,27 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
                 className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer p-1 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
                 tabIndex={-1}
               >
-                {showPwd
-                  ? <EyeOff size={16} />
-                  : <Eye    size={16} />}
+                {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
 
+          {/* Confirm Password */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Confirm Password</label>
+            <input
+              type={showPwd ? "text" : "password"}
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
+              required
+            />
+          </div>
+
           {/* Mobile Number */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.mobileNumber")}</label>
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.mobileNumber") || "Phone Number"}</label>
             <input
               type="tel"
               placeholder="e.g. +94 77 123 4567"
@@ -162,7 +190,7 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
 
           {/* Select Role */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.selectRole")}</label>
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.selectRole") || "Select Account Type"}</label>
             <div className="flex flex-col gap-2.5">
               {roles.map(r => (
                 <label
@@ -182,8 +210,8 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
                     </div>
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-xs font-semibold text-slate-900 dark:text-white">{t(r.labelKey)}</span>
-                    <span className="text-[11px] text-slate-500 dark:text-slate-400">{t(r.descKey)}</span>
+                    <span className="text-xs font-semibold text-slate-900 dark:text-white">{t(r.labelKey) || r.fallbackLabel}</span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">{t(r.descKey) || r.fallbackDesc}</span>
                   </div>
                 </label>
               ))}
@@ -195,15 +223,15 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
             disabled={loading}
             className="btn-anim w-full bg-[#1e3a8a] hover:bg-blue-900 dark:bg-blue-600 dark:hover:bg-blue-700 disabled:opacity-50 text-white font-semibold text-sm py-3 rounded-xl shadow-md cursor-pointer transition-colors mt-2"
           >
-            {loading ? t("auth.creatingAccount") : t("auth.createAccount")}
+            {loading ? (t("auth.creatingAccount") || "Creating Account...") : (t("auth.createAccount") || "Create Account")}
           </button>
         </form>
 
         {/* Back to Login */}
         <p className="text-xs md:text-sm text-center text-slate-500 dark:text-slate-400 mt-5">
-          {t("auth.alreadyAccount")}{" "}
+          {t("auth.alreadyAccount") || "Already have an account?"}{" "}
           <button onClick={onBackToLogin} className="bg-transparent border-none cursor-pointer text-[#1e3a8a] dark:text-blue-400 font-bold hover:underline">
-            {t("auth.signInHere")}
+            {t("auth.signInHere") || "Sign in here"}
           </button>
         </p>
 

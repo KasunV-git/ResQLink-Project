@@ -1,35 +1,28 @@
 const mysql = require('mysql2/promise');
-<<<<<<< HEAD
+const path  = require('path');
 
-// dotenv already loaded in App.js before this module is required
+// Load .env if not already loaded
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
+
 const pool = mysql.createPool({
-  host:             process.env.DB_HOST     || 'localhost',
-  user:             process.env.DB_USER     || 'root',
-  password:         process.env.DB_PASSWORD || '',
-  database:         process.env.DB_NAME     || 'resqlink',
+  host:               process.env.DB_HOST     || 'localhost',
+  user:               process.env.DB_USER     || 'root',
+  password:           process.env.DB_PASSWORD || '',
+  database:           process.env.DB_NAME     || 'resqlink',
   waitForConnections: true,
-  connectionLimit:  10,
-  queueLimit:       0,
-  timezone:         'local',
+  connectionLimit:    10,
+  queueLimit:         0,
+  timezone:           'local',
 });
 
 // Test connection on startup
 pool.getConnection()
-  .then(conn => { console.log('✅ MySQL connected successfully'); conn.release(); })
-  .catch(err  => console.error('❌ MySQL connection failed:', err.message));
+  .then(conn => {
+    console.log('✅ MySQL pool connected successfully to database:', process.env.DB_NAME || 'resqlink');
+    conn.release();
+  })
+  .catch(err => {
+    console.error('⚠️ MySQL connection notice:', err.message);
+  });
 
-=======
-require('dotenv').config();
-
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'Renu_mysql',
-  database: process.env.DB_NAME || 'resqlink',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
-
->>>>>>> kasuni-development
 module.exports = pool;
