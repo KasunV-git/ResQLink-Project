@@ -40,7 +40,7 @@ export default function Alerts({ alerts, onCreateAlert, onDeleteAlert, isDarkMod
   return (
     <div className="w-full flex flex-col gap-6" data-name="AdminAlerts">
       {/* Title */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 text-center">
         <h1 className={`font-semibold text-3xl tracking-tight transition-colors ${textHeading}`}>Emergency Broadcasts</h1>
         <p className={`text-base transition-colors ${textMuted}`}>Issue real-time alerts and manage active notifications for responders</p>
       </div>

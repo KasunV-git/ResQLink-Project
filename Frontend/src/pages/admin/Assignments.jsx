@@ -15,7 +15,7 @@ export default function Assignments({ assignments, onCancelAssignment, onComplet
   return (
     <div className="w-full flex flex-col gap-8" data-name="AdminAssignments">
       {/* Title */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 text-center">
         <h1 className={`font-semibold text-3xl tracking-tight transition-colors ${textHeading}`}>Resource Allocation Log</h1>
         <p className={`text-base transition-colors ${textMuted}`}>View and manage all volunteer dispatches and incident reports</p>
       </div>

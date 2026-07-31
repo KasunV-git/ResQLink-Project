@@ -95,9 +95,9 @@ export default function AIAnalysis({ isDarkMode }) {
         {/* Page Header */}
         <motion.div
           variants={itemVariants}
-          className="flex justify-between items-center pb-4 border-b border-solid border-slate-200 dark:border-slate-800"
+          className="flex justify-center items-center pb-4 border-b border-solid border-slate-200 dark:border-slate-800"
         >
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 text-center">
             <h1 className="font-bold text-3xl tracking-tight text-purple-600 dark:text-purple-400">
               Intelligence Center
             </h1>

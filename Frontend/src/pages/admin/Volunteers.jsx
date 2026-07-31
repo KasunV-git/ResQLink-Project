@@ -49,11 +49,9 @@ export default function Volunteers({ volunteers, onToggleAvailability, onAssign,
   return (
     <div className="w-full flex flex-col gap-6" data-name="AdminVolunteers">
       {/* Title */}
-      <div className="flex justify-between items-center">
-        <div className="flex flex-col gap-1">
-          <h1 className={`font-semibold text-3xl tracking-tight transition-colors ${textHeading}`}>Volunteers Portal</h1>
-          <p className={`text-base transition-colors ${textMuted}`}>Monitor availability, verify volunteer skills, and dispatch personnel</p>
-        </div>
+      <div className="flex flex-col gap-1 text-center">
+        <h1 className={`font-semibold text-3xl tracking-tight transition-colors ${textHeading}`}>Volunteers Portal</h1>
+        <p className={`text-base transition-colors ${textMuted}`}>Monitor availability, verify volunteer skills, and dispatch personnel</p>
       </div>
 
       {/* Main Layout split if volunteer is selected for assignment */}
