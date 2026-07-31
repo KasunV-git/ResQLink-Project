@@ -98,7 +98,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
       </div>
 
       {/* Overview Analytics Chart */}
-      <div className={`w-full max-w-[900px] border rounded-xl p-6 shadow-sm h-[320px] flex flex-col transition-colors duration-200 ${
+      <div className={`w-full max-w-[900px] border rounded-xl p-5 md:p-6 shadow-sm flex flex-col transition-colors duration-200 ${
         isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-900"
       }`}>
         <div className="mb-4">
@@ -159,7 +159,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
       {/* Main Grid */}
       <div className="flex flex-wrap justify-center gap-6 w-full max-w-[900px]">
         {/* Recent Assignments */}
-        <div className={`flex-1 min-w-[320px] border rounded-xl p-6 shadow-sm flex flex-col h-[400px] transition-colors duration-200 ${
+        <div className={`flex-1 min-w-[320px] border rounded-xl p-5 md:p-6 shadow-sm flex flex-col transition-colors duration-200 ${
           isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-900"
         }`}>
           <div className={`flex justify-between items-center pb-4 border-b ${borderMuted} mb-4`}>
@@ -200,7 +200,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
         </div>
 
         {/* Recent Broadcasts */}
-        <div className={`flex-1 min-w-[320px] border rounded-xl p-6 shadow-sm flex flex-col h-[400px] transition-colors duration-200 ${
+        <div className={`flex-1 min-w-[320px] border rounded-xl p-5 md:p-6 shadow-sm flex flex-col transition-colors duration-200 ${
           isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-900"
         }`}>
           <div className={`flex justify-between items-center pb-4 border-b ${borderMuted} mb-4`}>
