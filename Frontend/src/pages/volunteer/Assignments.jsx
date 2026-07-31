@@ -1,13 +1,12 @@
-<<<<<<< HEAD
 import React, { useState, useCallback, useMemo } from "react";
 import {
   Check, MapPin, CheckCircle2, Play,
   Loader2, AlertCircle, ChevronRight,
-  ClipboardList, Zap, Trophy, Filter, X,
+  ClipboardList, Zap, Trophy, Filter, X, ClipboardCheck
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import LocationPicker from "../../components/LocationPicker";
-import { SL_DISTRICTS, SL_PROVINCES } from "../../data/sriLankaLocations";
+import { SL_DISTRICTS } from "../../data/sriLankaLocations";
 
 function extractDistrict(location) {
   if (!location) return null;
@@ -50,15 +49,15 @@ const BADGE_DOT = {
 function PipelineBar({ counts }) {
   const { t } = useTranslation();
   const stages = [
-    { labelKey: "assignments.sections.assigned",   value: counts.assigned,   active: counts.assigned   > 0, numColor: "text-sky-700 dark:text-sky-400",     bg: counts.assigned   > 0 ? "bg-sky-50 dark:bg-sky-950/40 border-sky-200 dark:border-sky-900/60"     : "bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800" },
-    { labelKey: "assignments.sections.inProgress", value: counts.inProgress, active: counts.inProgress > 0, numColor: "text-amber-700 dark:text-amber-400",   bg: counts.inProgress > 0 ? "bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/60"   : "bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800" },
-    { labelKey: "assignments.sections.completed",  value: counts.completed,  active: counts.completed  > 0, numColor: "text-emerald-700 dark:text-emerald-400", bg: counts.completed  > 0 ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/60": "bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800" },
+    { labelKey: "assignments.sections.assigned",   fallback: "Assigned",    value: counts.assigned,   active: counts.assigned   > 0, numColor: "text-sky-700 dark:text-sky-400",     bg: counts.assigned   > 0 ? "bg-sky-50 dark:bg-sky-950/40 border-sky-200 dark:border-sky-900/60"     : "bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800" },
+    { labelKey: "assignments.sections.inProgress", fallback: "In Progress", value: counts.inProgress, active: counts.inProgress > 0, numColor: "text-amber-700 dark:text-amber-400",   bg: counts.inProgress > 0 ? "bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/60"   : "bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800" },
+    { labelKey: "assignments.sections.completed",  fallback: "Completed",   value: counts.completed,  active: counts.completed  > 0, numColor: "text-emerald-700 dark:text-emerald-400", bg: counts.completed  > 0 ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/60": "bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800" },
   ];
 
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 md:px-6 py-4 shadow-xs">
       <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">
-        {t("assignments.taskLifecycle")}
+        {t("assignments.taskLifecycle") || "Task Lifecycle Pipeline"}
       </p>
       <div className="flex items-center gap-1 md:gap-2">
         {stages.map((s, i) => (
@@ -68,7 +67,7 @@ function PipelineBar({ counts }) {
                 {s.value}
               </span>
               <span className={`text-[10px] md:text-xs font-semibold text-center leading-tight ${s.active ? s.numColor : "text-slate-400 dark:text-slate-500"}`}>
-                {t(s.labelKey)}
+                {t(s.labelKey) || s.fallback}
               </span>
             </div>
             {i < stages.length - 1 && (
@@ -88,7 +87,7 @@ function ActionButton({ sectionStatus, id, isLoading, onStart, onComplete }) {
     return (
       <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 py-1.5 px-2">
         <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
-        <span className="hidden sm:inline">{t("assignments.done")}</span>
+        <span className="hidden sm:inline">{t("assignments.done") || "Completed"}</span>
       </span>
     );
   }
@@ -96,14 +95,14 @@ function ActionButton({ sectionStatus, id, isLoading, onStart, onComplete }) {
     return (
       <button
         disabled={isLoading}
-        onClick={() => onStart(id)}
+        onClick={() => onStart ? onStart(id) : onComplete(id)}
         className="inline-flex items-center gap-1.5 bg-sky-600 hover:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-600
                    disabled:opacity-50 disabled:cursor-not-allowed
                    text-white text-xs font-semibold py-1.5 px-3 rounded-lg
                    shadow-xs transition-colors whitespace-nowrap"
       >
         {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
-        <span>{isLoading ? t("assignments.starting") : t("assignments.startTask")}</span>
+        <span>{isLoading ? (t("assignments.starting") || "Starting...") : (t("assignments.startTask") || "Start Task")}</span>
       </button>
     );
   }
@@ -117,7 +116,7 @@ function ActionButton({ sectionStatus, id, isLoading, onStart, onComplete }) {
                  shadow-xs transition-colors whitespace-nowrap"
     >
       {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-      <span>{isLoading ? t("assignments.saving") : t("assignments.markComplete")}</span>
+      <span>{isLoading ? (t("assignments.saving") || "Saving...") : (t("assignments.markComplete") || "Complete")}</span>
     </button>
   );
 }
@@ -165,7 +164,7 @@ function TaskRow({ item, section, isLoading, errorMsg, onStart, onComplete }) {
         <td className="px-5 py-3.5 text-center">
           <div className="flex flex-col items-center gap-0.5">
             <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-              {t(section.dateLabelKey)}
+              {t(section.dateLabelKey) || "Date"}
             </span>
             <span className="text-xs text-slate-600 dark:text-slate-300 font-medium">{date || "—"}</span>
           </div>
@@ -200,9 +199,9 @@ function TaskCard({ item, section, isLoading, errorMsg, onStart, onComplete }) {
   const district = extractDistrict(item.location);
 
   const BADGE_LABEL = {
-    "assigned":    t("assignments.badge.assigned"),
-    "in-progress": t("assignments.badge.inProgress"),
-    "completed":   t("assignments.badge.completed"),
+    "assigned":    t("assignments.badge.assigned") || "Assigned",
+    "in-progress": t("assignments.badge.inProgress") || "In Progress",
+    "completed":   t("assignments.badge.completed") || "Completed",
   };
 
   return (
@@ -229,7 +228,7 @@ function TaskCard({ item, section, isLoading, errorMsg, onStart, onComplete }) {
         {district && <DistrictBadge location={item.location} />}
         <span>·</span>
         <span>
-          {t(section.dateLabelKey)}:{" "}
+          {t(section.dateLabelKey) || "Date"}:{" "}
           <span className="text-slate-500 dark:text-slate-400 font-medium">{date || "—"}</span>
         </span>
       </div>
@@ -250,30 +249,6 @@ function TaskCard({ item, section, isLoading, errorMsg, onStart, onComplete }) {
   );
 }
 
-function SectionEmpty({ textKey }) {
-  const { t } = useTranslation();
-  return (
-    <div className="px-5 py-6 text-center">
-      <p className="text-sm text-slate-400 dark:text-slate-500 font-medium">{t(textKey)}</p>
-    </div>
-  );
-}
-
-function FullEmpty() {
-  const { t } = useTranslation();
-  return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs p-12 flex flex-col items-center gap-3 text-center">
-      <CheckCircle2 className="w-12 h-12 text-slate-200 dark:text-slate-700" />
-      <div>
-        <p className="font-semibold text-slate-600 dark:text-slate-300">{t("assignments.noAssignmentsYet")}</p>
-        <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">
-          {t("assignments.noAssignmentsDesc")}
-        </p>
-      </div>
-    </div>
-  );
-}
-
 function TaskSection({ section, tasks, loadingId, rowError, onStart, onComplete }) {
   const { t } = useTranslation();
   const { Icon } = section;
@@ -285,10 +260,10 @@ function TaskSection({ section, tasks, loadingId, rowError, onStart, onComplete 
           <Icon className={`w-4 h-4 flex-shrink-0 ${section.iconColor}`} />
           <div className="min-w-0">
             <h2 className="font-semibold text-sm text-slate-900 dark:text-white leading-tight">
-              {t(section.titleKey)}
+              {t(section.titleKey) || section.fallbackTitle}
             </h2>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight hidden sm:block">
-              {t(section.subtitleKey)}
+              {t(section.subtitleKey) || section.fallbackSubtitle}
             </p>
           </div>
         </div>
@@ -298,18 +273,20 @@ function TaskSection({ section, tasks, loadingId, rowError, onStart, onComplete 
       </div>
 
       {tasks.length === 0 ? (
-        <SectionEmpty textKey={section.emptyTextKey} />
+        <div className="px-5 py-6 text-center">
+          <p className="text-sm text-slate-400 dark:text-slate-500 font-medium">{t(section.emptyTextKey) || "No tasks in this stage"}</p>
+        </div>
       ) : (
         <>
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-800/40 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                  <th className="px-5 py-2.5">{t("assignments.disaster")}</th>
-                  <th className="px-5 py-2.5">{t("assignments.task")}</th>
-                  <th className="px-5 py-2.5">{t("assignments.location")}</th>
-                  <th className="px-5 py-2.5 text-center">{t(section.dateLabelKey)} {t("assignments.date")}</th>
-                  <th className="px-5 py-2.5 text-right">{t("assignments.action")}</th>
+                  <th className="px-5 py-2.5">{t("assignments.disaster") || "Disaster"}</th>
+                  <th className="px-5 py-2.5">{t("assignments.task") || "Task"}</th>
+                  <th className="px-5 py-2.5">{t("assignments.location") || "Location"}</th>
+                  <th className="px-5 py-2.5 text-center">{t(section.dateLabelKey) || "Date"}</th>
+                  <th className="px-5 py-2.5 text-right">{t("assignments.action") || "Action"}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -323,82 +300,10 @@ function TaskSection({ section, tasks, loadingId, rowError, onStart, onComplete 
                     onStart={onStart}
                     onComplete={onComplete}
                   />
-=======
-import { Check, MapPin, ClipboardCheck, ClipboardList, CheckCircle } from "lucide-react";
-
-export default function Assignments({ activeAssignments, completedAssignments, onCompleteAssignment }) {
-  return (
-    <div className="w-full flex flex-col gap-8" data-name="AssignmentsPage">
-      {/* Title */}
-      <div className="flex flex-col gap-1">
-        <h1 className="font-semibold text-3xl text-slate-900 tracking-tight">My Assignments</h1>
-        <p className="text-slate-500 text-base">View and manage your volunteer tasks</p>
-      </div>
-
-      {/* Active Assignments Table Card */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="flex items-center gap-2.5 px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-          <ClipboardList className="w-5 h-5 text-[#15803d]" />
-          <h2 className="font-semibold text-base text-slate-900">
-            Active Assignments ({activeAssignments.length})
-          </h2>
-        </div>
-
-        {activeAssignments.length === 0 ? (
-          <div className="p-8 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
-            <CheckCircle className="w-10 h-10 text-emerald-600/20" />
-            <p className="font-medium">All caught up! No active assignments</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-100 text-slate-400 text-xs font-semibold uppercase tracking-wider bg-slate-50/20">
-                  <th className="px-6 py-3">Disaster</th>
-                  <th className="px-6 py-3">Task</th>
-                  <th className="px-6 py-3">Location</th>
-                  <th className="px-6 py-3 text-center">Status</th>
-                  <th className="px-6 py-3 text-center">Assigned Date</th>
-                  <th className="px-6 py-3 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-700 text-sm font-medium">
-                {activeAssignments.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/40 transition-colors">
-                    <td className="px-6 py-4 font-semibold text-slate-900">{item.disaster}</td>
-                    <td className="px-6 py-4 text-slate-500 font-normal">{item.task}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1.5 text-slate-500 font-normal">
-                        <MapPin className="w-4 h-4 text-slate-400" />
-                        <span>{item.location}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <span className={`inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase ${
-                        item.status === "in-progress"
-                          ? "bg-amber-100 text-amber-700 border border-amber-200"
-                          : "bg-sky-100 text-sky-700 border border-sky-200"
-                      }`}>
-                        {item.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-center text-slate-500 font-normal">{item.assignedDate}</td>
-                    <td className="px-6 py-4 text-right">
-                      <button
-                        onClick={() => onCompleteAssignment(item.id)}
-                        className="inline-flex items-center gap-1.5 bg-[#15803d] hover:bg-[#166534] text-white text-xs font-semibold py-1.5 px-3 rounded-lg shadow-sm transition-colors"
-                      >
-                        <Check className="w-3.5 h-3.5" />
-                        Complete
-                      </button>
-                    </td>
-                  </tr>
->>>>>>> kasuni-development
                 ))}
               </tbody>
             </table>
           </div>
-<<<<<<< HEAD
           <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
             {tasks.map(item => (
               <TaskCard
@@ -420,55 +325,74 @@ export default function Assignments({ activeAssignments, completedAssignments, o
 
 const SECTIONS = [
   {
-    status:       "assigned",
-    titleKey:     "assignments.sections.assigned",
-    subtitleKey:  "assignments.sections.assignedSubtitle",
-    emptyTextKey: "assignments.emptyText.assigned",
-    dateLabelKey: "assignments.dateLabel.assigned",
-    dateField:    "assignedDate",
-    Icon:         ClipboardList,
-    headerBg:     "bg-slate-50 dark:bg-slate-800/60",
-    headerBorder: "border-slate-200 dark:border-slate-800",
-    iconColor:    "text-sky-600 dark:text-sky-400",
-    countBg:      "bg-sky-600",
-    rowHover:     "hover:bg-sky-50/40 dark:hover:bg-sky-950/30",
+    status:           "assigned",
+    titleKey:         "assignments.sections.assigned",
+    fallbackTitle:    "Assigned Tasks",
+    subtitleKey:      "assignments.sections.assignedSubtitle",
+    fallbackSubtitle: "Tasks assigned to you awaiting acceptance",
+    emptyTextKey:     "assignments.emptyText.assigned",
+    dateLabelKey:     "assignments.dateLabel.assigned",
+    dateField:        "assignedDate",
+    Icon:             ClipboardList,
+    headerBg:         "bg-slate-50 dark:bg-slate-800/60",
+    headerBorder:     "border-slate-200 dark:border-slate-800",
+    iconColor:        "text-sky-600 dark:text-sky-400",
+    countBg:          "bg-sky-600",
+    rowHover:         "hover:bg-sky-50/40 dark:hover:bg-sky-950/30",
   },
   {
-    status:       "in-progress",
-    titleKey:     "assignments.sections.inProgress",
-    subtitleKey:  "assignments.sections.inProgressSubtitle",
-    emptyTextKey: "assignments.emptyText.inProgress",
-    dateLabelKey: "assignments.dateLabel.assigned",
-    dateField:    "assignedDate",
-    Icon:         Zap,
-    headerBg:     "bg-amber-50/60 dark:bg-amber-950/30",
-    headerBorder: "border-amber-200 dark:border-amber-900/40",
-    iconColor:    "text-amber-600 dark:text-amber-400",
-    countBg:      "bg-amber-500",
-    rowHover:     "hover:bg-amber-50/40 dark:hover:bg-amber-950/30",
+    status:           "in-progress",
+    titleKey:         "assignments.sections.inProgress",
+    fallbackTitle:    "In Progress Tasks",
+    subtitleKey:      "assignments.sections.inProgressSubtitle",
+    fallbackSubtitle: "Active tasks currently underway",
+    emptyTextKey:     "assignments.emptyText.inProgress",
+    dateLabelKey:     "assignments.dateLabel.assigned",
+    dateField:        "assignedDate",
+    Icon:             Zap,
+    headerBg:         "bg-amber-50/60 dark:bg-amber-950/30",
+    headerBorder:     "border-amber-200 dark:border-amber-900/40",
+    iconColor:        "text-amber-600 dark:text-amber-400",
+    countBg:          "bg-amber-500",
+    rowHover:         "hover:bg-amber-50/40 dark:hover:bg-amber-950/30",
   },
   {
-    status:       "completed",
-    titleKey:     "assignments.sections.completed",
-    subtitleKey:  "assignments.sections.completedSubtitle",
-    emptyTextKey: "assignments.emptyText.completed",
-    dateLabelKey: "assignments.dateLabel.completed",
-    dateField:    "completedDate",
-    Icon:         Trophy,
-    headerBg:     "bg-emerald-50/60 dark:bg-emerald-950/30",
-    headerBorder: "border-emerald-200 dark:border-emerald-900/40",
-    iconColor:    "text-emerald-600 dark:text-emerald-400",
-    countBg:      "bg-emerald-600",
-    rowHover:     "",
+    status:           "completed",
+    titleKey:         "assignments.sections.completed",
+    fallbackTitle:    "Completed Assignments",
+    subtitleKey:      "assignments.sections.completedSubtitle",
+    fallbackSubtitle: "Tasks successfully completed and verified",
+    emptyTextKey:     "assignments.emptyText.completed",
+    dateLabelKey:     "assignments.dateLabel.completed",
+    dateField:        "completedDate",
+    Icon:             Trophy,
+    headerBg:         "bg-emerald-50/60 dark:bg-emerald-950/30",
+    headerBorder:     "border-emerald-200 dark:border-emerald-900/40",
+    iconColor:        "text-emerald-600 dark:text-emerald-400",
+    countBg:          "bg-emerald-600",
+    rowHover:         "",
   },
 ];
 
-export default function Assignments({ assignments = [], onStartAssignment, onCompleteAssignment }) {
+export default function Assignments({
+  assignments = [],
+  activeAssignments,
+  completedAssignments,
+  onStartAssignment,
+  onCompleteAssignment
+}) {
   const { t } = useTranslation();
   const [loadingId,      setLoadingId]      = useState(null);
   const [rowError,       setRowError]       = useState(null);
   const [filterProvince, setFilterProvince] = useState("");
   const [filterDistrict, setFilterDistrict] = useState("");
+
+  const allAssignments = useMemo(() => {
+    if (assignments && assignments.length > 0) return assignments;
+    const active = activeAssignments || [];
+    const completed = completedAssignments || [];
+    return [...active, ...completed];
+  }, [assignments, activeAssignments, completedAssignments]);
 
   const clearError = useCallback((id) => {
     setTimeout(() => setRowError(prev => (prev?.id === id ? null : prev)), 4000);
@@ -479,9 +403,11 @@ export default function Assignments({ assignments = [], onStartAssignment, onCom
     setLoadingId(id);
     setRowError(null);
     try {
-      await onStartAssignment(id);
+      if (onStartAssignment) {
+        await onStartAssignment(id);
+      }
     } catch (err) {
-      setRowError({ id, message: err?.message || t("assignments.failedStart") });
+      setRowError({ id, message: err?.message || "Failed to start task." });
       clearError(id);
     } finally {
       setLoadingId(null);
@@ -493,9 +419,11 @@ export default function Assignments({ assignments = [], onStartAssignment, onCom
     setLoadingId(id);
     setRowError(null);
     try {
-      await onCompleteAssignment(id);
+      if (onCompleteAssignment) {
+        await onCompleteAssignment(id);
+      }
     } catch (err) {
-      setRowError({ id, message: err?.message || t("assignments.failedComplete") });
+      setRowError({ id, message: err?.message || "Failed to complete task." });
       clearError(id);
     } finally {
       setLoadingId(null);
@@ -503,11 +431,11 @@ export default function Assignments({ assignments = [], onStartAssignment, onCom
   };
 
   const filteredAssignments = useMemo(() => {
-    if (!filterProvince && !filterDistrict) return assignments;
-    return assignments.filter(a =>
+    if (!filterProvince && !filterDistrict) return allAssignments;
+    return allAssignments.filter(a =>
       locationMatchesFilter(a.location, filterProvince, filterDistrict)
     );
-  }, [assignments, filterProvince, filterDistrict]);
+  }, [allAssignments, filterProvince, filterDistrict]);
 
   const hasLocationFilter = Boolean(filterProvince || filterDistrict);
 
@@ -539,10 +467,10 @@ export default function Assignments({ assignments = [], onStartAssignment, onCom
       {/* Page header */}
       <div className="flex flex-col gap-1">
         <h1 className="font-bold text-2xl md:text-3xl text-slate-900 dark:text-white tracking-tight">
-          {t("assignments.title")}
+          {t("assignments.title") || "My Assignments"}
         </h1>
         <p className="text-sm md:text-base text-slate-500 dark:text-slate-400">
-          {t("assignments.subtitle")}
+          {t("assignments.subtitle") || "View and manage your volunteer tasks"}
         </p>
       </div>
 
@@ -553,7 +481,7 @@ export default function Assignments({ assignments = [], onStartAssignment, onCom
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
             <Filter className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-            {t("assignments.filterByLocation")}
+            {t("assignments.filterByLocation") || "Filter by Location"}
           </div>
           {hasLocationFilter && (
             <button
@@ -561,7 +489,7 @@ export default function Assignments({ assignments = [], onStartAssignment, onCom
               className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
             >
               <X className="w-3 h-3" />
-              {t("assignments.clear")}
+              {t("assignments.clear") || "Clear"}
             </button>
           )}
         </div>
@@ -576,14 +504,14 @@ export default function Assignments({ assignments = [], onStartAssignment, onCom
         />
 
         <p className="text-[11px] text-slate-400 dark:text-slate-500">
-          {t("assignments.showing")}{" "}
+          {t("assignments.showing") || "Showing"}{" "}
           <span className="font-semibold text-slate-600 dark:text-slate-300">{filteredAssignments.length}</span>
-          {" "}{t("assignments.of")}{" "}
-          <span className="font-semibold text-slate-600 dark:text-slate-300">{assignments.length}</span>
-          {" "}{assignments.length !== 1 ? t("assignments.assignments") : t("assignments.assignment")}
+          {" "}{t("assignments.of") || "of"}{" "}
+          <span className="font-semibold text-slate-600 dark:text-slate-300">{allAssignments.length}</span>
+          {" "}{allAssignments.length !== 1 ? (t("assignments.assignments") || "assignments") : (t("assignments.assignment") || "assignment")}
           {hasLocationFilter && (
             <>
-              {" "}{t("assignments.in")}{" "}
+              {" "}{t("assignments.in") || "in"}{" "}
               <span className="font-semibold text-[#15803d] dark:text-emerald-400">
                 {filterDistrict || filterProvince}
               </span>
@@ -593,8 +521,16 @@ export default function Assignments({ assignments = [], onStartAssignment, onCom
       </div>
 
       {/* Sections or empty states */}
-      {assignments.length === 0 ? (
-        <FullEmpty />
+      {allAssignments.length === 0 ? (
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs p-12 flex flex-col items-center gap-3 text-center">
+          <CheckCircle2 className="w-12 h-12 text-slate-200 dark:text-slate-700" />
+          <div>
+            <p className="font-semibold text-slate-600 dark:text-slate-300">{t("assignments.noAssignmentsYet") || "No assignments yet"}</p>
+            <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">
+              {t("assignments.noAssignmentsDesc") || "All caught up! New disaster response tasks will appear here."}
+            </p>
+          </div>
+        </div>
       ) : (
         SECTIONS.map(section => (
           <TaskSection
@@ -609,54 +545,6 @@ export default function Assignments({ assignments = [], onStartAssignment, onCom
         ))
       )}
 
-=======
-        )}
-      </div>
-
-      {/* Completed Assignments Table Card */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="flex items-center gap-2.5 px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-          <ClipboardCheck className="w-5 h-5 text-emerald-600" />
-          <h2 className="font-semibold text-base text-slate-900">
-            Completed Assignments ({completedAssignments.length})
-          </h2>
-        </div>
-
-        {completedAssignments.length === 0 ? (
-          <div className="p-8 text-center text-slate-400">
-            <p className="font-medium">No completed assignments yet</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-100 text-slate-400 text-xs font-semibold uppercase tracking-wider bg-slate-50/20">
-                  <th className="px-6 py-3">Disaster</th>
-                  <th className="px-6 py-3">Task</th>
-                  <th className="px-6 py-3">Location</th>
-                  <th className="px-6 py-3 text-center">Completed Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-700 text-sm">
-                {completedAssignments.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/40 transition-colors font-medium">
-                    <td className="px-6 py-4 font-semibold text-slate-900">{item.disaster}</td>
-                    <td className="px-6 py-4 text-slate-500">{item.task}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1.5 text-slate-500">
-                        <MapPin className="w-4 h-4 text-slate-400" />
-                        <span>{item.location}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-center text-slate-500">{item.completedDate}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
->>>>>>> kasuni-development
     </div>
   );
 }
