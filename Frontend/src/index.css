@@ -1,14 +1,37 @@
 @import "tailwindcss";
 
-*, *::before, *::after { box-sizing: border-box; }
-html { width: 100%; height: 100%; scroll-behavior: smooth; overflow-x: hidden; }
+@variant dark (&:where(.dark, .dark *));
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
 body {
   width: 100%; min-height: 100%; margin: 0; padding: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   background-color: #EDF0F3;
+  color: #0f172a;
   overflow-x: hidden;
 }
+
+html.dark body {
+  background-color: #0b1329;
+  color: #f8fafc;
+}
+
 #root { width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
 
 /* ══ Keyframes ══ */

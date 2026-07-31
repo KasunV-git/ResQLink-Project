@@ -13,39 +13,29 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="app-footer" style={{
-      width: "100%",
-      backgroundColor: "#fff",
-      borderTop: "1px solid #e2e8f0",
-      flexShrink: 0,
-    }}>
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        flexWrap: "wrap",
-        gap: 10,
-      }}>
+    <footer className="app-footer w-full bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex-shrink-0 transition-colors">
+      <div className="flex items-center justify-between flex-wrap gap-2.5">
         {/* Left — logo + tagline */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src={logo} alt="ResQLink" style={{ height: 28, width: "auto" }} />
-          <span style={{ fontSize: 13, color: "#94a3b8" }}>
+        <div className="flex items-center gap-2.5">
+          <img src={logo} alt="ResQLink" className="h-7 w-auto brightness-100 dark:brightness-110" />
+          <span className="text-xs text-slate-400 dark:text-slate-500">
             {t("footer.tagline")}
           </span>
         </div>
 
         {/* Right — links + copyright */}
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          {links.map(label => (
-            <a key={label} href="#"
-              style={{ fontSize: 13, color: "#94a3b8", textDecoration: "none", fontWeight: 500, transition: "color 0.2s" }}
-              onMouseEnter={e => e.target.style.color = "#15803d"}
-              onMouseLeave={e => e.target.style.color = "#94a3b8"}>
+        <div className="flex items-center gap-4 text-xs font-medium">
+          {links.map((label) => (
+            <a
+              key={label}
+              href="#"
+              className="text-slate-400 dark:text-slate-500 hover:text-[#15803d] dark:hover:text-emerald-400 transition-colors no-underline"
+            >
               {label}
             </a>
           ))}
-          <span style={{ fontSize: 13, color: "#cbd5e1" }}>|</span>
-          <span style={{ fontSize: 13, color: "#94a3b8" }}>© {year} ResQLink</span>
+          <span className="text-slate-300 dark:text-slate-700">|</span>
+          <span className="text-slate-400 dark:text-slate-500">© {year} ResQLink</span>
         </div>
       </div>
     </footer>

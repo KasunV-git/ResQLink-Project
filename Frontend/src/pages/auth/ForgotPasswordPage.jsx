@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import logo from "../../assets/Logo & Name Side-cropped.svg";
+import ThemeToggle from "../../components/ThemeToggle";
+import LanguageSwitcher from "../../components/LanguageSwitcher";
 
 export default function ForgotPasswordPage({ onBackToLogin, onRegister, onGoHome }) {
   const { t } = useTranslation();
@@ -38,45 +40,44 @@ export default function ForgotPasswordPage({ onBackToLogin, onRegister, onGoHome
   /* ── SUCCESS STATE ── */
   if (submitted) {
     return (
-      <div style={S.page}>
-        <div className="anim-scale-in" style={{ ...S.card, textAlign:"center" }}>
+      <div className="min-h-screen w-full bg-slate-100 dark:bg-slate-950 flex flex-col items-center justify-center p-4 md:p-6 transition-colors relative">
+        <div className="absolute top-4 right-4 flex items-center gap-3">
+          <ThemeToggle size={18} />
+          <LanguageSwitcher />
+        </div>
 
-          <div style={{ display:"flex", justifyContent:"center", marginBottom:24 }}>
-            <div style={{
-              width:80, height:80, borderRadius:"50%",
-              backgroundColor:"#dcfce7",
-              display:"flex", alignItems:"center", justifyContent:"center",
-              boxShadow:"0 0 0 8px #f0fdf4",
-            }}>
-              <CheckCircle size={40} color="#15803d" strokeWidth={2} />
+        <div className="anim-scale-in bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl w-full max-w-[460px] p-6 md:p-9 text-center transition-colors">
+
+          <div className="flex justify-center mb-6">
+            <div className="w-20 h-20 rounded-full bg-emerald-100 dark:bg-emerald-950/80 flex items-center justify-center ring-8 ring-emerald-50 dark:ring-emerald-900/30">
+              <CheckCircle className="w-10 h-10 text-emerald-600 dark:text-emerald-400" strokeWidth={2} />
             </div>
           </div>
 
-          <h2 style={{ fontSize:22, fontWeight:700, color:"#0f172a", margin:"0 0 10px" }}>
+          <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-2">
             {t("auth.checkEmail")}
           </h2>
 
-          <p style={{ fontSize:14, color:"#64748b", lineHeight:1.7, margin:"0 0 28px" }}>
+          <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-7">
             {t("auth.resetSent")}{" "}
-            <strong style={{ color:"#0f172a" }}>{email.trim().toLowerCase()}</strong>
+            <strong className="text-slate-900 dark:text-slate-100 font-semibold">{email.trim().toLowerCase()}</strong>
           </p>
 
-          <div style={{
-            backgroundColor:"#f8fafc", border:"1px solid #e2e8f0",
-            borderRadius:10, padding:"16px 18px", marginBottom:28,
-            textAlign:"left",
-          }}>
-            <p style={{ fontSize:13, fontWeight:600, color:"#475569", margin:"0 0 10px" }}>
+          <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-xl p-4 mb-7 text-left">
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
               {t("auth.didntReceive")}
             </p>
-            <ul style={{ listStyle:"disc", paddingLeft:18, margin:0, display:"flex", flexDirection:"column", gap:8 }}>
+            <ul className="list-disc pl-4 space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
               {tips.map(tip => (
-                <li key={tip} style={{ fontSize:13, color:"#64748b" }}>{tip}</li>
+                <li key={tip}>{tip}</li>
               ))}
             </ul>
           </div>
 
-          <button onClick={onBackToLogin} className="btn-anim" style={S.btn}>
+          <button
+            onClick={onBackToLogin}
+            className="btn-anim w-full bg-[#1e3a8a] hover:bg-blue-900 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold text-sm py-3 rounded-xl shadow-md cursor-pointer transition-colors"
+          >
             {t("auth.backToLogin")}
           </button>
 
@@ -87,51 +88,54 @@ export default function ForgotPasswordPage({ onBackToLogin, onRegister, onGoHome
 
   /* ── FORM STATE ── */
   return (
-    <div style={S.page}>
-      <div className="anim-scale-in" style={S.card}>
+    <div className="min-h-screen w-full bg-slate-100 dark:bg-slate-950 flex flex-col items-center justify-center p-4 md:p-6 transition-colors relative">
+      <div className="absolute top-4 right-4 flex items-center gap-3">
+        <ThemeToggle size={18} />
+        <LanguageSwitcher />
+      </div>
 
-        <div style={{ display:"flex", justifyContent:"center", marginBottom:24 }}>
+      <div className="anim-scale-in bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl w-full max-w-[460px] p-6 md:p-9 transition-colors">
+
+        <div className="flex justify-center mb-6">
           <img
             src={logo}
             alt="ResQLink"
             onClick={onGoHome}
-            style={{ height:42, width:"auto", cursor: onGoHome ? "pointer" : "default" }}
+            className="h-11 w-auto cursor-pointer brightness-100 dark:brightness-110"
             title={t("common.backToHome")}
           />
         </div>
 
         <button
           onClick={onBackToLogin}
-          style={S.backBtn}
-          onMouseEnter={e => e.currentTarget.style.color = "#1e3a8a"}
-          onMouseLeave={e => e.currentTarget.style.color = "#64748b"}
+          className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-[#1e3a8a] dark:hover:text-blue-400 mb-5 transition-colors"
         >
           <ArrowLeft size={15} />
           {t("auth.backToLogin")}
         </button>
 
-        <div style={{ marginBottom:24 }}>
-          <h2 style={S.heading}>{t("auth.resetPassword")}</h2>
-          <p style={{ fontSize:14, color:"#64748b", lineHeight:1.65, margin:0 }}>
+        <div className="mb-6">
+          <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-1.5">{t("auth.resetPassword")}</h2>
+          <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
             {t("auth.resetSubtitle")}
           </p>
         </div>
 
         {error && (
-          <div style={S.errorBox}>{error}</div>
+          <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 text-xs font-semibold text-center">
+            {error}
+          </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display:"flex", flexDirection:"column", gap:16, marginBottom:20 }}>
-          <div style={S.fieldGroup}>
-            <label style={S.label}>{t("auth.emailAddress")}</label>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-5">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.emailAddress")}</label>
             <input
               type="email"
               placeholder={t("auth.emailPlaceholder")}
               value={email}
               onChange={e => setEmail(e.target.value)}
-              style={S.input}
-              onFocus={e => Object.assign(e.target.style, S.inputFocus)}
-              onBlur={e  => Object.assign(e.target.style, S.input)}
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
               required
             />
           </div>
@@ -139,44 +143,28 @@ export default function ForgotPasswordPage({ onBackToLogin, onRegister, onGoHome
           <button
             type="submit"
             disabled={loading}
-            className="btn-anim"
-            style={{ ...S.btn, ...(loading ? S.btnLoading : {}) }}
+            className="btn-anim w-full bg-[#1e3a8a] hover:bg-blue-900 dark:bg-blue-600 dark:hover:bg-blue-700 disabled:opacity-50 text-white font-semibold text-sm py-3 rounded-xl shadow-md cursor-pointer transition-colors mt-1"
           >
             {loading ? (
-              <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
-                <span style={{ width:16, height:16, border:"2px solid rgba(255,255,255,0.4)", borderTopColor:"#fff", borderRadius:"50%", animation:"spin 0.7s linear infinite", display:"inline-block" }} />
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin inline-block" />
                 {t("auth.sending")}
               </span>
             ) : t("auth.sendReset")}
           </button>
         </form>
 
-        <p style={{ textAlign:"center", fontSize:14, color:"#64748b", margin:0 }}>
+        <p className="text-xs md:text-sm text-center text-slate-500 dark:text-slate-400">
           {t("auth.noAccount")}{" "}
           <button
             onClick={onRegister}
-            style={{ background:"none", border:"none", color:"#1e3a8a", fontWeight:700, fontSize:14, cursor:"pointer", padding:0, fontFamily:"inherit" }}
+            className="bg-transparent border-none cursor-pointer text-[#1e3a8a] dark:text-blue-400 font-bold hover:underline"
           >
             {t("auth.registerHere")}
           </button>
         </p>
 
-        <style>{`@keyframes spin { to { transform:rotate(360deg) } }`}</style>
       </div>
     </div>
   );
 }
-
-const S = {
-  page:       { minHeight:"100vh", backgroundColor:"#f1f5f9", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 24px", fontFamily:"'Inter',-apple-system,sans-serif" },
-  card:       { backgroundColor:"#fff", borderRadius:16, boxShadow:"0 4px 32px rgba(0,0,0,0.10)", width:"100%", maxWidth:460, padding:"40px 36px", boxSizing:"border-box" },
-  backBtn:    { display:"flex", alignItems:"center", gap:6, background:"none", border:"none", cursor:"pointer", fontSize:14, fontWeight:500, color:"#64748b", padding:0, fontFamily:"inherit", marginBottom:20, transition:"color 0.2s" },
-  heading:    { fontSize:22, fontWeight:700, color:"#0f172a", margin:"0 0 8px" },
-  errorBox:   { backgroundColor:"#fef2f2", border:"1px solid #fecaca", color:"#dc2626", borderRadius:8, padding:"10px 14px", fontSize:13, fontWeight:500, textAlign:"center", marginBottom:8 },
-  fieldGroup: { display:"flex", flexDirection:"column", gap:6 },
-  label:      { fontSize:13, fontWeight:600, color:"#0f172a" },
-  input:      { width:"100%", height:44, backgroundColor:"#f1f5f9", border:"1.5px solid transparent", borderRadius:10, padding:"0 14px", fontSize:14, color:"#0f172a", outline:"none", boxSizing:"border-box", fontFamily:"inherit", transition:"border-color 0.15s" },
-  inputFocus: { width:"100%", height:44, backgroundColor:"#f1f5f9", border:"1.5px solid #1e3a8a", borderRadius:10, padding:"0 14px", fontSize:14, color:"#0f172a", outline:"none", boxSizing:"border-box", fontFamily:"inherit" },
-  btn:        { width:"100%", height:46, backgroundColor:"#1e3a8a", color:"#fff", fontSize:15, fontWeight:600, border:"none", borderRadius:10, cursor:"pointer", fontFamily:"inherit" },
-  btnLoading: { backgroundColor:"#3b5bdb", cursor:"not-allowed" },
-};

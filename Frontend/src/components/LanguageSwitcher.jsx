@@ -13,7 +13,7 @@ export default function LanguageSwitcher() {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
-  const current = LANGUAGES.find(l => l.code === i18n.language) ?? LANGUAGES[0];
+  const current = LANGUAGES.find((l) => l.code === i18n.language) ?? LANGUAGES[0];
 
   useEffect(() => {
     function handleOutsideClick(e) {
@@ -29,75 +29,34 @@ export default function LanguageSwitcher() {
   }
 
   return (
-    <div ref={ref} style={{ position: "relative" }}>
+    <div ref={ref} className="relative">
       <button
-        onClick={() => setOpen(v => !v)}
+        onClick={() => setOpen((v) => !v)}
         title="Switch language"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          background: "transparent",
-          border: "1px solid #e2e8f0",
-          borderRadius: 20,
-          padding: "5px 10px",
-          cursor: "pointer",
-          fontSize: 13,
-          fontWeight: 600,
-          color: "#475569",
-          fontFamily: "inherit",
-          transition: "background 0.15s",
-        }}
-        onMouseEnter={e => (e.currentTarget.style.background = "#f1f5f9")}
-        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+        className="flex items-center gap-1.5 bg-transparent border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full px-2.5 py-1 cursor-pointer text-xs font-semibold text-slate-600 dark:text-slate-300 transition-colors"
       >
-        <Globe size={14} color="#64748b" />
+        <Globe size={14} className="text-slate-500 dark:text-slate-400" />
         <span>{current.label}</span>
       </button>
 
       {open && (
-        <div
-          style={{
-            position: "absolute",
-            top: "calc(100% + 6px)",
-            right: 0,
-            background: "#fff",
-            border: "1px solid #e2e8f0",
-            borderRadius: 10,
-            boxShadow: "0 4px 20px rgba(0,0,0,0.10)",
-            minWidth: 130,
-            zIndex: 100,
-            overflow: "hidden",
-          }}
-        >
-          {LANGUAGES.map(lang => (
-            <button
-              key={lang.code}
-              onClick={() => switchLang(lang.code)}
-              style={{
-                display: "block",
-                width: "100%",
-                textAlign: "left",
-                padding: "9px 14px",
-                background: i18n.language === lang.code ? "#f0fdf4" : "transparent",
-                border: "none",
-                cursor: "pointer",
-                fontSize: 13,
-                fontWeight: i18n.language === lang.code ? 700 : 500,
-                color: i18n.language === lang.code ? "#15803d" : "#334155",
-                fontFamily: "inherit",
-                transition: "background 0.12s",
-              }}
-              onMouseEnter={e => {
-                if (i18n.language !== lang.code) e.currentTarget.style.background = "#f8fafc";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = i18n.language === lang.code ? "#f0fdf4" : "transparent";
-              }}
-            >
-              {lang.label}
-            </button>
-          ))}
+        <div className="absolute top-[calc(100%+6px)] right-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg min-w-[130px] z-50 overflow-hidden">
+          {LANGUAGES.map((lang) => {
+            const isSelected = i18n.language === lang.code;
+            return (
+              <button
+                key={lang.code}
+                onClick={() => switchLang(lang.code)}
+                className={`block w-full text-left px-3.5 py-2 text-xs cursor-pointer border-none transition-colors ${
+                  isSelected
+                    ? "bg-emerald-50 dark:bg-emerald-950/40 text-[#15803d] dark:text-emerald-400 font-bold"
+                    : "bg-transparent hover:bg-slate-50 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-200 font-medium"
+                }`}
+              >
+                {lang.label}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

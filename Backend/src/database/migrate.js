@@ -467,6 +467,19 @@ async function step15_charset_collation(conn) {
   console.log(`  ✅ ${name}`);
 }
 
+async function step16_users_avatar_url(conn) {
+  const name = '16_users_avatar_url';
+  if (await migrationDone(conn, name)) return console.log(`  ⏭  ${name}`);
+
+  if (!(await columnExists(conn, 'users', 'avatar_url'))) {
+    await conn.query(
+      `ALTER TABLE users ADD COLUMN avatar_url VARCHAR(500) DEFAULT NULL AFTER is_available`
+    );
+  }
+  await recordMigration(conn, name);
+  console.log(`  ✅ ${name}`);
+}
+
 // ── runner ────────────────────────────────────────────────────────────────────
 
 async function runMigrations() {
@@ -499,6 +512,7 @@ async function runMigrations() {
       step13_assignments_timestamps,
       step14_assignments_indexes,
       step15_charset_collation,
+      step16_users_avatar_url,
     ];
 
     for (const step of steps) {

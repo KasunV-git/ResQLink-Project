@@ -139,6 +139,19 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
     }
   };
 
+  const handleSaveSkills = async (newSkills) => {
+    if (!user) return;
+    try {
+      const res = await axios.put(`/api/skills/${user.id}`, { skills: newSkills });
+      setCurrentSkills(res.data.currentSkills);
+      setSuggestedSkills(res.data.suggestedSkills);
+      return res.data;
+    } catch (error) {
+      console.error("Failed to save skills:", error);
+      throw error;
+    }
+  };
+
   const handleAddSkill = async (skillName) => {
     if (!user) return;
     try {
@@ -163,13 +176,14 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
     }
   };
 
-  const handleUpdateProfile = async ({ firstName, lastName, phone }) => {
+  const handleUpdateProfile = async (profileData) => {
     if (!user) return;
     try {
-      const response = await axios.put(`/api/auth/profile/${user.id}`, { firstName, lastName, phone });
+      const response = await axios.put(`/api/auth/profile/${user.id}`, profileData);
       const updated = response.data;
       setUser(updated);
       localStorage.setItem("resqlink_volunteer_user", JSON.stringify(updated));
+      return updated;
     } catch (error) {
       console.error("Failed to update profile:", error);
       throw error;
@@ -233,6 +247,7 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
             suggestedSkills={suggestedSkills}
             onAddSkill={handleAddSkill}
             onRemoveSkill={handleRemoveSkill}
+            onSaveSkills={handleSaveSkills}
           />
         );
       case "alerts":
@@ -255,7 +270,7 @@ export default function VolunteerApp({ startOnRegister = false, onLogout, onGoHo
   const closeTab = (tab) => { setActiveTab(tab); setSidebarOpen(false); };
 
   return (
-    <div style={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column", backgroundColor: "#EDF0F3", fontFamily: "'Inter',sans-serif" }}>
+    <div className="w-full h-screen flex flex-col bg-[#EDF0F3] dark:bg-slate-950 transition-colors font-sans">
 
       <Header
         user={user}

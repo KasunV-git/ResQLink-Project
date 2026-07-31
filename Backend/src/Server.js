@@ -1,5 +1,7 @@
 const express = require('express');
 const cors    = require('cors');
+const path    = require('path');
+const fs      = require('fs');
 
 const authRouter        = require('./routes/auth');
 const skillsRouter      = require('./routes/skills');
@@ -7,6 +9,12 @@ const alertsRouter      = require('./routes/alerts');
 const assignmentsRouter = require('./routes/assignments');
 
 const app = express();
+
+// Ensure uploads/avatars directory exists
+const uploadsDir = path.join(__dirname, 'uploads/avatars');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 // ── Middleware ──
 app.use(cors({
@@ -19,8 +27,11 @@ app.use(cors({
   credentials: true,
 }));
 
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+// Serve static uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ── Routes ──
 app.use('/api/auth',        authRouter);

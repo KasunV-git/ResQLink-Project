@@ -37,11 +37,11 @@ export default function LocationPicker({
 
   // Base Tailwind classes shared by both selects
   const selectClass = [
-    "w-full bg-slate-50 border border-slate-200 rounded-lg",
-    "text-sm font-medium text-slate-700",
+    "w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg",
+    "text-sm font-medium text-slate-700 dark:text-slate-200",
     "appearance-none cursor-pointer transition-colors",
-    "focus:outline-none focus:border-[#15803d] focus:bg-white",
-    "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-100",
+    "focus:outline-none focus:border-[#15803d] dark:focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800",
+    "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-100 dark:disabled:bg-slate-800/50",
     compact ? "py-2 pl-3 pr-8" : "py-2.5 pl-3 pr-8",
   ].join(" ");
 

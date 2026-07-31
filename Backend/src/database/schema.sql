@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
   role         ENUM('Volunteer','Citizen','Administrator')
                               NOT NULL DEFAULT 'Volunteer',
   is_available TINYINT(1)     NOT NULL DEFAULT 1,
+  avatar_url   VARCHAR(500)   DEFAULT NULL,
   password     VARCHAR(255)   NOT NULL,
   created_at   TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at   TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP

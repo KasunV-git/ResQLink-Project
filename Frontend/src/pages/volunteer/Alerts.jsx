@@ -39,12 +39,12 @@ function alertMatchesLocation(alert, filterProvince, filterDistrict) {
 
 function TypePill({ type, count, active, onClick }) {
   const COLORS = {
-    all:       active ? "bg-slate-800 text-white border-slate-800"       : "bg-white text-slate-600 border-slate-200 hover:border-slate-400",
-    flood:     active ? "bg-blue-600 text-white border-blue-600"         : "bg-white text-blue-600 border-blue-200 hover:border-blue-400",
-    landslide: active ? "bg-amber-600 text-white border-amber-600"       : "bg-white text-amber-600 border-amber-200 hover:border-amber-400",
-    cyclone:   active ? "bg-purple-600 text-white border-purple-600"     : "bg-white text-purple-600 border-purple-200 hover:border-purple-400",
-    tsunami:   active ? "bg-sky-600 text-white border-sky-600"           : "bg-white text-sky-600 border-sky-200 hover:border-sky-400",
-    power:     active ? "bg-yellow-500 text-white border-yellow-500"     : "bg-white text-yellow-600 border-yellow-200 hover:border-yellow-400",
+    all:       active ? "bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-800 dark:border-slate-100" : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-400",
+    flood:     active ? "bg-blue-600 text-white border-blue-600"         : "bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-900/60 hover:border-blue-400",
+    landslide: active ? "bg-amber-600 text-white border-amber-600"       : "bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/60 hover:border-amber-400",
+    cyclone:   active ? "bg-purple-600 text-white border-purple-600"     : "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-900/60 hover:border-purple-400",
+    tsunami:   active ? "bg-sky-600 text-white border-sky-600"           : "bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400 border-sky-200 dark:border-sky-900/60 hover:border-sky-400",
+    power:     active ? "bg-yellow-500 text-white border-yellow-500"     : "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-900/60 hover:border-yellow-400",
   };
   const { t } = useTranslation();
 
@@ -61,7 +61,7 @@ function TypePill({ type, count, active, onClick }) {
       {count > 0 && (
         <span className={`
           text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center
-          ${active ? "bg-white/25" : "bg-slate-100 text-slate-600"}
+          ${active ? "bg-white/25 dark:bg-slate-900/30" : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300"}
         `}>
           {count}
         </span>
@@ -71,9 +71,9 @@ function TypePill({ type, count, active, onClick }) {
 }
 
 const PRIORITY_STYLE = {
-  high:   { border: "border-l-red-500",     badge: "bg-red-50 text-red-700 border-red-200"     },
-  medium: { border: "border-l-amber-500",   badge: "bg-amber-50 text-amber-700 border-amber-200" },
-  low:    { border: "border-l-emerald-500", badge: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  high:   { border: "border-l-red-500",     badge: "bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border-red-200 dark:border-red-900/60"     },
+  medium: { border: "border-l-amber-500",   badge: "bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-900/60" },
+  low:    { border: "border-l-emerald-500", badge: "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/60" },
 };
 
 export default function Alerts({ alerts }) {
@@ -116,26 +116,26 @@ export default function Alerts({ alerts }) {
 
       {/* Page header */}
       <div className="flex flex-col gap-1">
-        <h1 className="font-semibold text-2xl md:text-3xl text-slate-900 tracking-tight">
+        <h1 className="font-semibold text-2xl md:text-3xl text-slate-900 dark:text-white tracking-tight">
           {t("alerts.title")}
         </h1>
-        <p className="text-slate-500 text-sm md:text-base">
+        <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base">
           {t("alerts.subtitle")}
         </p>
       </div>
 
       {/* Filter panel */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 md:p-5 shadow-sm flex flex-col gap-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 md:p-5 shadow-xs flex flex-col gap-4">
 
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-            <Filter className="w-4 h-4 text-slate-400" />
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+            <Filter className="w-4 h-4 text-slate-400 dark:text-slate-500" />
             {t("alerts.filterAlerts")}
           </div>
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-700 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
             >
               <X className="w-3.5 h-3.5" />
               {t("alerts.clearFilters")}
@@ -145,7 +145,7 @@ export default function Alerts({ alerts }) {
 
         {/* Disaster type pills */}
         <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+          <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">
             {t("alerts.disasterType")}
           </p>
           <div className="flex flex-wrap gap-2">
@@ -163,7 +163,7 @@ export default function Alerts({ alerts }) {
 
         {/* Location filter */}
         <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+          <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">
             {t("alerts.filterByLocation")}
           </p>
           <LocationPicker
@@ -177,22 +177,22 @@ export default function Alerts({ alerts }) {
         </div>
 
         {/* Active filter summary */}
-        <div className="flex items-center justify-between pt-1 border-t border-slate-100">
-          <p className="text-xs text-slate-500">
+        <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             {t("alerts.showing")}{" "}
-            <span className="font-bold text-slate-700">{filteredAlerts.length}</span>
+            <span className="font-bold text-slate-700 dark:text-slate-200">{filteredAlerts.length}</span>
             {" "}{t("alerts.of")}{" "}
-            <span className="font-bold text-slate-700">{alerts.length}</span>
+            <span className="font-bold text-slate-700 dark:text-slate-200">{alerts.length}</span>
             {" "}{alerts.length !== 1 ? t("alerts.alertPlural") : t("alerts.alert")}
             {hasActiveFilters && (
-              <span className="ml-1.5 text-[#15803d] font-semibold">{t("alerts.filtersActive")}</span>
+              <span className="ml-1.5 text-[#15803d] dark:text-emerald-400 font-semibold">{t("alerts.filtersActive")}</span>
             )}
           </p>
 
           {hasActiveFilters && (
             <div className="flex flex-wrap gap-1.5">
               {typeFilter !== "all" && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-full">
                   {t(DISASTER_TYPES.find(t2 => t2.key === typeFilter)?.labelKey ?? "")}
                   <button onClick={() => setTypeFilter("all")} className="hover:text-red-500 transition-colors">
                     <X className="w-2.5 h-2.5" />
@@ -200,7 +200,7 @@ export default function Alerts({ alerts }) {
                 </span>
               )}
               {filterDistrict && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-full">
                   {filterDistrict}
                   <button onClick={() => setFilterDistrict("")} className="hover:text-red-500 transition-colors">
                     <X className="w-2.5 h-2.5" />
@@ -208,7 +208,7 @@ export default function Alerts({ alerts }) {
                 </span>
               )}
               {filterProvince && !filterDistrict && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-full">
                   {filterProvince}
                   <button onClick={() => { setFilterProvince(""); setFilterDistrict(""); }} className="hover:text-red-500 transition-colors">
                     <X className="w-2.5 h-2.5" />
@@ -221,25 +221,25 @@ export default function Alerts({ alerts }) {
       </div>
 
       {/* Alert list */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 md:p-5 shadow-sm flex flex-col gap-4">
-        <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-          <Bell className="w-5 h-5 text-red-600" />
-          <h2 className="font-semibold text-sm md:text-base text-slate-900">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 md:p-5 shadow-xs flex flex-col gap-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+          <Bell className="w-5 h-5 text-red-600 dark:text-red-400" />
+          <h2 className="font-semibold text-sm md:text-base text-slate-900 dark:text-white">
             {t("alerts.activeAlerts", { count: filteredAlerts.length })}
           </h2>
         </div>
 
         <div className="flex flex-col gap-3 md:gap-4">
           {alerts.length === 0 ? (
-            <div className="py-10 text-center text-slate-400">
+            <div className="py-10 text-center text-slate-400 dark:text-slate-500">
               <p className="font-medium text-sm">{t("alerts.noAlerts")}</p>
             </div>
           ) : filteredAlerts.length === 0 ? (
             <div className="py-10 text-center">
-              <p className="font-semibold text-sm text-slate-600 mb-1">{t("alerts.noMatch")}</p>
-              <p className="text-xs text-slate-400">
+              <p className="font-semibold text-sm text-slate-600 dark:text-slate-300 mb-1">{t("alerts.noMatch")}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">
                 {t("alerts.tryRemoving")}{" "}
-                <button onClick={clearFilters} className="text-[#15803d] font-semibold hover:underline">
+                <button onClick={clearFilters} className="text-[#15803d] dark:text-emerald-400 font-semibold hover:underline">
                   {t("alerts.clearAll")}
                 </button>
               </p>
@@ -250,7 +250,7 @@ export default function Alerts({ alerts }) {
               return (
                 <div
                   key={alert.id}
-                  className={`border border-slate-200 border-l-[4px] rounded-xl p-4 flex flex-col gap-3 shadow-sm transition-shadow hover:shadow-md ${pStyle.border}`}
+                  className={`border border-slate-200 dark:border-slate-800 border-l-[4px] rounded-xl p-4 flex flex-col gap-3 shadow-xs transition-all hover:shadow-md ${pStyle.border}`}
                 >
                   <div className="flex flex-wrap justify-between items-center gap-2 text-xs">
                     <div className="flex items-center gap-2">
@@ -258,24 +258,24 @@ export default function Alerts({ alerts }) {
                         {t("alerts.priority", { level: alert.priority })}
                       </span>
                       {getAlertType(alert) !== "other" && (
-                        <span className="font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 capitalize">
+                        <span className="font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 capitalize">
                           {t(DISASTER_TYPES.find(dt => dt.key === getAlertType(alert))?.labelKey ?? "")}
                         </span>
                       )}
                     </div>
-                    <span className="text-slate-400 font-medium">{alert.time}</span>
+                    <span className="text-slate-400 dark:text-slate-500 font-medium">{alert.time}</span>
                   </div>
 
-                  <p className="text-slate-900 text-sm md:text-base font-semibold leading-relaxed">
+                  <p className="text-slate-900 dark:text-slate-100 text-sm md:text-base font-semibold leading-relaxed">
                     {alert.message}
                   </p>
 
-                  <div className="flex flex-wrap justify-between items-center gap-2 text-xs border-t border-slate-100 pt-2.5">
-                    <span className="text-slate-400 font-medium">
+                  <div className="flex flex-wrap justify-between items-center gap-2 text-xs border-t border-slate-100 dark:border-slate-800 pt-2.5">
+                    <span className="text-slate-400 dark:text-slate-500 font-medium">
                       {t("alerts.source")}{" "}
-                      <span className="text-slate-600 font-semibold">{alert.source}</span>
+                      <span className="text-slate-600 dark:text-slate-300 font-semibold">{alert.source}</span>
                     </span>
-                    <span className="text-emerald-700 bg-emerald-50/50 border border-emerald-100 px-2.5 py-0.5 rounded-full font-semibold">
+                    <span className="text-emerald-700 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/50 border border-emerald-100 dark:border-emerald-900/60 px-2.5 py-0.5 rounded-full font-semibold">
                       {alert.target || t("alerts.forVolunteers")}
                     </span>
                   </div>

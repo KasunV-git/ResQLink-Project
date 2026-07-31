@@ -3,6 +3,8 @@ import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import logo from "../../assets/Logo & Name Side-cropped.svg";
+import ThemeToggle from "../../components/ThemeToggle";
+import LanguageSwitcher from "../../components/LanguageSwitcher";
 
 export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }) {
   const { t } = useTranslation();
@@ -45,140 +47,143 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
     { value: "Volunteer", labelKey: "auth.volunteerRole",  descKey: "auth.volunteerDesc" },
   ];
 
-  const inputStyle   = S.input;
-  const inputFocused = S.inputFocus;
-
   return (
-    <div style={S.page}>
-      <div className="anim-scale-in" style={S.card}>
+    <div className="min-h-screen w-full bg-slate-100 dark:bg-slate-950 flex flex-col items-center justify-center p-4 md:p-6 transition-colors relative">
+      {/* Top right theme & language controls */}
+      <div className="absolute top-4 right-4 flex items-center gap-3">
+        <ThemeToggle size={18} />
+        <LanguageSwitcher />
+      </div>
+
+      <div className="anim-scale-in bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl w-full max-w-[480px] p-6 md:p-9 transition-colors my-8">
 
         {/* Logo */}
-        <div style={S.logoRow}>
+        <div className="flex items-center justify-center mb-6">
           <img
             src={logo}
             alt="ResQLink"
             onClick={onGoHome}
-            style={{ height: 44, width: "auto", cursor: onGoHome ? "pointer" : "default" }}
+            className="h-11 w-auto cursor-pointer brightness-100 dark:brightness-110"
             title={t("common.backToHome")}
           />
         </div>
 
         {/* Heading */}
-        <div style={S.headingBlock}>
-          <h2 style={S.heading}>{t("auth.createAccount")}</h2>
-          <p style={S.subheading}>{t("auth.createSubtitle")}</p>
+        <div className="text-center mb-6">
+          <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-1">{t("auth.createAccount")}</h2>
+          <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400">{t("auth.createSubtitle")}</p>
         </div>
 
         {/* Error */}
-        {error && <div style={S.errorBox}>{error}</div>}
+        {error && (
+          <div className="mb-5 p-3 rounded-xl bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 text-xs font-semibold text-center">
+            {error}
+          </div>
+        )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} style={S.form}>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
           {/* First Name + Last Name — side by side */}
-          <div style={{ display: "flex", gap: 12 }}>
-            <div style={{ ...S.fieldGroup, flex: 1 }}>
-              <label style={S.label}>{t("auth.firstName")}</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.firstName")}</label>
               <input
                 type="text"
                 placeholder={t("auth.firstNamePlaceholder")}
                 value={firstName}
                 onChange={e => setFirstName(e.target.value)}
-                style={inputStyle}
-                onFocus={e => Object.assign(e.target.style, inputFocused)}
-                onBlur={e  => Object.assign(e.target.style, inputStyle)}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
                 required
               />
             </div>
-            <div style={{ ...S.fieldGroup, flex: 1 }}>
-              <label style={S.label}>{t("auth.lastName")}</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.lastName")}</label>
               <input
                 type="text"
                 placeholder={t("auth.lastNamePlaceholder")}
                 value={lastName}
                 onChange={e => setLastName(e.target.value)}
-                style={inputStyle}
-                onFocus={e => Object.assign(e.target.style, inputFocused)}
-                onBlur={e  => Object.assign(e.target.style, inputStyle)}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
                 required
               />
             </div>
           </div>
 
           {/* Email */}
-          <div style={S.fieldGroup}>
-            <label style={S.label}>{t("auth.email")}</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.email")}</label>
             <input
               type="email"
               placeholder={t("auth.emailPlaceholder")}
               value={email}
               onChange={e => setEmail(e.target.value)}
-              style={inputStyle}
-              onFocus={e => Object.assign(e.target.style, inputFocused)}
-              onBlur={e  => Object.assign(e.target.style, inputStyle)}
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
               required
             />
           </div>
 
           {/* Password with eye toggle */}
-          <div style={S.fieldGroup}>
-            <label style={S.label}>{t("auth.password")}</label>
-            <div style={{ position: "relative" }}>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.password")}</label>
+            <div className="relative">
               <input
                 type={showPwd ? "text" : "password"}
                 placeholder={t("auth.passwordCreate")}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                style={{ ...inputStyle, paddingRight: 42 }}
-                onFocus={e => Object.assign(e.target.style, { ...inputFocused, paddingRight: "42px" })}
-                onBlur={e  => Object.assign(e.target.style, { ...inputStyle,   paddingRight: "42px" })}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-3.5 pr-10 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPwd(v => !v)}
-                style={S.eyeBtn}
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer p-1 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
                 tabIndex={-1}
               >
                 {showPwd
-                  ? <EyeOff size={16} color="#94a3b8" />
-                  : <Eye    size={16} color="#94a3b8" />}
+                  ? <EyeOff size={16} />
+                  : <Eye    size={16} />}
               </button>
             </div>
           </div>
 
           {/* Mobile Number */}
-          <div style={S.fieldGroup}>
-            <label style={S.label}>{t("auth.mobileNumber")}</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.mobileNumber")}</label>
             <input
               type="tel"
               placeholder="e.g. +94 77 123 4567"
               value={phone}
               onChange={e => setPhone(e.target.value)}
-              style={inputStyle}
-              onFocus={e => Object.assign(e.target.style, inputFocused)}
-              onBlur={e  => Object.assign(e.target.style, inputStyle)}
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
             />
           </div>
 
           {/* Select Role */}
-          <div style={S.fieldGroup}>
-            <label style={S.label}>{t("auth.selectRole")}</label>
-            <div style={S.roleGroup}>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.selectRole")}</label>
+            <div className="flex flex-col gap-2.5">
               {roles.map(r => (
                 <label
                   key={r.value}
                   onClick={() => setRole(r.value)}
-                  style={{ ...S.roleOption, ...(role === r.value ? S.roleOptionSelected : {}) }}
+                  className={`flex items-center gap-3.5 border rounded-xl p-3 cursor-pointer transition-all ${
+                    role === r.value
+                      ? "border-[#1e3a8a] dark:border-blue-500 bg-blue-50/60 dark:bg-blue-950/40"
+                      : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  }`}
                 >
-                  <div style={S.radioWrapper}>
-                    <div style={{ ...S.radioOuter, ...(role === r.value ? S.radioOuterSelected : {}) }}>
-                      {role === r.value && <div style={S.radioInner} />}
+                  <div className="flex-shrink-0">
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
+                      role === r.value ? "border-[#1e3a8a] dark:border-blue-400" : "border-slate-300 dark:border-slate-600"
+                    }`}>
+                      {role === r.value && <div className="w-2 h-2 rounded-full bg-[#1e3a8a] dark:bg-blue-400" />}
                     </div>
                   </div>
-                  <div style={S.roleText}>
-                    <span style={S.roleName}>{t(r.labelKey)}</span>
-                    <span style={S.roleDesc}>{t(r.descKey)}</span>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs font-semibold text-slate-900 dark:text-white">{t(r.labelKey)}</span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">{t(r.descKey)}</span>
                   </div>
                 </label>
               ))}
@@ -188,50 +193,21 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
           <button
             type="submit"
             disabled={loading}
-            className="btn-anim"
-            style={{ ...S.btn, ...(loading ? S.btnDisabled : {}) }}
+            className="btn-anim w-full bg-[#1e3a8a] hover:bg-blue-900 dark:bg-blue-600 dark:hover:bg-blue-700 disabled:opacity-50 text-white font-semibold text-sm py-3 rounded-xl shadow-md cursor-pointer transition-colors mt-2"
           >
             {loading ? t("auth.creatingAccount") : t("auth.createAccount")}
           </button>
         </form>
 
         {/* Back to Login */}
-        <p style={S.linkLine}>
+        <p className="text-xs md:text-sm text-center text-slate-500 dark:text-slate-400 mt-5">
           {t("auth.alreadyAccount")}{" "}
-          <button onClick={onBackToLogin} style={S.linkBtn}>{t("auth.signInHere")}</button>
+          <button onClick={onBackToLogin} className="bg-transparent border-none cursor-pointer text-[#1e3a8a] dark:text-blue-400 font-bold hover:underline">
+            {t("auth.signInHere")}
+          </button>
         </p>
 
       </div>
     </div>
   );
 }
-
-const S = {
-  page:        { minHeight:"100vh", backgroundColor:"#f1f5f9", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 24px", fontFamily:"'Inter',-apple-system,sans-serif" },
-  card:        { backgroundColor:"#fff", borderRadius:16, boxShadow:"0 4px 32px rgba(0,0,0,0.10)", width:"100%", maxWidth:480, padding:"40px 36px", boxSizing:"border-box" },
-  logoRow:     { display:"flex", alignItems:"center", justifyContent:"center", marginBottom:24 },
-  headingBlock:{ textAlign:"center", marginBottom:24 },
-  heading:     { fontSize:22, fontWeight:700, color:"#0f172a", margin:"0 0 6px" },
-  subheading:  { fontSize:14, color:"#64748b", margin:0 },
-  errorBox:    { backgroundColor:"#fef2f2", border:"1px solid #fecaca", color:"#dc2626", borderRadius:8, padding:"10px 14px", fontSize:13, fontWeight:500, textAlign:"center", marginBottom:16 },
-  form:        { display:"flex", flexDirection:"column", gap:14, marginBottom:16 },
-  fieldGroup:  { display:"flex", flexDirection:"column", gap:6 },
-  label:       { fontSize:13, fontWeight:600, color:"#0f172a" },
-  input:       { width:"100%", height:42, backgroundColor:"#f1f5f9", border:"1.5px solid transparent", borderRadius:10, padding:"0 12px", fontSize:14, color:"#0f172a", outline:"none", boxSizing:"border-box", fontFamily:"inherit", transition:"border-color 0.15s" },
-  inputFocus:  { width:"100%", height:42, backgroundColor:"#f1f5f9", border:"1.5px solid #1e3a8a", borderRadius:10, padding:"0 12px", fontSize:14, color:"#0f172a", outline:"none", boxSizing:"border-box", fontFamily:"inherit" },
-  eyeBtn:      { position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", padding:0, display:"flex", alignItems:"center", justifyContent:"center" },
-  roleGroup:   { display:"flex", flexDirection:"column", gap:10 },
-  roleOption:  { display:"flex", alignItems:"center", gap:14, border:"1.5px solid #e2e8f0", borderRadius:10, padding:"11px 14px", cursor:"pointer", transition:"border-color 0.15s,background-color 0.15s", backgroundColor:"#fff" },
-  roleOptionSelected: { border:"1.5px solid #1e3a8a", backgroundColor:"#eff6ff" },
-  radioWrapper:{ flexShrink:0 },
-  radioOuter:  { width:18, height:18, borderRadius:"50%", border:"2px solid #cbd5e1", display:"flex", alignItems:"center", justifyContent:"center", transition:"border-color 0.15s" },
-  radioOuterSelected: { border:"2px solid #1e3a8a" },
-  radioInner:  { width:9, height:9, borderRadius:"50%", backgroundColor:"#1e3a8a" },
-  roleText:    { display:"flex", flexDirection:"column", gap:2 },
-  roleName:    { fontSize:14, fontWeight:600, color:"#0f172a" },
-  roleDesc:    { fontSize:12, color:"#64748b" },
-  btn:         { width:"100%", height:46, backgroundColor:"#1e3a8a", color:"#fff", fontSize:15, fontWeight:600, border:"none", borderRadius:10, cursor:"pointer", fontFamily:"inherit", marginTop:4 },
-  btnDisabled: { backgroundColor:"#3b5bdb", cursor:"not-allowed" },
-  linkLine:    { textAlign:"center", fontSize:14, color:"#64748b", margin:"14px 0 0" },
-  linkBtn:     { background:"none", border:"none", color:"#1e3a8a", fontWeight:700, fontSize:14, cursor:"pointer", padding:0, fontFamily:"inherit" },
-};

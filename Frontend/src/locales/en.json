@@ -268,7 +268,12 @@
     "noSkills": "No skills added yet. Add some below!",
     "suggestedSkills": "Suggested Skills",
     "suggestedDesc": "Click on any skill to add it to your profile",
-    "allSuggestedAdded": "You have added all suggested skills!"
+    "allSuggestedAdded": "You have added all suggested skills!",
+    "saveSkills": "Save Skills",
+    "saving": "Saving...",
+    "savedSuccess": "Skills saved successfully!",
+    "saveError": "Failed to save skills. Please try again.",
+    "unsavedChanges": "You have unsaved changes. Click Save Skills to update database."
   },
   "common": {
     "loading": "Loading portal data...",

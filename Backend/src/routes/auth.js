@@ -1,5 +1,7 @@
 const express = require('express');
 const bcrypt  = require('bcryptjs');
+const path    = require('path');
+const fs      = require('fs');
 const router  = express.Router();
 const db      = require('../config/db');
 
@@ -9,7 +11,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Fetch a user by ID — returns safe object (no password)
 async function getUserById(id) {
   const [rows] = await db.query(
-    'SELECT id, first_name, last_name, email, phone, role, is_available FROM users WHERE id = ?',
+    'SELECT id, first_name, last_name, email, phone, role, is_available, avatar_url FROM users WHERE id = ?',
     [id]
   );
   if (rows.length === 0) return null;
@@ -31,6 +33,7 @@ async function getUserById(id) {
     phone:       u.phone || '',
     role:        u.role,
     isAvailable: Boolean(u.is_available),
+    avatarUrl:   u.avatar_url || null,
     skills:      skillRows.map(r => r.name),
   };
 }
@@ -127,7 +130,7 @@ router.put('/profile/:id', async (req, res) => {
   const userId = parseInt(req.params.id, 10);
   if (isNaN(userId)) return res.status(400).json({ message: 'Invalid user ID.' });
 
-  const { firstName, lastName, phone, isAvailable } = req.body;
+  const { firstName, lastName, phone, isAvailable, avatarUrl } = req.body;
   const updates = [];
   const params  = [];
 
@@ -150,6 +153,45 @@ router.put('/profile/:id', async (req, res) => {
   if (isAvailable !== undefined) {
     updates.push('is_available = ?');
     params.push(isAvailable ? 1 : 0);
+  }
+
+  if (avatarUrl !== undefined) {
+    if (!avatarUrl) {
+      // Remove avatar
+      updates.push('avatar_url = NULL');
+    } else if (avatarUrl.startsWith('data:image/')) {
+      // Base64 encoded upload
+      try {
+        const matches = avatarUrl.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
+        if (matches) {
+          const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+          const base64Data = matches[2];
+          const buffer = Buffer.from(base64Data, 'base64');
+
+          const uploadsDir = path.join(__dirname, '../uploads/avatars');
+          if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+          }
+
+          const filename = `avatar-${userId}-${Date.now()}.${ext}`;
+          const filePath = path.join(uploadsDir, filename);
+          fs.writeFileSync(filePath, buffer);
+
+          const publicPath = `/uploads/avatars/${filename}`;
+          updates.push('avatar_url = ?');
+          params.push(publicPath);
+        } else {
+          updates.push('avatar_url = ?');
+          params.push(avatarUrl);
+        }
+      } catch (err) {
+        console.error('Failed to save avatar image file:', err);
+        return res.status(400).json({ message: 'Failed to process avatar image.' });
+      }
+    } else {
+      updates.push('avatar_url = ?');
+      params.push(avatarUrl);
+    }
   }
 
   try {

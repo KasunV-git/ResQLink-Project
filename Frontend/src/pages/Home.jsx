@@ -3,6 +3,7 @@ import { MapPin, Brain, Users, Bell, Clock, Activity, UserCheck, Shield, Menu, X
 import { useTranslation } from "react-i18next";
 import logo from "../assets/Logo & Name Side-cropped.svg";
 import LanguageSwitcher from "../components/LanguageSwitcher";
+import ThemeToggle from "../components/ThemeToggle";
 
 function smoothScrollTo(id) {
   const el = document.getElementById(id);
@@ -75,34 +76,38 @@ export default function Home({ onLogin, onRegister }) {
   ];
 
   return (
-    <div className="w-full min-h-screen bg-white">
+    <div className="w-full min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
 
       {/* ── NAVBAR ── */}
-      <nav className="anim-fade-in-down sticky top-0 z-50 bg-white border-b border-slate-200"
-        style={{ boxShadow: "0 1px 8px rgba(0,0,0,0.05)" }}>
+      <nav className="anim-fade-in-down sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-xs">
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
-          <img src={logo} alt="ResQLink" className="h-9 w-auto flex-shrink-0" />
+          <img src={logo} alt="ResQLink" className="h-9 w-auto flex-shrink-0 brightness-100 dark:brightness-110" />
 
           {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-4">
             {navLinks.map(([id, label]) => (
               <a key={id} href={`#${id}`}
                 onClick={e => { e.preventDefault(); smoothScrollTo(id); }}
-                className="text-sm font-medium text-slate-500 hover:text-[#1e3a8a] transition-colors no-underline">
+                className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#1e3a8a] dark:hover:text-blue-400 transition-colors no-underline">
                 {label}
               </a>
             ))}
+            <ThemeToggle size={18} />
             <LanguageSwitcher />
-            <button onClick={onLogin} className="btn-anim bg-[#1e3a8a] text-white border-none rounded-lg px-5 py-2.5 text-sm font-semibold cursor-pointer">
+            <button onClick={onLogin} className="btn-anim bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-[#1e3a8a] dark:text-blue-400 border border-[#1e3a8a] dark:border-blue-500 rounded-xl px-4 py-2 text-sm font-semibold cursor-pointer transition-all">
               {t("nav.login")}
+            </button>
+            <button onClick={onRegister} className="btn-anim bg-[#1e3a8a] dark:bg-blue-600 hover:bg-blue-900 dark:hover:bg-blue-700 text-white border-none rounded-xl px-4.5 py-2 text-sm font-semibold cursor-pointer shadow-sm transition-all">
+              {t("nav.register")}
             </button>
           </div>
 
           {/* Mobile hamburger */}
           <div className="md:hidden flex items-center gap-2">
+            <ThemeToggle size={18} />
             <LanguageSwitcher />
             <button onClick={() => setMenuOpen(!menuOpen)}
-              className="bg-transparent border-none cursor-pointer p-1.5 rounded-md text-slate-500">
+              className="bg-transparent border-none cursor-pointer p-1.5 rounded-md text-slate-600 dark:text-slate-300">
               {menuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
@@ -110,38 +115,44 @@ export default function Home({ onLogin, onRegister }) {
 
         {/* Mobile dropdown */}
         {menuOpen && (
-          <div className="md:hidden anim-fade-in-down bg-white border-t border-slate-100 px-4 py-4 flex flex-col gap-3">
+          <div className="md:hidden anim-fade-in-down bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-4 py-4 flex flex-col gap-3">
             {navLinks.map(([id, label]) => (
               <a key={id} href={`#${id}`}
                 onClick={e => { e.preventDefault(); setMenuOpen(false); setTimeout(() => smoothScrollTo(id), 50); }}
-                className="text-[15px] font-medium text-slate-500 no-underline py-1">
+                className="text-[15px] font-medium text-slate-600 dark:text-slate-300 no-underline py-1">
                 {label}
               </a>
             ))}
-            <button onClick={() => { setMenuOpen(false); onLogin(); }}
-              className="btn-anim bg-[#1e3a8a] text-white border-none rounded-lg py-3 text-sm font-semibold cursor-pointer mt-1">
-              {t("nav.login")}
-            </button>
+            <div className="flex flex-col gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <button onClick={() => { setMenuOpen(false); onLogin(); }}
+                className="btn-anim w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 text-sm font-semibold cursor-pointer transition-colors">
+                {t("nav.login")}
+              </button>
+              <button onClick={() => { setMenuOpen(false); onRegister(); }}
+                className="btn-anim w-full bg-[#1e3a8a] dark:bg-blue-600 hover:bg-blue-900 dark:hover:bg-blue-700 text-white border-none rounded-xl py-2.5 text-sm font-semibold cursor-pointer transition-colors shadow-xs">
+                {t("nav.register")}
+              </button>
+            </div>
           </div>
         )}
       </nav>
 
       {/* ── HERO ── */}
-      <section className="w-full bg-white py-12 md:py-16 lg:py-20 px-4 md:px-6">
+      <section className="w-full bg-white dark:bg-slate-900 py-12 md:py-16 lg:py-20 px-4 md:px-6 transition-colors">
         <div className="max-w-[1200px] mx-auto flex flex-col lg:flex-row items-center gap-10 lg:gap-12">
 
           <div className="anim-fade-in-left w-full lg:flex-1">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight text-slate-900 mb-4 md:mb-5">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight text-slate-900 dark:text-white mb-4 md:mb-5">
               {t("home.heroTitle")}
             </h1>
-            <p className="text-base md:text-lg text-slate-500 leading-relaxed mb-7 md:mb-8">
+            <p className="text-base md:text-lg text-slate-500 dark:text-slate-400 leading-relaxed mb-7 md:mb-8">
               {t("home.heroSubtitle")}
             </p>
             <div className="flex flex-wrap gap-3 md:gap-4">
-              <button className="btn-anim bg-[#1e3a8a] text-white border-none rounded-[9px] px-6 py-3 text-[15px] font-semibold cursor-pointer">
+              <button onClick={onRegister} className="btn-anim bg-[#1e3a8a] dark:bg-blue-600 hover:bg-blue-900 dark:hover:bg-blue-700 text-white border-none rounded-xl px-6 py-3 text-[15px] font-semibold cursor-pointer shadow-md transition-all">
                 {t("home.reportDisaster")}
               </button>
-              <button className="btn-anim bg-white text-[#1e3a8a] border-2 border-[#1e3a8a] rounded-[9px] px-6 py-3 text-[15px] font-semibold cursor-pointer"
+              <button className="btn-anim bg-white dark:bg-slate-800 text-[#1e3a8a] dark:text-blue-400 border-2 border-[#1e3a8a] dark:border-blue-500 rounded-xl px-6 py-3 text-[15px] font-semibold cursor-pointer shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
                 onClick={onRegister}>
                 {t("home.joinVolunteer")}
               </button>
@@ -150,18 +161,17 @@ export default function Home({ onLogin, onRegister }) {
 
           {/* Right — live incidents preview card */}
           <div className="anim-fade-in-right w-full lg:flex-1 lg:max-w-[440px]">
-            <div className="hover-card bg-white rounded-2xl border border-slate-100 p-5 md:p-6"
-              style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.10)" }}>
+            <div className="hover-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 md:p-6 shadow-xl">
 
-              <div className="flex justify-between pb-4 mb-4 border-b border-slate-100">
+              <div className="flex justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-700">
                 {[
-                  { lKey: "home.activeIncidents", v: "18",    c: "text-slate-900"    },
-                  { lKey: "home.volunteers",       v: "2,400", c: "text-slate-900"    },
-                  { lKey: "home.resolved",         v: "87%",   c: "text-emerald-600"  },
+                  { lKey: "home.activeIncidents", v: "18",    c: "text-slate-900 dark:text-white"    },
+                  { lKey: "home.volunteers",       v: "2,400", c: "text-slate-900 dark:text-white"    },
+                  { lKey: "home.resolved",         v: "87%",   c: "text-emerald-600 dark:text-emerald-400"  },
                 ].map(s => (
                   <div key={s.lKey} className="text-center">
                     <div className={`text-2xl md:text-[26px] font-bold ${s.c}`}>{s.v}</div>
-                    <div className="text-[11px] md:text-xs text-slate-400 mt-0.5">{t(s.lKey)}</div>
+                    <div className="text-[11px] md:text-xs text-slate-400 dark:text-slate-500 mt-0.5">{t(s.lKey)}</div>
                   </div>
                 ))}
               </div>
@@ -169,12 +179,12 @@ export default function Home({ onLogin, onRegister }) {
               <div className="flex flex-col gap-2.5">
                 {incidents.map(inc => (
                   <div key={inc.labelKey}
-                    className="flex items-center justify-between bg-slate-50 hover:bg-slate-100 rounded-[10px] px-3 py-2.5 transition-colors">
+                    className="flex items-center justify-between bg-slate-50 dark:bg-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl px-3 py-2.5 transition-colors">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: inc.dot }} />
                       <div className="min-w-0">
-                        <div className="text-[13px] font-semibold text-slate-900 truncate">{t(inc.labelKey)}</div>
-                        <div className="text-[11px] text-slate-400 mt-0.5">{t(inc.severityKey)} {t("home.severity")} • {inc.time}</div>
+                        <div className="text-[13px] font-semibold text-slate-900 dark:text-slate-100 truncate">{t(inc.labelKey)}</div>
+                        <div className="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5">{t(inc.severityKey)} {t("home.severity")} • {inc.time}</div>
                       </div>
                     </div>
                     <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full flex-shrink-0 ml-2"
@@ -190,23 +200,22 @@ export default function Home({ onLogin, onRegister }) {
       </section>
 
       {/* ── FEATURES ── */}
-      <section id="features" className="w-full bg-slate-50 py-12 md:py-16 lg:py-20 px-4 md:px-6">
+      <section id="features" className="w-full bg-slate-50 dark:bg-slate-950 py-12 md:py-16 lg:py-20 px-4 md:px-6 transition-colors">
         <div className="max-w-[1200px] mx-auto">
-          <h2 className="reveal text-2xl md:text-3xl font-bold text-center text-slate-900 mb-3">
+          <h2 className="reveal text-2xl md:text-3xl font-bold text-center text-slate-900 dark:text-white mb-3">
             {t("home.featuresTitle")}
           </h2>
-          <p className="reveal text-base md:text-[17px] text-slate-500 text-center mb-10 md:mb-12">
+          <p className="reveal text-base md:text-[17px] text-slate-500 dark:text-slate-400 text-center mb-10 md:mb-12">
             {t("home.featuresSubtitle")}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
             {features.map(({ Icon, titleKey, descKey }, i) => (
-              <div key={titleKey} className={`reveal hover-card d-${(i+1)*100} bg-white rounded-[14px] p-6 md:p-7 border border-slate-100`}
-                style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.05)" }}>
-                <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4">
-                  <Icon size={22} color="#1e3a8a" />
+              <div key={titleKey} className={`reveal hover-card d-${(i+1)*100} bg-white dark:bg-slate-900 rounded-2xl p-6 md:p-7 border border-slate-100 dark:border-slate-800 shadow-sm`}>
+                <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/60 rounded-xl flex items-center justify-center mb-4">
+                  <Icon size={22} className="text-[#1e3a8a] dark:text-blue-400" />
                 </div>
-                <h3 className="text-[15px] md:text-base font-bold text-slate-900 mb-2">{t(titleKey)}</h3>
-                <p className="text-sm md:text-[14px] text-slate-500 leading-relaxed">{t(descKey)}</p>
+                <h3 className="text-[15px] md:text-base font-bold text-slate-900 dark:text-white mb-2">{t(titleKey)}</h3>
+                <p className="text-sm md:text-[14px] text-slate-500 dark:text-slate-400 leading-relaxed">{t(descKey)}</p>
               </div>
             ))}
           </div>
@@ -214,23 +223,22 @@ export default function Home({ onLogin, onRegister }) {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section id="how" className="w-full bg-white py-12 md:py-16 lg:py-20 px-4 md:px-6">
+      <section id="how" className="w-full bg-white dark:bg-slate-900 py-12 md:py-16 lg:py-20 px-4 md:px-6 transition-colors">
         <div className="max-w-[1200px] mx-auto">
-          <h2 className="reveal text-2xl md:text-3xl font-bold text-center text-slate-900 mb-3">
+          <h2 className="reveal text-2xl md:text-3xl font-bold text-center text-slate-900 dark:text-white mb-3">
             {t("home.howTitle")}
           </h2>
-          <p className="reveal text-base md:text-[17px] text-slate-500 text-center mb-10 md:mb-12">
+          <p className="reveal text-base md:text-[17px] text-slate-500 dark:text-slate-400 text-center mb-10 md:mb-12">
             {t("home.howSubtitle")}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
             {steps.map(({ Icon, labelKey, descKey }, i) => (
               <div key={labelKey} className={`reveal d-${(i+1)*100} flex flex-col items-center text-center gap-4`}>
-                <div className="w-16 h-16 bg-[#1e3a8a] rounded-full flex items-center justify-center cursor-default transition-all duration-200 hover:scale-110"
-                  style={{ boxShadow: "0 4px 18px rgba(30,58,138,0.3)" }}>
+                <div className="w-16 h-16 bg-[#1e3a8a] dark:bg-blue-600 rounded-full flex items-center justify-center cursor-default transition-all duration-200 hover:scale-110 shadow-lg">
                   <Icon size={26} color="#fff" />
                 </div>
-                <h3 className="text-[15px] md:text-base font-bold text-slate-900">{t(labelKey)}</h3>
-                <p className="text-sm md:text-[14px] text-slate-500 leading-relaxed">{t(descKey)}</p>
+                <h3 className="text-[15px] md:text-base font-bold text-slate-900 dark:text-white">{t(labelKey)}</h3>
+                <p className="text-sm md:text-[14px] text-slate-500 dark:text-slate-400 leading-relaxed">{t(descKey)}</p>
               </div>
             ))}
           </div>
@@ -238,25 +246,25 @@ export default function Home({ onLogin, onRegister }) {
       </section>
 
       {/* ── ROLES ── */}
-      <section id="roles" className="w-full bg-slate-50 py-12 md:py-16 lg:py-20 px-4 md:px-6">
+      <section id="roles" className="w-full bg-slate-50 dark:bg-slate-950 py-12 md:py-16 lg:py-20 px-4 md:px-6 transition-colors">
         <div className="max-w-[1200px] mx-auto">
-          <h2 className="reveal text-2xl md:text-3xl font-bold text-center text-slate-900 mb-3">
+          <h2 className="reveal text-2xl md:text-3xl font-bold text-center text-slate-900 dark:text-white mb-3">
             {t("home.rolesTitle")}
           </h2>
-          <p className="reveal text-base md:text-[17px] text-slate-500 text-center mb-10 md:mb-12">
+          <p className="reveal text-base md:text-[17px] text-slate-500 dark:text-slate-400 text-center mb-10 md:mb-12">
             {t("home.rolesSubtitle")}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
             {roles.map(({ Icon, titleKey, color, items }, i) => (
-              <div key={titleKey} className={`reveal hover-card d-${(i+1)*100} bg-white rounded-[14px] p-6 md:p-7`}
-                style={{ border: `1.5px solid ${color}`, boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
+              <div key={titleKey} className={`reveal hover-card d-${(i+1)*100} bg-white dark:bg-slate-900 rounded-2xl p-6 md:p-7 shadow-sm`}
+                style={{ border: `1.5px solid ${color}` }}>
                 <div className="flex items-center gap-2.5 mb-5">
                   <Icon size={20} color={color} />
-                  <h3 className="text-base font-bold text-slate-900">{t(titleKey)}</h3>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">{t(titleKey)}</h3>
                 </div>
                 <ul className="list-none p-0 m-0 flex flex-col gap-3">
                   {items.map(itemKey => (
-                    <li key={itemKey} className="flex items-center gap-2.5 text-[15px] text-slate-600 font-medium">
+                    <li key={itemKey} className="flex items-center gap-2.5 text-[15px] text-slate-600 dark:text-slate-300 font-medium">
                       <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="flex-shrink-0">
                         <circle cx="9" cy="9" r="9" fill={color} opacity="0.12"/>
                         <path d="M5.5 9l2.5 2.5 4.5-5" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -272,7 +280,7 @@ export default function Home({ onLogin, onRegister }) {
       </section>
 
       {/* ── CTA ── */}
-      <section className="w-full bg-[#1e3a8a] py-12 md:py-16 lg:py-20 px-4 md:px-6">
+      <section className="w-full bg-[#1e3a8a] dark:bg-blue-950 py-12 md:py-16 lg:py-20 px-4 md:px-6 transition-colors">
         <div className="reveal max-w-[700px] mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 md:mb-4">
             {t("home.ctaTitle")}
@@ -282,11 +290,11 @@ export default function Home({ onLogin, onRegister }) {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <button onClick={onLogin}
-              className="btn-anim bg-transparent text-white border-2 border-white rounded-[9px] px-8 py-3 text-[15px] font-semibold cursor-pointer">
+              className="btn-anim bg-transparent text-white border-2 border-white hover:bg-white/10 rounded-xl px-8 py-3 text-[15px] font-semibold cursor-pointer">
               {t("nav.login")}
             </button>
             <button onClick={onRegister}
-              className="btn-anim bg-transparent text-white border-2 border-white rounded-[9px] px-8 py-3 text-[15px] font-semibold cursor-pointer">
+              className="btn-anim bg-transparent text-white border-2 border-white hover:bg-white/10 rounded-xl px-8 py-3 text-[15px] font-semibold cursor-pointer">
               {t("nav.register")}
             </button>
           </div>
@@ -294,25 +302,25 @@ export default function Home({ onLogin, onRegister }) {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="w-full bg-white border-t border-slate-200 px-4 md:px-6 pt-8 pb-5">
+      <footer className="w-full bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-4 md:px-6 pt-8 pb-5 transition-colors">
         <div className="max-w-[1200px] mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-start gap-5 mb-5">
             <div>
-              <img src={logo} alt="ResQLink" className="h-8 w-auto mb-2" />
-              <p className="text-[13px] text-slate-400 m-0">
+              <img src={logo} alt="ResQLink" className="h-8 w-auto mb-2 brightness-100 dark:brightness-110" />
+              <p className="text-[13px] text-slate-400 dark:text-slate-500 m-0">
                 {t("home.footerTagline")}
               </p>
             </div>
             <div className="flex gap-6 md:gap-7">
               {[["home.privacy", t("home.privacy")], ["home.terms", t("home.terms")]].map(([key, label]) => (
                 <a key={key} href="#"
-                  className="text-sm text-slate-500 no-underline font-medium hover:text-[#1e3a8a] transition-colors">
+                  className="text-sm text-slate-500 dark:text-slate-400 no-underline font-medium hover:text-[#1e3a8a] dark:hover:text-blue-400 transition-colors">
                   {label}
                 </a>
               ))}
             </div>
           </div>
-          <div className="border-t border-slate-100 pt-4 text-center text-[13px] text-slate-400">
+          <div className="border-t border-slate-100 dark:border-slate-800 pt-4 text-center text-[13px] text-slate-400 dark:text-slate-500">
             {t("home.copyright")}
           </div>
         </div>

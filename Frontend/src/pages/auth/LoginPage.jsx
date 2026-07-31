@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import RegisterPage from "./RegisterPage";
 import ForgotPasswordPage from "./ForgotPasswordPage";
 import logo from "../../assets/Logo & Name Side-cropped.svg";
+import ThemeToggle from "../../components/ThemeToggle";
+import LanguageSwitcher from "../../components/LanguageSwitcher";
 
 export default function LoginPage({ onLoginSuccess, initialShowRegister = false, onGoHome }) {
   const { t } = useTranslation();
@@ -15,6 +17,10 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
   const [showPwd,     setShowPwd]     = useState(false);
   const [loading,     setLoading]     = useState(false);
   const [error,       setError]       = useState("");
+
+  useEffect(() => {
+    setShowRegister(initialShowRegister);
+  }, [initialShowRegister]);
 
   if (showRegister) {
     return (
@@ -51,67 +57,73 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
   };
 
   return (
-    <div style={styles.page}>
-      <div className="anim-scale-in" style={styles.card}>
+    <div className="min-h-screen w-full bg-slate-100 dark:bg-slate-950 flex flex-col items-center justify-center p-4 md:p-6 transition-colors relative">
+      {/* Top right theme & language controls */}
+      <div className="absolute top-4 right-4 flex items-center gap-3">
+        <ThemeToggle size={18} />
+        <LanguageSwitcher />
+      </div>
+
+      <div className="anim-scale-in bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl w-full max-w-[460px] p-6 md:p-9 transition-colors">
 
         {/* Logo */}
-        <div style={styles.logoRow}>
+        <div className="flex items-center justify-center mb-6">
           <img
             src={logo}
             alt="ResQLink"
             onClick={onGoHome}
-            style={{ height: 44, width: "auto", cursor: onGoHome ? "pointer" : "default" }}
+            className="h-11 w-auto cursor-pointer brightness-100 dark:brightness-110"
             title={t("common.backToHome")}
           />
         </div>
 
         {/* Heading */}
-        <div style={styles.headingBlock}>
-          <h2 style={styles.heading}>{t("auth.welcomeBack")}</h2>
-          <p style={styles.subheading}>{t("auth.signInSubtitle")}</p>
+        <div className="text-center mb-6">
+          <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-1">{t("auth.welcomeBack")}</h2>
+          <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400">{t("auth.signInSubtitle")}</p>
         </div>
 
         {/* Error */}
-        {error && <div style={styles.errorBox}>{error}</div>}
+        {error && (
+          <div className="mb-5 p-3 rounded-xl bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 text-xs font-semibold text-center">
+            {error}
+          </div>
+        )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.fieldGroup}>
-            <label style={styles.label}>{t("auth.email")}</label>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.email")}</label>
             <input
               type="email"
               placeholder={t("auth.emailPlaceholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              style={styles.input}
-              onFocus={(e) => Object.assign(e.target.style, styles.inputFocus)}
-              onBlur={(e) => Object.assign(e.target.style, styles.input)}
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
               required
             />
           </div>
 
-          <div style={styles.fieldGroup}>
-            <label style={styles.label}>{t("auth.password")}</label>
-            <div style={{ position: "relative" }}>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.password")}</label>
+            <div className="relative">
               <input
                 type={showPwd ? "text" : "password"}
                 placeholder={t("auth.passwordPlaceholder")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                style={{ ...styles.input, paddingRight: 42 }}
-                onFocus={(e) => Object.assign(e.target.style, { ...styles.inputFocus, paddingRight: "42px" })}
-                onBlur={(e)  => Object.assign(e.target.style, { ...styles.input,      paddingRight: "42px" })}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-3.5 pr-10 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPwd(v => !v)}
-                style={styles.eyeBtn}
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer p-1 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
                 tabIndex={-1}
               >
                 {showPwd
-                  ? <EyeOff size={16} color="#94a3b8" />
-                  : <Eye    size={16} color="#94a3b8" />}
+                  ? <EyeOff size={16} />
+                  : <Eye    size={16} />}
               </button>
             </div>
           </div>
@@ -119,40 +131,37 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
           <button
             type="submit"
             disabled={loading}
-            className="btn-anim"
-            style={{ ...styles.btn, ...(loading ? styles.btnDisabled : {}) }}
+            className="btn-anim w-full bg-[#1e3a8a] hover:bg-blue-900 dark:bg-blue-600 dark:hover:bg-blue-700 disabled:opacity-50 text-white font-semibold text-sm py-3 rounded-xl shadow-md cursor-pointer transition-colors mt-2"
           >
             {loading ? t("auth.signingIn") : t("auth.signIn")}
           </button>
         </form>
 
         {/* Links */}
-        <p style={styles.linkLine}>
+        <p className="text-xs md:text-sm text-center text-slate-500 dark:text-slate-400 mt-5">
           {t("auth.noAccount")}{" "}
-          <button onClick={() => setShowRegister(true)} style={styles.linkBtn}>
+          <button onClick={() => setShowRegister(true)} className="bg-transparent border-none cursor-pointer text-[#1e3a8a] dark:text-blue-400 font-bold hover:underline">
             {t("auth.registerHere")}
           </button>
         </p>
-        <p style={styles.forgotLine}>
+        <p className="text-center mt-2">
           <button
             type="button"
             onClick={() => setShowForgotPassword(true)}
-            style={{ background:"none", border:"none", cursor:"pointer", fontSize:14, color:"#64748b", fontFamily:"inherit", fontWeight:500, padding:0, transition:"color 0.2s" }}
-            onMouseEnter={e => e.target.style.color = "#1e3a8a"}
-            onMouseLeave={e => e.target.style.color = "#64748b"}
+            className="bg-transparent border-none cursor-pointer text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-[#1e3a8a] dark:hover:text-blue-400 transition-colors"
           >
             {t("auth.forgotPassword")}
           </button>
         </p>
 
         {/* Demo Credentials */}
-        <div style={styles.demoBox}>
-          <p style={styles.demoTitle}>{t("auth.demoCredentials")}</p>
-          <p style={styles.demoRow}><span style={styles.demoLabel}>Email:</span> volunteer@resqlink.com</p>
-          <p style={styles.demoRow}><span style={styles.demoLabel}>Password:</span> demo123</p>
+        <div className="mt-6 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 flex flex-col gap-1.5">
+          <p className="text-xs font-bold text-slate-700 dark:text-slate-200">{t("auth.demoCredentials")}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400"><span className="font-semibold text-slate-700 dark:text-slate-300">Email:</span> volunteer@resqlink.com</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400"><span className="font-semibold text-slate-700 dark:text-slate-300">Password:</span> demo123</p>
           <button
             type="button"
-            style={styles.fillBtn}
+            className="mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold py-1.5 px-3 rounded-lg shadow-xs cursor-pointer transition-colors"
             onClick={() => { setEmail("volunteer@resqlink.com"); setPassword("demo123"); }}
           >
             {t("auth.fillDemo")}

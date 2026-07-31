@@ -1,36 +1,64 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Home from './pages/Home';
 import VolunteerApp from './pages/volunteer/VolunteerApp';
 
 export default function App() {
-  // Check if user is already logged in
-  const isLoggedIn = () => {
-    const saved = localStorage.getItem("resqlink_volunteer_user");
-    return saved ? true : false;
+  const getInitialView = () => {
+    const hash = (window.location.hash || "").toLowerCase();
+    const savedUser = localStorage.getItem("resqlink_volunteer_user");
+
+    if (hash === "#/login") {
+      return { showApp: true, startOnRegister: false };
+    }
+    if (hash === "#/signup" || hash === "#/register") {
+      return { showApp: true, startOnRegister: true };
+    }
+    if (savedUser) {
+      return { showApp: true, startOnRegister: false };
+    }
+    return { showApp: false, startOnRegister: false };
   };
 
-  const [showApp, setShowApp] = useState(isLoggedIn);
-  const [startOnRegister, setStartOnRegister] = useState(false);
+  const [viewState, setViewState] = useState(getInitialView);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = (window.location.hash || "").toLowerCase();
+      if (hash === "#/login") {
+        setViewState({ showApp: true, startOnRegister: false });
+      } else if (hash === "#/signup" || hash === "#/register") {
+        setViewState({ showApp: true, startOnRegister: true });
+      } else if (hash === "#/home" || hash === "#/" || hash === "") {
+        const savedUser = localStorage.getItem("resqlink_volunteer_user");
+        if (!savedUser) {
+          setViewState({ showApp: false, startOnRegister: false });
+        }
+      }
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
 
   const handleLogin = () => {
-    setStartOnRegister(false);
-    setShowApp(true);
+    window.location.hash = "#/login";
+    setViewState({ showApp: true, startOnRegister: false });
   };
 
   const handleRegister = () => {
-    setStartOnRegister(true);
-    setShowApp(true);
+    window.location.hash = "#/signup";
+    setViewState({ showApp: true, startOnRegister: true });
   };
 
   const handleLogout = () => {
-    setShowApp(false);
-    setStartOnRegister(false);
+    window.location.hash = "#/home";
+    setViewState({ showApp: false, startOnRegister: false });
   };
 
-  if (showApp) {
+  if (viewState.showApp) {
     return (
       <VolunteerApp
-        startOnRegister={startOnRegister}
+        startOnRegister={viewState.startOnRegister}
         onLogout={handleLogout}
         onGoHome={handleLogout}
       />

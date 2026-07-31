@@ -88,4 +88,68 @@ router.delete('/:userId', async (req, res) => {
   }
 });
 
+/* ══ PUT /api/skills/:userId (Save all skills) ══ */
+router.put('/:userId', async (req, res) => {
+  const userId = parseInt(req.params.userId, 10);
+  if (isNaN(userId)) {
+    return res.status(400).json({ message: 'Invalid user ID.' });
+  }
+
+  const rawSkills = Array.isArray(req.body.skills) ? req.body.skills : [];
+  const skillsList = [
+    ...new Set(
+      rawSkills
+        .map(s => String(s || '').trim())
+        .filter(s => s.length > 0 && s.length <= 100)
+    )
+  ];
+
+  try {
+    const skillIds = [];
+
+    for (const skillName of skillsList) {
+      let skillId;
+      const [existing] = await db.query('SELECT id FROM skills WHERE name = ?', [skillName]);
+      if (existing.length === 0) {
+        const [inserted] = await db.query('INSERT INTO skills (name) VALUES (?)', [skillName]);
+        skillId = inserted.insertId;
+      } else {
+        skillId = existing[0].id;
+      }
+      skillIds.push(skillId);
+    }
+
+    // Replace user_skills for this user
+    await db.query('DELETE FROM user_skills WHERE user_id = ?', [userId]);
+
+    if (skillIds.length > 0) {
+      const values = skillIds.map(id => [userId, id]);
+      await db.query('INSERT INTO user_skills (user_id, skill_id) VALUES ?', [values]);
+    }
+
+    // Fetch updated skills list
+    const [currentRows] = await db.query(
+      `SELECT s.name FROM skills s
+       JOIN user_skills us ON s.id = us.skill_id
+       WHERE us.user_id = ?
+       ORDER BY s.name`,
+      [userId]
+    );
+    const currentSkills = currentRows.map(r => r.name);
+
+    const [allRows] = await db.query('SELECT name FROM skills ORDER BY name');
+    const suggestedSkills = allRows.map(r => r.name).filter(n => !currentSkills.includes(n));
+
+    return res.json({
+      message: 'Skills saved successfully.',
+      currentSkills,
+      suggestedSkills,
+    });
+  } catch (error) {
+    console.error('Save skills error:', error.message);
+    return res.status(500).json({ message: 'Failed to save skills.' });
+  }
+});
+
 module.exports = router;
+
