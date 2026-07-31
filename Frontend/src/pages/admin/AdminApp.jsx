@@ -22,7 +22,7 @@ function AdminSidebar({ activeTab, onTabChange, isDarkMode, isMobile, onClose })
   ];
 
   return (
-    <div className={`border-r-[0.8px] border-solid w-[256px] h-full shrink-0 flex flex-col pt-4 px-4 gap-1 shadow-sm transition-colors duration-200 ${
+    <div className={`border-r-[0.8px] border-solid w-[256px] h-full shrink-0 flex flex-col pt-6 px-5 gap-2 shadow-sm transition-colors duration-200 ${
       isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-[#e5e7eb] text-slate-900"
     }`}>
       {/* Mobile Drawer Close Button */}
@@ -76,6 +76,7 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
   });
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
   const [volunteers, setVolunteers] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [alerts, setAlerts] = useState([]);
@@ -83,7 +84,21 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
 
   useEffect(() => {
     localStorage.setItem("resqlink_admin_theme", JSON.stringify(isDarkMode));
+    // Apply dark mode class to html element for Tailwind's dark: modifiers
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }, [isDarkMode]);
+
+  const handleToggleSidebar = () => {
+    if (window.innerWidth >= 1024) {
+      setDesktopSidebarOpen(!desktopSidebarOpen);
+    } else {
+      setSidebarOpen(!sidebarOpen);
+    }
+  };
 
   const fetchAdminData = async () => {
     setLoading(true);
@@ -281,11 +296,11 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
         onTabChange={setActiveTab}
         isDarkMode={isDarkMode}
         onToggleTheme={() => setIsDarkMode(!isDarkMode)}
-        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        onToggleSidebar={handleToggleSidebar}
       />
       <div className="flex flex-1 overflow-hidden relative">
         {/* Desktop Sidebar */}
-        <div className="hidden lg:block">
+        <div className={`hidden lg:block transition-all duration-300 ${desktopSidebarOpen ? "w-[256px]" : "w-0 overflow-hidden"}`}>
           <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} isDarkMode={isDarkMode} />
         </div>
 
@@ -324,8 +339,8 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
           )}
         </AnimatePresence>
 
-        <div className="flex-1 overflow-y-auto p-4 md:p-8">
-          <div className="max-w-[1100px] mx-auto pb-12">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 lg:p-10 min-w-0">
+          <div className="max-w-[1100px] mx-auto pb-12 w-full">
             {renderContent()}
           </div>
         </div>

@@ -60,9 +60,9 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
           <div className={`rounded-lg p-3 ${isDarkMode ? "bg-emerald-950/40 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>
             <Users className="w-6 h-6" />
           </div>
-          <div className="flex flex-col">
-            <span className={`font-bold text-2xl ${isDarkMode ? "text-white" : "text-slate-900"}`}>{totalVolunteers}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider ${textColorMuted}`}>Total Volunteers</span>
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{totalVolunteers}</span>
+            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>Total Volunteers</span>
           </div>
         </div>
 
@@ -70,9 +70,9 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
           <div className={`rounded-lg p-3 ${isDarkMode ? "bg-blue-950/40 text-blue-400" : "bg-blue-50 text-blue-600"}`}>
             <CheckCircle className="w-6 h-6" />
           </div>
-          <div className="flex flex-col">
-            <span className={`font-bold text-2xl ${isDarkMode ? "text-white" : "text-slate-900"}`}>{availableVolunteers}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider ${textColorMuted}`}>Available Now</span>
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{availableVolunteers}</span>
+            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>Available Now</span>
           </div>
         </div>
 
@@ -80,9 +80,9 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
           <div className={`rounded-lg p-3 ${isDarkMode ? "bg-amber-950/40 text-amber-400" : "bg-amber-50 text-amber-600"}`}>
             <ClipboardList className="w-6 h-6" />
           </div>
-          <div className="flex flex-col">
-            <span className={`font-bold text-2xl ${isDarkMode ? "text-white" : "text-slate-900"}`}>{activeAssignments}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider ${textColorMuted}`}>Active Tasks</span>
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{activeAssignments}</span>
+            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>Active Tasks</span>
           </div>
         </div>
 
@@ -90,9 +90,9 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
           <div className={`rounded-lg p-3 ${isDarkMode ? "bg-red-950/40 text-red-400" : "bg-red-50 text-red-600"}`}>
             <ShieldAlert className="w-6 h-6" />
           </div>
-          <div className="flex flex-col">
-            <span className={`font-bold text-2xl ${isDarkMode ? "text-white" : "text-slate-900"}`}>{totalAlerts}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider ${textColorMuted}`}>Active Alerts</span>
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{totalAlerts}</span>
+            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>Active Alerts</span>
           </div>
         </div>
       </div>
@@ -180,9 +180,9 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
             ) : (
               assignments.slice(0, 5).map((a) => (
                 <div key={a.id} className={`border rounded-lg p-3 flex justify-between items-center ${bgList}`}>
-                  <div className="flex flex-col gap-1">
-                    <span className={`font-semibold text-sm ${isDarkMode ? "text-slate-100" : "text-slate-900"}`}>{a.volunteerName}</span>
-                    <span className={`text-xs ${textColorMuted}`}>{a.disaster} &bull; {a.task}</span>
+                  <div className="flex flex-col gap-1 min-w-0 flex-1 pr-2">
+                    <span className={`font-semibold text-sm truncate ${isDarkMode ? "text-slate-100" : "text-slate-900"}`}>{a.volunteerName}</span>
+                    <span className={`text-xs truncate ${textColorMuted}`}>{a.disaster} &bull; {a.task}</span>
                   </div>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
                     a.status === "completed"
@@ -233,7 +233,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
                     </span>
                     <span className={textColorMuted}>{alert.time}</span>
                   </div>
-                  <p className={`text-xs font-medium leading-relaxed ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}>{alert.message}</p>
+                  <p className={`text-xs font-medium leading-relaxed line-clamp-2 ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}>{alert.message}</p>
                 </div>
               ))
             )}

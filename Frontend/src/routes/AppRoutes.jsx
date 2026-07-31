@@ -1,5 +1,6 @@
 // frontend/src/routes/AppRoutes.jsx
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import MainLayout from '../layouts/MainLayout'
 import AuthLayout from '../layouts/AuthLayout'
 import Dashboard from '../pages/citizen/Dashboard'
@@ -7,8 +8,11 @@ import Report from '../pages/citizen/Report'
 import Alerts from '../pages/citizen/Alerts'
 import Profile from '../pages/citizen/Profile'
 import MapPage from '../pages/citizen/MapPage'
+import AdminApp from '../pages/admin/AdminApp'
 
 const AppRoutes = () => {
+    const { user, logout, setUser } = useAuth();
+
     return (
         <Routes>
             {/* Default → dashboard */}
@@ -29,6 +33,9 @@ const AppRoutes = () => {
                 <Route path="map" element={<MapPage />} />
                 <Route path="profile" element={<Profile />} />
             </Route>
+
+            {/* Admin routes */}
+            <Route path="/admin/*" element={<AdminApp user={user} onLogout={logout} onUpdateUser={setUser} />} />
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/citizen/dashboard" replace />} />

@@ -5,15 +5,14 @@ export default function Header({ user, alertsCount, onTabChange, isDarkMode, onT
     <div className={`border-b-[0.8px] border-solid h-[64px] shrink-0 w-full flex items-center justify-between px-4 sm:px-6 z-10 shadow-sm transition-colors duration-200 ${
       isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-[#e5e7eb] text-slate-900"
     }`}>
-      {/* Brand Logo & Menu Button */}
       <div className="flex items-center gap-2">
-        {/* Mobile Menu Button */}
+        {/* Menu Toggle Button */}
         <button 
           onClick={onToggleSidebar}
-          className={`lg:hidden p-2 rounded-lg transition-colors cursor-pointer mr-1 ${
-            isDarkMode ? "hover:bg-slate-800 text-white hover:text-slate-200" : "hover:bg-slate-100 text-slate-700 hover:text-slate-900"
+          className={`p-2 rounded-lg transition-colors cursor-pointer mr-1 ${
+            isDarkMode ? "hover:bg-slate-800 text-slate-300 hover:text-slate-100" : "hover:bg-slate-100 text-slate-500 hover:text-slate-700"
           }`}
-          title="Toggle Mobile Menu"
+          title="Toggle Sidebar"
         >
           <Menu className="w-6 h-6" />
         </button>
