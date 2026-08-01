@@ -1,60 +1,59 @@
-const express = require("express");
-const cors = require("cors");
-const sequelize = require("./database/connection");
-const initDb = require("./database/initDb");
-const authRouter = require("./routes/auth");
-const skillsRouter = require("./routes/skills");
-const alertsRouter = require("./routes/alerts");
-const assignmentsRouter = require("./routes/assignments");
+const express = require('express');
+const cors    = require('cors');
+const path    = require('path');
+const fs      = require('fs');
+
+const authRouter        = require('./routes/auth');
+const skillsRouter      = require('./routes/skills');
+const alertsRouter      = require('./routes/alerts');
+const assignmentsRouter = require('./routes/assignments');
+const disasterRouter    = require('./routes/disasterRoutes');
 
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// Ensure uploads directories exist
+const uploadsDir = path.join(__dirname, 'uploads/avatars');
+const reportsDir = path.join(__dirname, 'uploads/reports');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+if (!fs.existsSync(reportsDir)) {
+  fs.mkdirSync(reportsDir, { recursive: true });
+}
 
-// Routes
-app.use("/api/auth", authRouter);
-app.use("/api/skills", skillsRouter);
-app.use("/api/alerts", alertsRouter);
-app.use("/api/assignments", assignmentsRouter);
+// ── Middleware ──
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
 
-// Health Check Route
-app.get("/health", (req, res) => {
-    res.json({ status: "OK", service: "ResQLink API" });
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+// Serve static uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// ── Routes ──
+app.use('/api/auth',        authRouter);
+app.use('/api/skills',      skillsRouter);
+app.use('/api/alerts',      alertsRouter);
+app.use('/api/assignments', assignmentsRouter);
+app.use('/api/disasters',   disasterRouter);
+
+// ── Health check ──
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', service: 'ResQLink API', timestamp: new Date().toISOString() });
 });
 
-// Error handling middleware
+// ── 404 handler ──
+app.use((req, res) => {
+  res.status(404).json({ message: `Route ${req.method} ${req.path} not found` });
+});
+
+// ── Global error handler ──
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ message: "Internal Server Error" });
+  console.error('Unhandled error:', err.stack || err);
+  res.status(500).json({ message: 'Internal Server Error' });
 });
-
-// Server start logic
-const PORT = process.env.PORT || 5000;
-
-async function startServer() {
-    try {
-        // Authenticate Sequelize connection
-        await sequelize.authenticate();
-        console.log("Database connected successfully via Sequelize");
-
-        // Initialize Database (tables and seed data)
-        await initDb();
-
-        // Start listening
-        app.listen(PORT, () => {
-            console.log(`ResQLink Server is running on port ${PORT}`);
-        });
-    } catch (error) {
-        console.error("Failed to start ResQLink server:", error);
-        process.exit(1);
-    }
-}
-
-// Start the server if this file is run directly
-if (require.main === module) {
-    startServer();
-}
 
 module.exports = app;
