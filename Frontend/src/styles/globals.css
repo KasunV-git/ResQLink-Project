@@ -2,69 +2,52 @@
 @import './variables.css';
 @import './layout.css';
 @import './pages.css';
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
+.citizen-portal {
     font-family: 'Inter', sans-serif;
     background: var(--bg);
     color: var(--text-dark);
     line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    transition: background .25s ease, color .25s ease;
+    min-height: 100vh;
+    width: 100%;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+.citizen-portal *,
+.citizen-portal *::before,
+.citizen-portal *::after {
+    box-sizing: border-box;
+}
+
+.citizen-portal h1,
+.citizen-portal h2,
+.citizen-portal h3,
+.citizen-portal h4,
+.citizen-portal h5,
+.citizen-portal h6 {
     font-family: 'Inter', sans-serif;
     line-height: 1.2;
     color: var(--text-dark);
 }
 
-a {
+.citizen-portal a {
     text-decoration: none;
     color: inherit;
 }
 
-button {
+.citizen-portal button {
     cursor: pointer;
     font-family: inherit;
 }
 
-input,
-textarea,
-select {
+.citizen-portal input,
+.citizen-portal textarea,
+.citizen-portal select {
     font-family: inherit;
     outline: none;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-    width: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--border-mid);
-    border-radius: 3px;
-}
-
 /* Utility classes */
-.card {
+.citizen-portal .card {
     background: var(--bg-card);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
@@ -72,7 +55,7 @@ select {
     transition: background .25s ease, border-color .25s ease;
 }
 
-.badge {
+.citizen-portal .badge {
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -84,27 +67,27 @@ select {
     text-transform: uppercase;
 }
 
-.badge-danger {
+.citizen-portal .badge-danger {
     background: var(--danger-bg);
     color: var(--danger);
 }
 
-.badge-warning {
+.citizen-portal .badge-warning {
     background: var(--warning-bg);
     color: var(--warning);
 }
 
-.badge-info {
+.citizen-portal .badge-info {
     background: var(--info-bg);
     color: var(--info);
 }
 
-.badge-success {
+.citizen-portal .badge-success {
     background: var(--success-bg);
     color: var(--success);
 }
 
-.btn {
+.citizen-portal .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -118,54 +101,54 @@ select {
     white-space: nowrap;
 }
 
-.btn-primary {
+.citizen-portal .btn-primary {
     background: var(--teal);
     color: #fff;
 }
 
-.btn-primary:hover {
+.citizen-portal .btn-primary:hover {
     background: var(--teal-dark);
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
 
-.btn-navy {
+.citizen-portal .btn-navy {
     background: var(--navy);
     color: #fff;
 }
 
-.btn-navy:hover {
+.citizen-portal .btn-navy:hover {
     background: var(--navy-dark);
 }
 
-.btn-outline {
+.citizen-portal .btn-outline {
     background: transparent;
     color: var(--navy);
     border: 1.5px solid var(--border-mid);
 }
 
-.btn-outline:hover {
+.citizen-portal .btn-outline:hover {
     border-color: var(--navy);
     background: var(--bg);
 }
 
-.btn-danger {
+.citizen-portal .btn-danger {
     background: var(--danger);
     color: #fff;
 }
 
-.btn-danger:hover {
+.citizen-portal .btn-danger:hover {
     opacity: .88;
 }
 
 /* Form elements */
-.form-group {
+.citizen-portal .form-group {
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
 
-.form-label {
+.citizen-portal .form-label {
     font-size: 12px;
     font-weight: 600;
     color: var(--text-mid);
@@ -173,7 +156,7 @@ select {
     text-transform: uppercase;
 }
 
-.form-input {
+.citizen-portal .form-input {
     padding: 11px 14px;
     border: 1.5px solid var(--border);
     border-radius: var(--radius-md);
@@ -183,17 +166,17 @@ select {
     transition: var(--transition);
 }
 
-.form-input:focus {
+.citizen-portal .form-input:focus {
     border-color: var(--teal);
     box-shadow: 0 0 0 3px rgba(26, 158, 122, .12);
 }
 
-.form-input::placeholder {
+.citizen-portal .form-input::placeholder {
     color: var(--text-light);
 }
 
 /* Select dropdown – dark-mode aware */
-.form-select {
+.citizen-portal .form-select {
     appearance: none;
     -webkit-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23718096' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E");
@@ -205,19 +188,18 @@ select {
     cursor: pointer;
 }
 
-.form-select option {
+.citizen-portal .form-select option {
     background: var(--bg-input);
     color: var(--text-dark);
 }
 
-
 /* ── Page layout ── */
-.page-wrapper {
+.citizen-portal .page-wrapper {
     display: flex;
     min-height: 100vh;
 }
 
-.main-content {
+.citizen-portal .main-content {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -225,30 +207,30 @@ select {
     min-width: 0;
 }
 
-.page-body {
+.citizen-portal .page-body {
     flex: 1;
     padding: 28px 32px;
     overflow-y: auto;
 }
 
 /* ── Sidebar overlay for mobile ── */
-.sidebar-overlay {
+.citizen-portal .sidebar-overlay {
     display: none;
 }
 
 /* ── Responsive breakpoints ── */
 @media (max-width: 1024px) {
-    .page-body {
+    .citizen-portal .page-body {
         padding: 24px 20px;
     }
 }
 
 @media (max-width: 768px) {
-    .page-body {
+    .citizen-portal .page-body {
         padding: 16px;
     }
 
-    .sidebar-overlay {
+    .citizen-portal .sidebar-overlay {
         display: block;
         position: fixed;
         inset: 0;

@@ -1,5 +1,5 @@
-/* ===== ResQLink Design Tokens ===== */
-:root {
+/* ===== ResQLink Design Tokens (Scoped to Citizen Portal) ===== */
+.citizen-portal {
     /* Primary Colors */
     --navy: #1a2456;
     --navy-dark: #111a3e;
@@ -49,7 +49,8 @@
 }
 
 /* ===== Dark Mode Overrides ===== */
-[data-theme="dark"] {
+.citizen-portal[data-theme="dark"],
+html.dark .citizen-portal {
     --bg: #0f1117;
     --bg-card: #1a1d27;
     --bg-sidebar: #13161f;
