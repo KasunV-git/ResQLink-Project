@@ -1,39 +1,79 @@
-// frontend/src/routes/AppRoutes.jsx
-import { Routes, Route, Navigate } from 'react-router-dom'
-import MainLayout from '../layouts/MainLayout'
-import AuthLayout from '../layouts/AuthLayout'
-import Dashboard from '../pages/citizen/Dashboard'
-import Report from '../pages/citizen/Report'
-import Alerts from '../pages/citizen/Alerts'
-import Profile from '../pages/citizen/Profile'
-import MapPage from '../pages/citizen/MapPage'
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Home from '../pages/Home';
+import LoginPage from '../pages/auth/LoginPage';
+import RegisterPage from '../pages/auth/RegisterPage';
+import VolunteerApp from '../pages/volunteer/VolunteerApp';
+import AdminApp from '../pages/admin/AdminApp';
+import MainLayout from '../layouts/MainLayout';
+import CitizenDashboard from '../pages/citizen/Dashboard';
+import CitizenReport from '../pages/citizen/Report';
+import CitizenAlerts from '../pages/citizen/Alerts';
+import CitizenProfile from '../pages/citizen/Profile';
+import CitizenMap from '../pages/citizen/MapPage';
+import ProtectedRoute from '../components/ProtectedRoute';
+import { useAuth } from '../context/AuthContext';
 
 const AppRoutes = () => {
-    return (
-        <Routes>
-            {/* Default → dashboard */}
-            <Route path="/" element={<Navigate to="/citizen/dashboard" replace />} />
+  const { user, login, logout, updateUser } = useAuth();
 
-            {/* Auth routes */}
-            <Route element={<AuthLayout />}>
-                <Route path="/login" element={<div style={{ padding: 40 }}>Login Page</div>} />
-                <Route path="/register" element={<div style={{ padding: 40 }}>Register Page</div>} />
-            </Route>
+  const handleLoginSuccess = (data) => {
+    const userObj = data.user || data;
+    login(userObj);
+  };
 
-            {/* Citizen routes - no protection for demo */}
-            <Route path="/citizen" element={<MainLayout />}>
-                <Route index element={<Navigate to="dashboard" replace />} />
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="report" element={<Report />} />
-                <Route path="alerts" element={<Alerts />} />
-                <Route path="map" element={<MapPage />} />
-                <Route path="profile" element={<Profile />} />
-            </Route>
+  return (
+    <Routes>
+      {/* Public Landing & Auth Routes */}
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
+      <Route path="/register" element={<RegisterPage onLoginSuccess={handleLoginSuccess} />} />
+      <Route path="/signup" element={<RegisterPage onLoginSuccess={handleLoginSuccess} />} />
 
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/citizen/dashboard" replace />} />
-        </Routes>
-    )
-}
+      {/* Protected Volunteer Routes */}
+      <Route element={<ProtectedRoute allowedRoles={['Volunteer']} />}>
+        <Route
+          path="/volunteer/*"
+          element={
+            <VolunteerApp
+              user={user}
+              onLogout={logout}
+              onGoHome={logout}
+              onUpdateUser={updateUser}
+            />
+          }
+        />
+      </Route>
 
-export default AppRoutes
+      {/* Protected Citizen Routes */}
+      <Route element={<ProtectedRoute allowedRoles={['Citizen']} />}>
+        <Route path="/citizen" element={<MainLayout user={user} onLogout={logout} />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<CitizenDashboard />} />
+          <Route path="report" element={<CitizenReport />} />
+          <Route path="alerts" element={<CitizenAlerts />} />
+          <Route path="map" element={<CitizenMap />} />
+          <Route path="profile" element={<CitizenProfile user={user} onLogout={logout} />} />
+        </Route>
+      </Route>
+
+      {/* Protected Admin Routes */}
+      <Route element={<ProtectedRoute allowedRoles={['Admin']} />}>
+        <Route
+          path="/admin/*"
+          element={
+            <AdminApp
+              user={user}
+              onLogout={logout}
+              onUpdateUser={updateUser}
+            />
+          }
+        />
+      </Route>
+
+      {/* Fallback Catch-All */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+};
+
+export default AppRoutes;

@@ -1,51 +1,56 @@
 const express = require('express');
-const router = express.Router();
-const db = require('../config/db');
+const router  = express.Router();
+const db      = require('../config/db');
 
-// Get active emergency alerts
+function formatAlertTime(value) {
+  if (!value) return '';
+  const d = value instanceof Date ? value : new Date(value);
+  if (isNaN(d.getTime())) return String(value);
+
+  const month = d.toLocaleString('en-US', { month: 'short' });
+  const day   = d.getDate();
+  let   hours = d.getHours();
+  const mins  = String(d.getMinutes()).padStart(2, '0');
+  const ampm  = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12;
+  const hh = String(hours).padStart(2, '0');
+
+  return `${month} ${day}, ${hh}:${mins} ${ampm}`;
+}
+
+/* ══ GET /api/alerts ══ */
 router.get('/', async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT * FROM alerts ORDER BY id DESC');
-    
-    // Map db columns to match frontend expectations
+    const [rows] = await db.query(`
+      SELECT id, priority, message, source, time, alert_time, target
+        FROM alerts
+       ORDER BY id DESC
+    `);
+
     const alerts = rows.map(row => ({
-      id: row.id,
+      id:       row.id,
       priority: row.priority,
-      message: row.message,
-      source: row.source,
-      time: row.time,
-      target: row.target
+      message:  row.message,
+      source:   row.source,
+      time:     row.time || formatAlertTime(row.alert_time),
+      target:   row.target,
     }));
 
-    res.json(alerts);
+    return res.json(alerts);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    console.error('Alerts fetch error:', error.message);
+    return res.status(500).json({ message: 'Failed to fetch alerts.' });
   }
 });
 
-// Create new alert (for admin)
+/* ══ POST /api/alerts (Admin create) ══ */
 router.post('/', async (req, res) => {
   const { priority, message, source, target } = req.body;
   if (!priority || !message || !source) {
     return res.status(400).json({ message: 'Priority, message, and source are required' });
   }
 
-  // Format current time as: "Month Day, Hour:Minute AM/PM" (e.g. "Apr 3, 03:00 PM")
-  const today = new Date();
-  const formatTime = (date) => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const month = months[date.getMonth()];
-    const day = date.getDate();
-    let hours = date.getHours();
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
-    const formattedHours = String(hours).padStart(2, '0');
-    return `${month} ${day}, ${formattedHours}:${minutes} ${ampm}`;
-  };
-  const timeString = formatTime(today);
+  const timeString = formatAlertTime(new Date());
 
   try {
     const [result] = await db.query(
@@ -53,7 +58,7 @@ router.post('/', async (req, res) => {
       [priority, message, source, timeString, target || 'For Volunteers']
     );
 
-    res.status(201).json({
+    return res.status(201).json({
       id: result.insertId,
       priority,
       message,
@@ -62,12 +67,12 @@ router.post('/', async (req, res) => {
       target: target || 'For Volunteers'
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    console.error('Create alert error:', error.message);
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
-// Delete alert (for admin)
+/* ══ DELETE /api/alerts/:id (Admin delete) ══ */
 router.delete('/:id', async (req, res) => {
   const alertId = req.params.id;
   try {
@@ -76,10 +81,10 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Alert not found' });
     }
     await db.query('DELETE FROM alerts WHERE id = ?', [alertId]);
-    res.json({ message: 'Alert deleted successfully' });
+    return res.json({ message: 'Alert deleted successfully' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    console.error('Delete alert error:', error.message);
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
