@@ -124,7 +124,7 @@ const Alerts = () => {
             const res = await getAlerts({ limit: 50 });
             const data = res.data?.data ?? res.data;
             if (Array.isArray(data) && data.length > 0) {
-                setAlerts(data);
+                setAlerts(data.map(a => ({ ...a, alert_id: a.id || a.alert_id })));
             } else {
                 setAlerts(DEMO);
             }
