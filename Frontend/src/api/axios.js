@@ -20,7 +20,10 @@ api.interceptors.response.use(
     (err) => {
         if (err.response?.status === 401) {
             localStorage.removeItem('token');
-            window.location.href = '/login';
+            localStorage.removeItem('resqlink_token');
+            if (!window.location.hash.includes('login') && !window.location.pathname.includes('login')) {
+                window.location.hash = '#/login';
+            }
         }
         return Promise.reject(err);
     }

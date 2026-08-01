@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { UserCheck, UserX, Clipboard, MapPin } from "lucide-react";
 
-export default function Volunteers({ volunteers, onToggleAvailability, onAssign, isDarkMode }) {
+export default function Volunteers({ volunteers, alerts = [], onToggleAvailability, onAssign, isDarkMode }) {
   const [selectedVolunteer, setSelectedVolunteer] = useState(null);
   const [disaster, setDisaster] = useState("");
   const [task, setTask] = useState("");
@@ -31,8 +31,9 @@ export default function Volunteers({ volunteers, onToggleAvailability, onAssign,
         setMsg("");
       }, 1500);
     } catch (error) {
-      console.error(error);
-      setMsg("Failed to assign task. Try again.");
+      console.error("Assignment submission error:", error);
+      const serverMsg = error.response?.data?.message || error.message || "Failed to assign task. Try again.";
+      setMsg(serverMsg);
     } finally {
       setAssignLoading(false);
     }
@@ -45,6 +46,15 @@ export default function Volunteers({ volunteers, onToggleAvailability, onAssign,
   const bgHeader = isDarkMode ? "bg-slate-950/60" : "bg-slate-50/50";
   const bgRowHover = isDarkMode ? "hover:bg-slate-950/40" : "hover:bg-slate-50/40";
   const divideColor = isDarkMode ? "divide-slate-800" : "divide-slate-100";
+
+  // Pre-populated incident suggestions from active alerts or defaults
+  const incidentSuggestions = Array.from(new Set([
+    "Kelani River Flood – Kelaniya",
+    "Kegalle Landslide – Aranayake",
+    "Badulla Landslide Warning",
+    "Ratnapura Flash Flood",
+    ...(alerts || []).map(a => a.message.length > 40 ? a.message.slice(0, 37) + "..." : a.message)
+  ]));
 
   return (
     <div className="w-full flex flex-col gap-6" data-name="AdminVolunteers">
@@ -155,11 +165,10 @@ export default function Volunteers({ volunteers, onToggleAvailability, onAssign,
                             setSelectedVolunteer(vol);
                             setMsg("");
                           }}
-                          disabled={!vol.isAvailable}
                           className={`inline-flex items-center gap-1 text-xs font-semibold py-1.5 px-3 rounded-lg shadow-sm transition-colors border cursor-pointer ${
                             isDarkMode
-                              ? "bg-emerald-600 border-emerald-700 text-white hover:bg-emerald-700 disabled:bg-slate-800 disabled:text-slate-600 disabled:border-slate-850"
-                              : "bg-emerald-700 border-emerald-700 text-white hover:bg-emerald-800 disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200"
+                              ? "bg-emerald-600 border-emerald-700 text-white hover:bg-emerald-700"
+                              : "bg-emerald-700 border-emerald-700 text-white hover:bg-emerald-800"
                           }`}
                         >
                           Assign Task
@@ -209,7 +218,8 @@ export default function Volunteers({ volunteers, onToggleAvailability, onAssign,
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="e.g. Downtown Flash Flood"
+                    list="disaster-suggestions"
+                    placeholder="e.g. Kelani River Flood"
                     value={disaster}
                     onChange={(e) => setDisaster(e.target.value)}
                     className={`w-full text-sm rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-600 ${
@@ -219,6 +229,11 @@ export default function Volunteers({ volunteers, onToggleAvailability, onAssign,
                     }`}
                     required
                   />
+                  <datalist id="disaster-suggestions">
+                    {incidentSuggestions.map((item, idx) => (
+                      <option key={idx} value={item} />
+                    ))}
+                  </datalist>
                 </div>
               </div>
 
@@ -230,6 +245,7 @@ export default function Volunteers({ volunteers, onToggleAvailability, onAssign,
                   <Clipboard className="absolute right-3 top-2.5 w-4 h-4 text-slate-400" />
                   <input
                     type="text"
+                    list="task-suggestions"
                     placeholder="e.g. Distribute relief packets"
                     value={task}
                     onChange={(e) => setTask(e.target.value)}
@@ -240,6 +256,13 @@ export default function Volunteers({ volunteers, onToggleAvailability, onAssign,
                     }`}
                     required
                   />
+                  <datalist id="task-suggestions">
+                    <option value="Distribute dry rations and drinking water" />
+                    <option value="Assist search and rescue operations" />
+                    <option value="Provide emergency medical support" />
+                    <option value="Shelter management and food distribution" />
+                    <option value="Evacuation assistance for vulnerable residents" />
+                  </datalist>
                 </div>
               </div>
 
@@ -251,7 +274,8 @@ export default function Volunteers({ volunteers, onToggleAvailability, onAssign,
                   <MapPin className="absolute right-3 top-2.5 w-4 h-4 text-slate-400" />
                   <input
                     type="text"
-                    placeholder="e.g. Central Community Shelter"
+                    list="location-suggestions"
+                    placeholder="e.g. Kelaniya Relief Camp"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     className={`w-full text-sm rounded-lg py-2 pl-3 pr-10 focus:outline-none focus:ring-2 focus:ring-emerald-600 ${
@@ -261,6 +285,13 @@ export default function Volunteers({ volunteers, onToggleAvailability, onAssign,
                     }`}
                     required
                   />
+                  <datalist id="location-suggestions">
+                    <option value="Kelaniya Relief Camp, Gampaha District" />
+                    <option value="Aranayake, Kegalle District" />
+                    <option value="Ratnapura Community Center" />
+                    <option value="Badulla District Secretariat" />
+                    <option value="Colombo Evacuation Center" />
+                  </datalist>
                 </div>
               </div>
 

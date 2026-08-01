@@ -11,7 +11,10 @@ function formatDate(value) {
 
 function todayString() {
   const d = new Date();
-  return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
+  const year  = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day   = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 /* ══ GET /api/assignments (Admin all assignments) ══ */
@@ -114,7 +117,8 @@ router.post('/:id/complete', async (req, res) => {
     return res.status(400).json({ message: 'Invalid assignment ID.' });
   }
 
-  const dateString = todayString();
+  const dateDb = todayString();
+  const dateUi = formatDate(dateDb);
 
   try {
     const [rows] = await db.query('SELECT id, status FROM assignments WHERE id = ?', [assignmentId]);
@@ -124,13 +128,13 @@ router.post('/:id/complete', async (req, res) => {
 
     await db.query(
       "UPDATE assignments SET status = 'completed', completed_date = ? WHERE id = ?",
-      [dateString, assignmentId]
+      [dateDb, assignmentId]
     );
 
     return res.json({
       message: 'Assignment completed successfully.',
       status: 'completed',
-      completedDate: dateString,
+      completedDate: dateUi,
     });
   } catch (error) {
     console.error('Complete assignment error:', error.message);
@@ -141,16 +145,22 @@ router.post('/:id/complete', async (req, res) => {
 /* ══ POST /api/assignments (Admin assign) ══ */
 router.post('/', async (req, res) => {
   const { userId, disaster, task, location } = req.body;
-  if (!userId || !disaster || !task || !location) {
-    return res.status(400).json({ message: 'userId, disaster, task, and location are required' });
+  if (userId === undefined || userId === null || userId === '' || !disaster || !task || !location) {
+    return res.status(400).json({ message: 'userId, disaster, task, and location are required.' });
   }
 
-  const dateString = todayString();
+  const numericUserId = parseInt(userId, 10);
+  if (isNaN(numericUserId)) {
+    return res.status(400).json({ message: 'Invalid volunteer ID.' });
+  }
+
+  const dateDb = todayString();
+  const dateUi = formatDate(dateDb);
 
   try {
-    const [userRows] = await db.query('SELECT id, name, first_name, last_name FROM users WHERE id = ?', [userId]);
+    const [userRows] = await db.query('SELECT id, name, first_name, last_name FROM users WHERE id = ?', [numericUserId]);
     if (userRows.length === 0) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'Volunteer user not found in database.' });
     }
 
     const volunteerName = userRows[0].name || `${userRows[0].first_name || ''} ${userRows[0].last_name || ''}`.trim() || 'Volunteer';
@@ -158,23 +168,26 @@ router.post('/', async (req, res) => {
     const [result] = await db.query(
       `INSERT INTO assignments (user_id, disaster, task, location, status, assigned_date) 
        VALUES (?, ?, ?, ?, 'assigned', ?)`,
-      [userId, disaster, task, location, dateString]
+      [numericUserId, disaster.trim(), task.trim(), location.trim(), dateDb]
     );
+
+    // Automatically ensure volunteer is marked available/active when assigned a task
+    await db.query(`UPDATE users SET is_available = 1 WHERE id = ?`, [numericUserId]);
 
     return res.status(201).json({
       id: result.insertId,
-      userId,
+      userId: numericUserId,
       volunteerName,
-      disaster,
-      task,
-      location,
+      disaster: disaster.trim(),
+      task: task.trim(),
+      location: location.trim(),
       status: 'assigned',
-      assignedDate: dateString,
+      assignedDate: dateUi,
       completedDate: null
     });
   } catch (error) {
     console.error('Create assignment error:', error.message);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    return res.status(500).json({ message: error.message || 'Failed to create assignment on server.' });
   }
 });
 
