@@ -1,9 +1,9 @@
 /* frontend/src/styles/layout.css */
 
 /* ══════════════════════════════════════
-   NAVBAR
+   NAVBAR (CITIZEN PORTAL ONLY)
 ══════════════════════════════════════ */
-.navbar-header {
+.citizen-portal .navbar-header {
     height: 56px;
     background: var(--bg-navbar);
     border-bottom: 1px solid var(--border);
@@ -18,7 +18,7 @@
     gap: 12px;
 }
 
-.navbar-left {
+.citizen-portal .navbar-left {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -26,13 +26,13 @@
     min-width: 0;
 }
 
-.navbar-tabs {
+.citizen-portal .navbar-tabs {
     display: flex;
     gap: 20px;
     overflow: hidden;
 }
 
-.navbar-tab {
+.citizen-portal .navbar-tab {
     font-size: 14px;
     font-weight: 500;
     color: var(--text-mid);
@@ -41,18 +41,18 @@
     white-space: nowrap;
 }
 
-.navbar-tab:hover {
+.citizen-portal .navbar-tab:hover {
     color: var(--teal);
 }
 
-.navbar-right {
+.citizen-portal .navbar-right {
     display: flex;
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
 }
 
-.navbar-icon-btn {
+.citizen-portal .navbar-icon-btn {
     width: 36px;
     height: 36px;
     border-radius: 10px;
@@ -68,13 +68,13 @@
     text-decoration: none;
 }
 
-.navbar-icon-btn:hover {
+.citizen-portal .navbar-icon-btn:hover {
     background: var(--border);
     color: var(--text-dark);
     transform: translateY(-1px);
 }
 
-.navbar-badge {
+.citizen-portal .navbar-badge {
     position: absolute;
     top: -4px;
     right: -4px;
@@ -90,7 +90,7 @@
     justify-content: center;
 }
 
-.navbar-avatar-btn {
+.citizen-portal .navbar-avatar-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -100,12 +100,12 @@
     text-decoration: none;
 }
 
-.navbar-avatar-btn:hover {
+.citizen-portal .navbar-avatar-btn:hover {
     transform: scale(1.08);
     box-shadow: 0 0 0 3px rgba(26, 158, 122, .35);
 }
 
-.navbar-avatar-img {
+.citizen-portal .navbar-avatar-img {
     width: 34px;
     height: 34px;
     border-radius: 50%;
@@ -114,7 +114,7 @@
     display: block;
 }
 
-.navbar-avatar-fallback {
+.citizen-portal .navbar-avatar-fallback {
     width: 34px;
     height: 34px;
     border-radius: 50%;
@@ -130,7 +130,7 @@
 }
 
 /* Hamburger – hidden on desktop */
-.hamburger-btn {
+.citizen-portal .hamburger-btn {
     display: none;
     align-items: center;
     justify-content: center;
@@ -145,15 +145,15 @@
     flex-shrink: 0;
 }
 
-.hamburger-btn:hover {
+.citizen-portal .hamburger-btn:hover {
     background: var(--border);
     color: var(--text-dark);
 }
 
 /* ══════════════════════════════════════
-   SIDEBAR
+   SIDEBAR (CITIZEN PORTAL ONLY)
 ══════════════════════════════════════ */
-.sidebar {
+.citizen-portal .sidebar {
     width: 230px;
     min-height: 100vh;
     background: var(--bg-sidebar);
@@ -170,7 +170,7 @@
     overflow-y: auto;
 }
 
-.sidebar-brand {
+.citizen-portal .sidebar-brand {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -179,7 +179,7 @@
     margin-bottom: 12px;
 }
 
-.sidebar-brand-icon {
+.citizen-portal .sidebar-brand-icon {
     width: 36px;
     height: 36px;
     border-radius: 10px;
@@ -190,7 +190,7 @@
     flex-shrink: 0;
 }
 
-.sidebar-brand-name {
+.citizen-portal .sidebar-brand-name {
     font-family: 'Inter', sans-serif;
     font-weight: 700;
     font-size: 15px;
@@ -198,18 +198,19 @@
     line-height: 1.2;
 }
 
-[data-theme="dark"] .sidebar-brand-name {
+.citizen-portal[data-theme="dark"] .sidebar-brand-name,
+html.dark .citizen-portal .sidebar-brand-name {
     color: var(--text-dark);
 }
 
-.sidebar-brand-sub {
+.citizen-portal .sidebar-brand-sub {
     font-size: 9px;
     font-weight: 600;
     color: var(--text-muted);
     letter-spacing: 1px;
 }
 
-.sidebar-close-btn {
+.citizen-portal .sidebar-close-btn {
     display: none;
     margin-left: auto;
     background: none;
@@ -223,11 +224,11 @@
     transition: color .18s ease;
 }
 
-.sidebar-close-btn:hover {
+.citizen-portal .sidebar-close-btn:hover {
     color: var(--text-dark);
 }
 
-.sidebar-nav {
+.citizen-portal .sidebar-nav {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -235,7 +236,7 @@
     padding: 0 12px;
 }
 
-.sidebar-nav-item {
+.citizen-portal .sidebar-nav-item {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -253,23 +254,24 @@
     text-decoration: none;
 }
 
-.sidebar-nav-item:hover {
+.citizen-portal .sidebar-nav-item:hover {
     background: var(--bg-hover);
     color: var(--text-dark);
 }
 
-.sidebar-nav-active {
+.citizen-portal .sidebar-nav-active {
     background: linear-gradient(135deg, rgba(26,36,86,.12), rgba(26,158,122,.12));
     color: var(--navy);
     font-weight: 600;
 }
 
-[data-theme="dark"] .sidebar-nav-active {
+.citizen-portal[data-theme="dark"] .sidebar-nav-active,
+html.dark .citizen-portal .sidebar-nav-active {
     background: linear-gradient(135deg, rgba(26,36,86,.4), rgba(26,158,122,.2));
     color: var(--teal-light);
 }
 
-.sidebar-bottom {
+.citizen-portal .sidebar-bottom {
     padding: 12px 12px 0;
     border-top: 1px solid var(--border);
     margin-top: 8px;
@@ -278,7 +280,7 @@
     gap: 2px;
 }
 
-.sidebar-logout-btn {
+.citizen-portal .sidebar-logout-btn {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -295,7 +297,7 @@
     width: 100%;
 }
 
-.sidebar-logout-btn:hover {
+.citizen-portal .sidebar-logout-btn:hover {
     background: var(--danger-bg);
 }
 
@@ -304,12 +306,12 @@
 ══════════════════════════════════════ */
 @media (max-width: 768px) {
     /* Show hamburger on mobile */
-    .hamburger-btn {
+    .citizen-portal .hamburger-btn {
         display: flex;
     }
 
     /* Sidebar becomes off-canvas drawer */
-    .sidebar {
+    .citizen-portal .sidebar {
         position: fixed;
         left: 0;
         top: 0;
@@ -318,20 +320,20 @@
         box-shadow: var(--shadow-lg);
     }
 
-    .sidebar.sidebar-open {
+    .citizen-portal .sidebar.sidebar-open {
         transform: translateX(0);
     }
 
     /* Show close button on mobile */
-    .sidebar-close-btn {
+    .citizen-portal .sidebar-close-btn {
         display: flex;
     }
 
-    .navbar-tabs {
+    .citizen-portal .navbar-tabs {
         display: none;
     }
 
-    .navbar-header {
+    .citizen-portal .navbar-header {
         padding: 0 16px;
     }
 }

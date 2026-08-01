@@ -228,6 +228,7 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
         return (
           <Volunteers
             volunteers={volunteers}
+            alerts={alerts}
             onToggleAvailability={handleToggleVolunteerAvailability}
             onAssign={handleCreateAssignment}
             isDarkMode={isDarkMode}

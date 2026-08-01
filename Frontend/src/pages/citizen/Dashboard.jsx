@@ -84,16 +84,12 @@ const Dashboard = () => {
                     getAlerts({ limit: 5 }),
                     getMyReports(),
                 ]);
-                setAlerts(
-                    alertRes.status === 'fulfilled' && alertRes.value.data?.data?.length
-                        ? alertRes.value.data.data
-                        : DEMO_ALERTS
-                );
-                setReports(
-                    reportRes.status === 'fulfilled' && reportRes.value.data?.data?.length
-                        ? reportRes.value.data.data
-                        : DEMO_REPORTS
-                );
+
+                let alertData = alertRes.status === 'fulfilled' ? (alertRes.value.data?.data ?? alertRes.value.data) : null;
+                let reportData = reportRes.status === 'fulfilled' ? (reportRes.value.data?.data ?? reportRes.value.data) : null;
+
+                setAlerts(Array.isArray(alertData) && alertData.length > 0 ? alertData : DEMO_ALERTS);
+                setReports(Array.isArray(reportData) && reportData.length > 0 ? reportData : DEMO_REPORTS);
             } catch {
                 setAlerts(DEMO_ALERTS);
                 setReports(DEMO_REPORTS);
