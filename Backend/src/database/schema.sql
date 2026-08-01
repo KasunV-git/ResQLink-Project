@@ -6,10 +6,11 @@
 -- ── users ────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS users (
   id           INT            NOT NULL AUTO_INCREMENT,
+  username     VARCHAR(255)   DEFAULT NULL,
   name         VARCHAR(255)   DEFAULT NULL,
   first_name   VARCHAR(100)   DEFAULT NULL,
   last_name    VARCHAR(100)   DEFAULT NULL,
-  email        VARCHAR(255)   NOT NULL,
+  email        VARCHAR(255)   DEFAULT NULL,
   phone        VARCHAR(50)    DEFAULT NULL,
   role         VARCHAR(50)    NOT NULL DEFAULT 'Volunteer',
   is_available TINYINT(1)     NOT NULL DEFAULT 1,
@@ -18,7 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
   created_at   TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at   TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  UNIQUE KEY uq_users_email (email),
+  UNIQUE KEY uq_users_username (username),
   INDEX idx_users_role (role),
   INDEX idx_users_avail (is_available)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
