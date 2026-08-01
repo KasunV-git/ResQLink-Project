@@ -8,9 +8,9 @@ import LanguageSwitcher from "../../components/LanguageSwitcher";
 
 export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }) {
   const { t } = useTranslation();
+  const [username,        setUsername]        = useState("");
   const [firstName,       setFirstName]       = useState("");
   const [lastName,        setLastName]        = useState("");
-  const [email,           setEmail]           = useState("");
   const [phone,           setPhone]           = useState("");
   const [password,        setPassword]        = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -21,6 +21,10 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!username.trim()) {
+      setError(t("auth.validationUsernameRequired") || "Username is required.");
+      return;
+    }
     if (!firstName.trim() || !lastName.trim()) {
       setError(t("auth.validationNameRequired") || "First and last name are required.");
       return;
@@ -38,10 +42,10 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
     setError("");
     try {
       const response = await axios.post("/api/auth/signup", {
+        username,
         name: `${firstName} ${lastName}`.trim(),
         firstName,
         lastName,
-        email,
         phone,
         password,
         confirmPassword,
@@ -127,14 +131,14 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
             </div>
           </div>
 
-          {/* Email */}
+          {/* Username */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.email") || "Email"}</label>
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.username") || "Username"}</label>
             <input
-              type="email"
-              placeholder={t("auth.emailPlaceholder") || "Enter your email"}
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+              type="text"
+              placeholder={t("auth.usernamePlaceholder") || "Enter your username"}
+              value={username}
+              onChange={e => setUsername(e.target.value)}
               className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
               required
             />

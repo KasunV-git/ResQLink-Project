@@ -13,11 +13,12 @@ import LoginPage from "./pages/auth/LoginPage";
 import { useAuth } from "./context/AuthContext";
 
 const getNormalizedRole = (role) => {
-  if (!role) return "volunteer";
+  if (!role) return "citizen";
   const str = String(role).toLowerCase().trim();
   if (str === "admin" || str === "administrator") return "admin";
-  if (str === "citizen") return "citizen";
-  return "volunteer";
+  if (str === "citizen" || str === "user" || str === "public") return "citizen";
+  if (str === "volunteer") return "volunteer";
+  return "citizen";
 };
 
 export default function App() {
