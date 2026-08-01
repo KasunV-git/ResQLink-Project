@@ -342,6 +342,18 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 lg:p-10 min-w-0 flex justify-center">
           <div className="max-w-[1100px] w-full pb-12 flex flex-col items-center">
             {renderContent()}
+            
+            {/* Global Footer */}
+            <footer style={{marginTop: '100px'}}className={`w-full pt-8 border-t flex flex-col sm:flex-row justify-between items-center gap-4 text-sm transition-colors duration-200 ${
+              isDarkMode ? "border-slate-800 text-slate-500" : "border-slate-200 text-slate-500"
+            }`}>
+              <p>&copy; {new Date().getFullYear()} ResQLink System. All rights reserved.</p>
+              <div className="flex gap-6 font-medium">
+                <a href="#" className={`transition-colors ${isDarkMode ? "hover:text-slate-300" : "hover:text-slate-800"}`}>Privacy</a>
+                <a href="#" className={`transition-colors ${isDarkMode ? "hover:text-slate-300" : "hover:text-slate-800"}`}>Terms</a>
+                <a href="#" className={`transition-colors ${isDarkMode ? "hover:text-slate-300" : "hover:text-slate-800"}`}>Support</a>
+              </div>
+            </footer>
           </div>
         </div>
       </div>
