@@ -201,4 +201,8 @@ async function seedLK() {
   }
 }
 
-seedLK();
+if (require.main === module) {
+  seedLK();
+}
+
+module.exports = seedLK;

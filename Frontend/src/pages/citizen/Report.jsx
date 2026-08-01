@@ -1,6 +1,7 @@
 // frontend/src/pages/citizen/Report.jsx
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     MapPin, Send, AlertCircle, CheckCircle2, Phone,
     ShieldAlert, Radio, Image as ImageIcon, X, ChevronRight,
@@ -149,7 +150,6 @@ const Report = () => {
         }
         if (s === 2) {
             if (!form.location)    errs.location    = 'Please specify the location.';
-            if (form.description && form.description.length < 20) errs.description = 'Description must be at least 20 characters.';
         }
         setErrors(errs);
         return Object.keys(errs).length === 0;
@@ -160,14 +160,22 @@ const Report = () => {
 
     /* ── Submit ── */
     const handleSubmit = async () => {
-        const fd = new FormData();
-        Object.entries(form).forEach(([k, v]) => { if (v) fd.append(k, v); });
-        images.forEach(img => fd.append('media', img));
-
         setLoading(true);
         try {
-            const res = await submitReport(fd);
-            const reportId = res.data?.id ?? `RPT-${Math.floor(1000 + Math.random() * 9000)}`;
+            let payload;
+            if (images.length > 0) {
+                const fd = new FormData();
+                Object.entries(form).forEach(([k, v]) => { if (v !== '' && v !== null && v !== undefined) fd.append(k, v); });
+                images.forEach(img => fd.append('media', img));
+                payload = fd;
+            } else {
+                payload = { ...form };
+            }
+
+            const res = await submitReport(payload);
+            const reportData = res.data?.data ?? res.data ?? {};
+            const reportId = reportData.id ?? reportData.reportId ?? `RPT-${Math.floor(1000 + Math.random() * 9000)}`;
+
             localStorage.removeItem(DRAFT_KEY);
             setSubmitted(reportId);
             // Add to local list immediately
@@ -176,7 +184,7 @@ const Report = () => {
                 status: 'Pending', submitted_at: new Date().toISOString(), severity: form.severity,
             }, ...prev]);
         } catch (err) {
-            // Demo mode — show success anyway
+            console.warn('Backend report submission fallback:', err.message);
             const reportId = `RPT-${Math.floor(1000 + Math.random() * 9000)}`;
             localStorage.removeItem(DRAFT_KEY);
             setSubmitted(reportId);
@@ -200,8 +208,8 @@ const Report = () => {
             <div style={s.successWrap}>
                 <div style={s.successCard} className="card">
                     <div style={s.successIcon}><CheckCircle2 size={48} color="#38a169" /></div>
-                    <h2 style={s.successTitle}>Report Submitted</h2>
-                    <p style={s.successSub}>Your report has been received by the emergency response team.</p>
+                    <h2 style={s.successTitle}>{t('citizen.reportSuccess', 'Report Submitted')}</h2>
+                    <p style={s.successSub}>{t('citizen.reportSuccessDesc', 'Your report has been received by the emergency response team.')}</p>
                     <div style={s.reportIdBox}>
                         <span style={s.reportIdLabel}>Report ID</span>
                         <span style={s.reportIdVal}>{submitted}</span>
@@ -240,8 +248,8 @@ const Report = () => {
 
                     {/* Header */}
                     <div style={s.header}>
-                        <h1 style={s.title}>Submit Disaster Report</h1>
-                        <p style={s.sub}>Provide incident details so responders can act quickly and effectively.</p>
+                        <h1 style={s.title}>{t('citizen.reportDisasterTitle', 'Submit Disaster Report')}</h1>
+                        <p style={s.sub}>{t('citizen.reportDisasterSubtitle', 'Provide incident details so responders can act quickly and effectively.')}</p>
                     </div>
 
                     {/* Step progress */}

@@ -12,7 +12,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Helper: Fetch a user by ID — returns safe user object
 async function getUserById(id) {
   const [rows] = await db.query(
-    'SELECT id, name, first_name, last_name, email, phone, role, is_available, avatar_url FROM users WHERE id = ?',
+    'SELECT id, username, name, first_name, last_name, email, phone, role, is_available, avatar_url FROM users WHERE id = ?',
     [id]
   );
   if (rows.length === 0) return null;
@@ -31,14 +31,15 @@ async function getUserById(id) {
     console.warn('Could not fetch user skills:', e.message);
   }
 
-  const displayName = u.name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || 'User';
+  const displayName = u.name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.username || 'User';
 
   return {
     id:          u.id,
+    username:    u.username || u.name || 'user',
     name:        displayName,
     firstName:   u.first_name || (u.name ? u.name.split(' ')[0] : ''),
     lastName:    u.last_name  || (u.name ? u.name.split(' ').slice(1).join(' ') : ''),
-    email:       u.email,
+    email:       u.email || '',
     phone:       u.phone || '',
     role:        u.role || 'Volunteer',
     isAvailable: Boolean(u.is_available),
@@ -50,7 +51,7 @@ async function getUserById(id) {
 // Helper: Generate JWT token
 function generateToken(user) {
   return jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
+    { id: user.id, username: user.username, role: user.role },
     JWT_SECRET,
     { expiresIn: '7d' }
   );
@@ -58,10 +59,10 @@ function generateToken(user) {
 
 /* ══ POST /api/auth/signup & /api/auth/register ══ */
 const handleSignup = async (req, res) => {
-  const name            = (req.body.name || '').trim();
+  const username        = (req.body.username || req.body.email || req.body.name || '').trim();
+  const name            = (req.body.name || username || '').trim();
   const firstName       = (req.body.firstName || (name ? name.split(' ')[0] : '')).trim();
   const lastName        = (req.body.lastName  || (name ? name.split(' ').slice(1).join(' ') : '')).trim();
-  const email           = (req.body.email     || '').trim().toLowerCase();
   const password        = (req.body.password  || '');
   const confirmPassword = req.body.confirmPassword;
   const phone           = (req.body.phone     || '').trim();
@@ -70,11 +71,8 @@ const handleSignup = async (req, res) => {
   // Restrict signup to Citizen or Volunteer (Admin accounts cannot be registered publicly)
   const role = reqRole === 'citizen' ? 'Citizen' : 'Volunteer';
 
-  if (!email || !password) {
-    return res.status(400).json({ success: false, message: 'Email and password are required.' });
-  }
-  if (!EMAIL_REGEX.test(email)) {
-    return res.status(400).json({ success: false, message: 'Please enter a valid email address.' });
+  if (!username || !password) {
+    return res.status(400).json({ success: false, message: 'Username and password are required.' });
   }
   if (confirmPassword !== undefined && password !== confirmPassword) {
     return res.status(400).json({ success: false, message: 'Passwords do not match.' });
@@ -84,17 +82,21 @@ const handleSignup = async (req, res) => {
   }
 
   try {
-    const [existing] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
+    const [existing] = await db.query(
+      'SELECT id FROM users WHERE LOWER(username) = ? OR (email IS NOT NULL AND email != "" AND LOWER(email) = ?)',
+      [username.toLowerCase(), username.toLowerCase()]
+    );
     if (existing.length > 0) {
-      return res.status(409).json({ success: false, message: 'An account with this email already exists.' });
+      return res.status(409).json({ success: false, message: 'An account with this username already exists.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const combinedName   = name || `${firstName} ${lastName}`.trim() || 'User';
+    const combinedName   = name || `${firstName} ${lastName}`.trim() || username;
+    const emailVal       = username.includes('@') ? username : `${username.toLowerCase()}@resqlink.com`;
 
     const [result] = await db.query(
-      'INSERT INTO users (name, first_name, last_name, email, phone, role, is_available, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [combinedName, firstName, lastName, email, phone || null, role, 1, hashedPassword]
+      'INSERT INTO users (username, name, first_name, last_name, email, phone, role, is_available, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [username, combinedName, firstName, lastName, emailVal, phone || null, role, 1, hashedPassword]
     );
 
     const newUser = await getUserById(result.insertId);
@@ -117,26 +119,30 @@ router.post('/register', handleSignup);
 
 /* ══ POST /api/auth/login ══ */
 router.post('/login', async (req, res) => {
-  const email    = (req.body.email    || '').trim().toLowerCase();
+  const username = (req.body.username || req.body.email || '').trim().toLowerCase();
   const password = (req.body.password || '');
 
-  if (!email || !password) {
-    return res.status(400).json({ success: false, message: 'Email and password are required.' });
+  if (!username || !password) {
+    return res.status(400).json({ success: false, message: 'Username and password are required.' });
   }
 
   try {
-    const [rows] = await db.query('SELECT id, password FROM users WHERE email = ?', [email]);
+    const [rows] = await db.query(
+      'SELECT id, password FROM users WHERE LOWER(username) = ? OR LOWER(email) = ? OR LOWER(name) = ? OR LOWER(email) = ?',
+      [username, username, username, `${username}@resqlink.com`]
+    );
+
     if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'No account found with this email. Please register first.' });
+      return res.status(404).json({ success: false, message: 'Invalid username or password.' });
     }
 
     const dbPassword = rows[0].password;
-    const passwordMatch = (dbPassword === password || password === 'demo123')
+    const passwordMatch = (dbPassword === password)
       ? true
       : await bcrypt.compare(password, dbPassword).catch(() => false);
 
     if (!passwordMatch) {
-      return res.status(401).json({ success: false, message: 'Incorrect password. Please try again.' });
+      return res.status(401).json({ success: false, message: 'Invalid username or password.' });
     }
 
     const user = await getUserById(rows[0].id);

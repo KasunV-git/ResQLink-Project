@@ -14,7 +14,7 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
   const { login: authLogin } = useAuth();
   const [showRegister,       setShowRegister]       = useState(initialShowRegister);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [email,       setEmail]       = useState("");
+  const [username,    setUsername]    = useState("");
   const [password,    setPassword]    = useState("");
   const [showPwd,     setShowPwd]     = useState(false);
   const [loading,     setLoading]     = useState(false);
@@ -48,22 +48,12 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
     );
   }
 
-  const fillDemo = (role) => {
-    const map = {
-      citizen: "citizen@resqlink.com",
-      volunteer: "volunteer@resqlink.com",
-      admin: "admin@resqlink.com",
-    };
-    setEmail(map[role] || "volunteer@resqlink.com");
-    setPassword("demo123");
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
-      const response = await axios.post("/api/auth/login", { email, password });
+      const response = await axios.post("/api/auth/login", { username, password });
       const data = response.data;
       const userObj = data.user || data;
 
@@ -74,7 +64,7 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
       }
     } catch (err) {
       console.error("Login error:", err);
-      setError(err.response?.data?.message || t("auth.invalidCredentials") || "Invalid credentials. Please try again.");
+      setError(err.response?.data?.message || t("auth.invalidCredentials") || "Invalid username or password.");
     } finally {
       setLoading(false);
     }
@@ -117,19 +107,23 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.email") || "Email"}</label>
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              {t("auth.username") || "Username"}
+            </label>
             <input
-              type="email"
-              placeholder={t("auth.emailPlaceholder") || "Enter your email"}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder={t("auth.usernamePlaceholder") || "Enter your username"}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
               required
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.password") || "Password"}</label>
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              {t("auth.password") || "Password"}
+            </label>
             <div className="relative">
               <input
                 type={showPwd ? "text" : "password"}
@@ -175,30 +169,6 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
             {t("auth.forgotPassword") || "Forgot password?"}
           </button>
         </p>
-
-        {/* Demo Credentials */}
-        <div className="mt-6 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 flex flex-col gap-2">
-          <p className="text-xs font-bold text-slate-700 dark:text-slate-200">{t("auth.demoCredentials") || "Demo Credentials:"}</p>
-          <div className="flex flex-col gap-1.5">
-            {[
-              { role: "citizen", label: "Citizen", email: "citizen@resqlink.com" },
-              { role: "volunteer", label: "Volunteer", email: "volunteer@resqlink.com" },
-              { role: "admin", label: "Admin", email: "admin@resqlink.com" },
-            ].map(({ role, label, email: demoEmail }) => (
-              <button
-                key={role}
-                type="button"
-                onClick={() => fillDemo(role)}
-                className="flex items-center justify-between text-xs px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left"
-              >
-                <span className="font-semibold text-slate-700 dark:text-slate-300">{label}:</span>
-                <span className="text-slate-500 dark:text-slate-400">{demoEmail}</span>
-              </button>
-            ))}
-          </div>
-          <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Password: <span className="font-mono font-semibold text-slate-600 dark:text-slate-300">demo123</span></p>
-        </div>
-
       </div>
     </div>
   );

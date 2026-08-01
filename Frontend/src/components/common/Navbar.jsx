@@ -2,13 +2,16 @@
 import { Link } from 'react-router-dom';
 import { Bell, Sun, Moon, Menu } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { getAlerts } from '../../api/alertApi';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 const Navbar = ({ tabs = [], onMenuClick }) => {
     const { user } = useAuth();
     const { isDark, toggleTheme } = useTheme();
+    const { t } = useTranslation();
     const [unreadCount, setUnreadCount] = useState(0);
 
     useEffect(() => {
@@ -23,6 +26,15 @@ const Navbar = ({ tabs = [], onMenuClick }) => {
             .catch(() => setUnreadCount(0));
     }, []);
 
+    const defaultCitizenTabs = [
+        { to: '/citizen/dashboard', label: t('sidebar.dashboard', 'Dashboard') },
+        { to: '/citizen/report', label: t('sidebar.report', 'Report') },
+        { to: '/citizen/alerts', label: t('sidebar.alerts', 'Alerts') },
+        { to: '/citizen/map', label: t('sidebar.map', 'Map') },
+        { to: '/citizen/profile', label: t('sidebar.profile', 'Profile') },
+    ];
+    const navTabs = tabs && tabs.length > 0 ? tabs : defaultCitizenTabs;
+
     return (
         <header className="navbar-header">
             <div className="navbar-left">
@@ -30,20 +42,23 @@ const Navbar = ({ tabs = [], onMenuClick }) => {
                 <button
                     className="hamburger-btn"
                     onClick={onMenuClick}
-                    aria-label="Toggle menu"
+                    aria-label={t('header.openMenu', 'Toggle menu')}
                 >
                     <Menu size={20} />
                 </button>
 
                 {/* Tab navigation */}
                 <nav className="navbar-tabs">
-                    {tabs.map(({ to, label }) => (
+                    {navTabs.map(({ to, label }) => (
                         <Link key={to} to={to} className="navbar-tab">{label}</Link>
                     ))}
                 </nav>
             </div>
 
-            <div className="navbar-right">
+            <div className="navbar-right" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                {/* Language switcher */}
+                <LanguageSwitcher />
+
                 {/* Dark / Light mode toggle */}
                 <button
                     className="navbar-icon-btn"
@@ -58,7 +73,7 @@ const Navbar = ({ tabs = [], onMenuClick }) => {
                 </button>
 
                 {/* Notification bell */}
-                <Link to="/citizen/alerts" className="navbar-icon-btn" aria-label="Alerts">
+                <Link to="/citizen/alerts" className="navbar-icon-btn" aria-label={t('header.alertsLabel', 'Alerts')}>
                     <Bell size={18} />
                     {unreadCount > 0 && (
                         <span className="navbar-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
@@ -69,7 +84,7 @@ const Navbar = ({ tabs = [], onMenuClick }) => {
                 <Link
                     to="/citizen/profile"
                     className="navbar-avatar-btn"
-                    aria-label="My profile"
+                    aria-label={t('sidebar.profile', 'My profile')}
                 >
                     {user?.avatar ? (
                         <img src={user.avatar} alt="avatar" className="navbar-avatar-img" />

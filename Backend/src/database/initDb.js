@@ -29,8 +29,8 @@ async function initDb() {
     const schemaSql  = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
     const statements = schemaSql
       .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'));
+      .map(s => s.replace(/--.*$/gm, '').trim())
+      .filter(s => s.length > 0);
 
     for (const stmt of statements) {
       await connection.query(stmt);
@@ -40,46 +40,55 @@ async function initDb() {
     // ── 3. Seed demo users ──────────────────────────────────────────────────
     const usersToSeed = [
       {
+        username: 'volunteer',
         name: 'Kamal Perera',
         email: 'volunteer@resqlink.com',
         phone: '+94 77 234 5678',
         role: 'Volunteer',
         is_available: true,
-        password: 'demo123'
+        password: 'volunteer123'
       },
       {
+        username: 'admin',
         name: 'ResQLink Admin',
         email: 'admin@resqlink.com',
         phone: '+94 11 000 0000',
         role: 'Admin',
         is_available: false,
-        password: 'demo123'
+        password: 'admin123'
       },
       {
+        username: 'citizen',
         name: 'Jane Citizen',
         email: 'citizen@resqlink.com',
         phone: '+94 71 555 5555',
         role: 'Citizen',
         is_available: false,
-        password: 'demo123'
+        password: 'citizen123'
       }
     ];
 
     let volunteerId;
     for (const u of usersToSeed) {
-      const [existing] = await connection.query('SELECT id FROM users WHERE email = ?', [u.email]);
+      const hashedPassword = await bcrypt.hash(u.password, 10);
+      const [existing] = await connection.query(
+        'SELECT id FROM users WHERE username = ? OR email = ?', [u.username, u.email]
+      );
       if (existing.length === 0) {
-        const hashedPassword = await bcrypt.hash(u.password, 10);
         const [insert] = await connection.query(
-          `INSERT INTO users (name, email, phone, role, is_available, password) 
-           VALUES (?, ?, ?, ?, ?, ?)`,
-          [u.name, u.email, u.phone, u.role, u.is_available ? 1 : 0, hashedPassword]
+          `INSERT INTO users (username, name, email, phone, role, is_available, password) 
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [u.username, u.name, u.email, u.phone, u.role, u.is_available ? 1 : 0, hashedPassword]
         );
         if (u.role === 'Volunteer') volunteerId = insert.insertId;
-        console.log(`✅ ${u.role} user '${u.name}' seeded.`);
+        console.log(`✅ ${u.role} user '${u.username}' seeded.`);
       } else {
+        await connection.query(
+          'UPDATE users SET username = ?, password = ? WHERE id = ?',
+          [u.username, hashedPassword, existing[0].id]
+        );
         if (u.role === 'Volunteer') volunteerId = existing[0].id;
-        console.log(`ℹ️ ${u.role} user '${u.name}' already exists.`);
+        console.log(`ℹ️ ${u.role} user '${u.username}' updated with new password.`);
       }
     }
 
