@@ -26,6 +26,15 @@ const Navbar = ({ tabs = [], onMenuClick }) => {
             .catch(() => setUnreadCount(0));
     }, []);
 
+    const defaultCitizenTabs = [
+        { to: '/citizen/dashboard', label: t('sidebar.dashboard', 'Dashboard') },
+        { to: '/citizen/report', label: t('sidebar.report', 'Report') },
+        { to: '/citizen/alerts', label: t('sidebar.alerts', 'Alerts') },
+        { to: '/citizen/map', label: t('sidebar.map', 'Map') },
+        { to: '/citizen/profile', label: t('sidebar.profile', 'Profile') },
+    ];
+    const navTabs = tabs && tabs.length > 0 ? tabs : defaultCitizenTabs;
+
     return (
         <header className="navbar-header">
             <div className="navbar-left">
@@ -40,7 +49,7 @@ const Navbar = ({ tabs = [], onMenuClick }) => {
 
                 {/* Tab navigation */}
                 <nav className="navbar-tabs">
-                    {tabs.map(({ to, label }) => (
+                    {navTabs.map(({ to, label }) => (
                         <Link key={to} to={to} className="navbar-tab">{label}</Link>
                     ))}
                 </nav>
