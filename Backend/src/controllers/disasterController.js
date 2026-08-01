@@ -2,13 +2,14 @@
 const { Disaster } = require('../models');
 const { successResponse, errorResponse } = require('../utils/responseHandler');
 const { Op } = require('sequelize');
+const db = require('../config/db');
 
 // Submit disaster report
 const submitReport = async (req, res) => {
     try {
         const { type, location, description, lat, lng } = req.body;
-        const media_url = req.file
-            ? `/uploads/reports/${req.file.filename}`
+        const media_url = req.files && req.files.length > 0
+            ? `/uploads/reports/${req.files[0].filename}`
             : null;
 
         const disaster = await Disaster.create({
@@ -85,10 +86,63 @@ const getNearbyHazards = async (req, res) => {
     }
 };
 
+// Admin: Get all reports
+const getAllReports = async (req, res) => {
+    try {
+        const reports = await Disaster.findAll({
+            order: [['created_at', 'DESC']],
+        });
+        return successResponse(res, 'All reports fetched.', reports);
+    } catch (err) {
+        return errorResponse(res, err.message, 500);
+    }
+};
+
+// Admin: Update report status
+const updateReportStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { action, announce, message, priority } = req.body;
+        
+        const report = await Disaster.findByPk(id);
+        if (!report) return errorResponse(res, 'Report not found.', 404);
+
+        if (action === 'approve') {
+            await report.update({
+                verification_status: 'verified',
+                status: 'active'
+            });
+
+            // Announce if requested
+            if (announce) {
+                const timeString = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                await db.query(
+                    `INSERT INTO alerts (priority, message, source, time, target) VALUES (?, ?, ?, ?, ?)`,
+                    [priority || 'High', message || `Disaster verified: ${report.type} at ${report.location}`, 'Admin System', timeString, 'For Volunteers']
+                );
+            }
+
+            return successResponse(res, 'Report approved successfully.', report);
+        } else if (action === 'reject') {
+            await report.update({
+                verification_status: 'rejected',
+                status: 'resolved'
+            });
+            return successResponse(res, 'Report rejected successfully.', report);
+        } else {
+            return errorResponse(res, 'Invalid action.', 400);
+        }
+    } catch (err) {
+        return errorResponse(res, err.message, 500);
+    }
+};
+
 module.exports = {
     submitReport,
     getMyReports,
     getReportById,
     getDisasters,
     getNearbyHazards,
+    getAllReports,
+    updateReportStatus,
 };
