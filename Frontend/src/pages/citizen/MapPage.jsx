@@ -1,5 +1,6 @@
 // frontend/src/pages/citizen/MapPage.jsx
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     MapContainer, TileLayer, Marker, Popup,
     Circle, Polyline, useMap, useMapEvents,
@@ -237,14 +238,16 @@ const MapPage = () => {
         setFlyTarget({ center: [m.lat, m.lng], zoom: 15 });
     };
 
+    const { t } = useTranslation();
+
     return (
         <div style={s.page}>
 
-            {/* ── Header ── */}
+            {/* ── Page header ── */}
             <div style={s.pageHead}>
                 <div>
-                    <h1 style={s.title}>Safety Map</h1>
-                    <p style={s.sub}>Live disaster zones, evacuation routes, and safe shelters.</p>
+                    <h1 style={s.title}>{t('citizen.mapTitle', 'Safety Map')}</h1>
+                    <p style={s.sub}>{t('citizen.mapSubtitle', 'Live disaster zones, evacuation routes, and safe shelters.')}</p>
                 </div>
                 <div style={s.headerBtns}>
                     <button

@@ -1,6 +1,7 @@
 // frontend/src/pages/citizen/Dashboard.jsx
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     ShieldCheck, Siren, Wind, CheckCircle2, ChevronRight,
     FileText, Map, Bell, TriangleAlert, Activity, Users,
@@ -100,9 +101,10 @@ const Dashboard = () => {
         load();
     }, []);
 
+    const { t } = useTranslation();
     const hour = new Date().getHours();
-    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-    const firstName = user?.name?.split(' ')[0] ?? 'Citizen';
+    const greeting = hour < 12 ? t('dashboard.goodMorning', 'Good morning') : hour < 18 ? t('dashboard.goodAfternoon', 'Good afternoon') : t('dashboard.goodEvening', 'Good evening');
+    const firstName = user?.name?.split(' ')[0] ?? t('auth.citizenRole', 'Citizen');
 
     const activeAlerts   = alerts.filter(a => !a.acknowledged);
     const criticalAlerts = alerts.filter(a => !a.acknowledged && a.severity === 'CRITICAL');
@@ -118,7 +120,7 @@ const Dashboard = () => {
                 <div>
                     <h1 style={s.greetTitle}>{greeting}, {firstName}.</h1>
                     <p style={s.greetSub}>
-                        Here's your emergency situation overview for today.
+                        {t('dashboard.overviewSubtitle', "Here's your emergency situation overview for today.")}
                     </p>
                 </div>
                 <div style={s.dateChip}>
@@ -142,21 +144,21 @@ const Dashboard = () => {
             <div style={s.statsRow} className="dash-stats-row">
                 {[
                     {
-                        icon: Bell, label: 'Active Alerts', value: activeAlerts.length,
+                        icon: Bell, label: t('citizen.activeAlerts', 'Active Alerts'), value: activeAlerts.length,
                         color: activeAlerts.length > 0 ? '#e53e3e' : '#38a169',
                         bg: activeAlerts.length > 0 ? '#fff5f5' : '#f0fff4',
                         to: '/citizen/alerts',
                     },
                     {
-                        icon: AlertOctagon, label: 'Critical', value: criticalAlerts.length,
+                        icon: AlertOctagon, label: t('citizen.criticalAlerts', 'Critical'), value: criticalAlerts.length,
                         color: '#dd6b20', bg: '#fffaf0', to: '/citizen/alerts',
                     },
                     {
-                        icon: FileText, label: 'My Reports', value: reports.length,
+                        icon: FileText, label: t('citizen.myReports', 'My Reports'), value: reports.length,
                         color: '#3182ce', bg: '#ebf8ff', to: '/citizen/report',
                     },
                     {
-                        icon: ShieldCheck, label: 'Trust Score', value: user?.trust_score ?? 84,
+                        icon: ShieldCheck, label: t('citizen.trustScore', 'Trust Score'), value: user?.trust_score ?? 84,
                         color: '#1a9e7a', bg: '#f0fff4', to: '/citizen/profile',
                     },
                 ].map(({ icon: Icon, label, value, color, bg, to }) => (
@@ -178,19 +180,19 @@ const Dashboard = () => {
                     <div style={s.sectionHead}>
                         <h2 style={s.sectionTitle}>
                             <Bell size={16} color="#1a2456" style={{ marginRight: 8 }} />
-                            Active Alerts
+                            {t('citizen.activeAlerts', 'Active Alerts')}
                             {activeAlerts.length > 0 && (
                                 <span style={s.countBadge}>{activeAlerts.length}</span>
                             )}
                         </h2>
-                        <Link to="/citizen/alerts" style={s.viewAll}>View all →</Link>
+                        <Link to="/citizen/alerts" style={s.viewAll}>{t('dashboard.viewAll', 'View all →')}</Link>
                     </div>
 
                     <div style={s.alertList}>
                         {alerts.length === 0 ? (
                             <div style={s.empty}>
                                 <CheckCircle2 size={32} color="#c6f6d5" />
-                                <p>No active alerts in your area.</p>
+                                <p>{t('citizen.noActiveAlerts', 'No active alerts in your area.')}</p>
                             </div>
                         ) : (
                             alerts.slice(0, 4).map((alert) => {
@@ -237,7 +239,7 @@ const Dashboard = () => {
                     <section>
                         <h2 style={{ ...s.sectionTitle, marginBottom: 14 }}>
                             <Activity size={16} color="#1a2456" style={{ marginRight: 8 }} />
-                            Quick Actions
+                            {t('citizen.quickActions', 'Quick Actions')}
                         </h2>
                         <div style={s.quickList}>
                             {[

@@ -2,13 +2,16 @@
 import { Link } from 'react-router-dom';
 import { Bell, Sun, Moon, Menu } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { getAlerts } from '../../api/alertApi';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 const Navbar = ({ tabs = [], onMenuClick }) => {
     const { user } = useAuth();
     const { isDark, toggleTheme } = useTheme();
+    const { t } = useTranslation();
     const [unreadCount, setUnreadCount] = useState(0);
 
     useEffect(() => {
@@ -30,7 +33,7 @@ const Navbar = ({ tabs = [], onMenuClick }) => {
                 <button
                     className="hamburger-btn"
                     onClick={onMenuClick}
-                    aria-label="Toggle menu"
+                    aria-label={t('header.openMenu', 'Toggle menu')}
                 >
                     <Menu size={20} />
                 </button>
@@ -43,7 +46,10 @@ const Navbar = ({ tabs = [], onMenuClick }) => {
                 </nav>
             </div>
 
-            <div className="navbar-right">
+            <div className="navbar-right" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                {/* Language switcher */}
+                <LanguageSwitcher />
+
                 {/* Dark / Light mode toggle */}
                 <button
                     className="navbar-icon-btn"
@@ -58,7 +64,7 @@ const Navbar = ({ tabs = [], onMenuClick }) => {
                 </button>
 
                 {/* Notification bell */}
-                <Link to="/citizen/alerts" className="navbar-icon-btn" aria-label="Alerts">
+                <Link to="/citizen/alerts" className="navbar-icon-btn" aria-label={t('header.alertsLabel', 'Alerts')}>
                     <Bell size={18} />
                     {unreadCount > 0 && (
                         <span className="navbar-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
@@ -69,7 +75,7 @@ const Navbar = ({ tabs = [], onMenuClick }) => {
                 <Link
                     to="/citizen/profile"
                     className="navbar-avatar-btn"
-                    aria-label="My profile"
+                    aria-label={t('sidebar.profile', 'My profile')}
                 >
                     {user?.avatar ? (
                         <img src={user.avatar} alt="avatar" className="navbar-avatar-img" />

@@ -1,5 +1,6 @@
 // frontend/src/pages/citizen/Alerts.jsx
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     Siren, Wind, CheckCircle2, Info, Search, BellOff,
     Check, RefreshCw, ChevronDown, ChevronUp, Copy,
@@ -182,6 +183,7 @@ const Alerts = () => {
             return 0;
         });
 
+    const { t } = useTranslation();
     const unreadVisible = visible.filter(a => !a.acknowledged).length;
 
     if (loading) return <Loader fullPage />;
@@ -192,8 +194,8 @@ const Alerts = () => {
             {/* ── Page header ── */}
             <div style={s.pageHead}>
                 <div>
-                    <h1 style={s.title}>Alert Feed</h1>
-                    <p style={s.sub}>Real-time emergency alerts and directives for your area.</p>
+                    <h1 style={s.title}>{t('citizen.alertsTitle', 'Alert Feed')}</h1>
+                    <p style={s.sub}>{t('citizen.alertsSubtitle', 'Real-time emergency alerts and directives for your area.')}</p>
                 </div>
                 <div style={s.headerActions}>
                     {unreadVisible > 0 && (
