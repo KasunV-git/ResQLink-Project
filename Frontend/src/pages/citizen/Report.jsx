@@ -176,14 +176,8 @@ const Report = () => {
                 status: 'Pending', submitted_at: new Date().toISOString(), severity: form.severity,
             }, ...prev]);
         } catch (err) {
-            // Demo mode — show success anyway
-            const reportId = `RPT-${Math.floor(1000 + Math.random() * 9000)}`;
-            localStorage.removeItem(DRAFT_KEY);
-            setSubmitted(reportId);
-            setMyReports(prev => [{
-                id: reportId, type: form.type, location: form.location,
-                status: 'Pending', submitted_at: new Date().toISOString(), severity: form.severity,
-            }, ...prev]);
+            console.error('Error submitting report:', err);
+            setErrors({ location: 'Failed to submit report. Please try again later.' });
         } finally {
             setLoading(false);
         }

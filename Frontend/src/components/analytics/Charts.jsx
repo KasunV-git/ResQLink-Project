@@ -18,8 +18,10 @@ import {
   PolarRadiusAxis,
   Radar
 } from "recharts";
+import { useTranslation } from "react-i18next";
 
 export default function Charts({ data, isDarkMode }) {
+  const { t } = useTranslation();
   const { trendData, resourceUtilization, incidentDistribution, performanceMetrics } = data;
 
   const cardClass = `border rounded-xl p-5 shadow-sm flex flex-col h-[350px] transition-colors duration-200 ${
@@ -43,8 +45,8 @@ export default function Charts({ data, isDarkMode }) {
       {/* 1. Incident Trend Line Chart */}
       <div className={cardClass}>
         <div className="mb-4">
-          <h3 className="font-semibold text-base">Incidents & Predictions Trend</h3>
-          <p className={`text-xs ${textMutedClass}`}>AI predicted vs active logged incidents (24h)</p>
+          <h3 className="font-semibold text-base">{t("adminAICharts.chart1Title")}</h3>
+          <p className={`text-xs ${textMutedClass}`}>{t("adminAICharts.chart1Sub")}</p>
         </div>
         <div className="flex-1 w-full h-full min-h-[200px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -59,7 +61,7 @@ export default function Charts({ data, isDarkMode }) {
                 dataKey="incidents"
                 stroke="#a855f7"
                 strokeWidth={2}
-                name="Active Incidents"
+                name={t("adminAICharts.activeIncidents")}
                 activeDot={{ r: 6 }}
               />
               <Line
@@ -68,7 +70,7 @@ export default function Charts({ data, isDarkMode }) {
                 stroke="#ec4899"
                 strokeWidth={2}
                 strokeDasharray="5 5"
-                name="AI Predicted"
+                name={t("adminAICharts.aiPredicted")}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -78,8 +80,8 @@ export default function Charts({ data, isDarkMode }) {
       {/* 2. Resource Utilization Bar Chart */}
       <div className={cardClass}>
         <div className="mb-4">
-          <h3 className="font-semibold text-base">Resource Utilization</h3>
-          <p className={`text-xs ${textMutedClass}`}>Allocated vs available reserves by sector</p>
+          <h3 className="font-semibold text-base">{t("adminAICharts.chart2Title")}</h3>
+          <p className={`text-xs ${textMutedClass}`}>{t("adminAICharts.chart2Sub")}</p>
         </div>
         <div className="flex-1 w-full h-full min-h-[200px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -89,8 +91,8 @@ export default function Charts({ data, isDarkMode }) {
               <YAxis stroke={isDarkMode ? "#94a3b8" : "#64748b"} fontSize={11} />
               <Tooltip {...tooltipStyle} />
               <Legend wrapperStyle={{ fontSize: '12px' }} />
-              <Bar dataKey="allocated" fill="#a855f7" name="Allocated (%)" stackId="a" radius={[0, 0, 0, 0]} />
-              <Bar dataKey="available" fill="#38bdf8" name="Available (%)" stackId="a" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="allocated" fill="#a855f7" name={t("adminAICharts.allocated")} stackId="a" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="available" fill="#38bdf8" name={t("adminAICharts.available")} stackId="a" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -99,8 +101,8 @@ export default function Charts({ data, isDarkMode }) {
       {/* 3. Incident Distribution Pie Chart */}
       <div className={cardClass}>
         <div className="mb-4">
-          <h3 className="font-semibold text-base">Incident Distribution</h3>
-          <p className={`text-xs ${textMutedClass}`}>Share of ongoing operational incidents by type</p>
+          <h3 className="font-semibold text-base">{t("adminAICharts.chart3Title")}</h3>
+          <p className={`text-xs ${textMutedClass}`}>{t("adminAICharts.chart3Sub")}</p>
         </div>
         <div className="flex-1 flex flex-col sm:flex-row items-center justify-center gap-4">
           <div className="w-[180px] h-[180px]">
@@ -138,8 +140,8 @@ export default function Charts({ data, isDarkMode }) {
       {/* 4. Performance Metrics Radar Chart */}
       <div className={cardClass}>
         <div className="mb-4">
-          <h3 className="font-semibold text-base">Operational Performance KPIs</h3>
-          <p className={`text-xs ${textMutedClass}`}>AI benchmark efficiency vs target thresholds</p>
+          <h3 className="font-semibold text-base">{t("adminAICharts.chart4Title")}</h3>
+          <p className={`text-xs ${textMutedClass}`}>{t("adminAICharts.chart4Sub")}</p>
         </div>
         <div className="flex-1 w-full h-full min-h-[200px] flex items-center justify-center">
           <ResponsiveContainer width="100%" height="100%">
@@ -148,7 +150,7 @@ export default function Charts({ data, isDarkMode }) {
               <PolarAngleAxis dataKey="subject" stroke={isDarkMode ? "#94a3b8" : "#64748b"} fontSize={10} />
               <PolarRadiusAxis angle={30} domain={[0, 100]} stroke={isDarkMode ? "#94a3b8" : "#64748b"} fontSize={10} />
               <Radar
-                name="AI Efficiency Rating"
+                name={t("adminAICharts.aiEfficiency")}
                 dataKey="A"
                 stroke="#a855f7"
                 fill="#a855f7"

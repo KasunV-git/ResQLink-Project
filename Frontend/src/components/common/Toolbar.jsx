@@ -1,4 +1,5 @@
 import { Search, RefreshCw } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Toolbar({
   search,
@@ -13,6 +14,7 @@ export default function Toolbar({
   loading,
   isDarkMode,
 }) {
+  const { t } = useTranslation();
   return (
     <div
       className={`border rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors ${
@@ -31,7 +33,7 @@ export default function Toolbar({
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search operational insights..."
+            placeholder={t("adminAIToolbar.searchPlaceholder")}
             className={`w-full pl-9 pr-4 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors ${
               isDarkMode
                 ? "bg-slate-950 border-slate-800 text-white placeholder-slate-500"
@@ -52,10 +54,10 @@ export default function Toolbar({
                 : "bg-slate-50 border-slate-200 text-slate-900"
             }`}
           >
-            <option value="All">All Priorities</option>
-            <option value="Critical">Critical</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
+            <option value="All">{t("adminAIToolbar.allPriorities")}</option>
+            <option value="Critical">{t("adminAIToolbar.critical")}</option>
+            <option value="High">{t("adminAIToolbar.high")}</option>
+            <option value="Medium">{t("adminAIToolbar.medium")}</option>
           </select>
 
           {/* Category Dropdown */}
@@ -68,10 +70,10 @@ export default function Toolbar({
                 : "bg-slate-50 border-slate-200 text-slate-900"
             }`}
           >
-            <option value="All">All Categories</option>
-            <option value="Resources">Resources</option>
-            <option value="Infrastructure">Infrastructure</option>
-            <option value="Operations">Operations</option>
+            <option value="All">{t("adminAIToolbar.allCategories")}</option>
+            <option value="Resources">{t("adminAIToolbar.resources")}</option>
+            <option value="Infrastructure">{t("adminAIToolbar.infrastructure")}</option>
+            <option value="Operations">{t("adminAIToolbar.operations")}</option>
           </select>
 
           {/* Date Range Selector */}
@@ -84,9 +86,9 @@ export default function Toolbar({
                 : "bg-slate-50 border-slate-200 text-slate-900"
             }`}
           >
-            <option value="Last 24 Hours">Last 24 Hours</option>
-            <option value="Last 7 Days">Last 7 Days</option>
-            <option value="Last 30 Days">Last 30 Days</option>
+            <option value="Last 24 Hours">{t("adminAIToolbar.last24h")}</option>
+            <option value="Last 7 Days">{t("adminAIToolbar.last7d")}</option>
+            <option value="Last 30 Days">{t("adminAIToolbar.last30d")}</option>
           </select>
         </div>
       </div>
@@ -102,7 +104,7 @@ export default function Toolbar({
         }`}
       >
         <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-        <span>Refresh</span>
+        <span>{t("adminAIToolbar.refresh")}</span>
       </button>
     </div>
   );

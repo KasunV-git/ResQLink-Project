@@ -1,13 +1,16 @@
 import { ClipboardList, Users, ShieldAlert, CheckCircle } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label } from "recharts";
+import { useTranslation } from "react-i18next";
 
 // Extracted Component for Assignment Records
-const AssignmentRecord = ({ a, isDarkMode }) => (
+const AssignmentRecord = ({ a, isDarkMode }) => {
+  const { t } = useTranslation();
+  return (
   <div className={`flex flex-col py-4 px-2 sm:px-4 border-b last:border-0 ${isDarkMode ? "border-white/10" : "border-slate-200"}`}>
     {/* Top Header */}
     <div className="flex justify-between items-center pb-2">
       <span className={`text-xs ${isDarkMode ? "text-white/60" : "text-slate-500"}`}>
-        Volunteer: <span className={`text-sm font-medium ${isDarkMode ? "text-white/90" : "text-slate-800"}`}>{a.volunteerName}</span>
+        {t("adminDashboard.volunteer")}: <span className={`text-sm font-medium ${isDarkMode ? "text-white/90" : "text-slate-800"}`}>{a.volunteerName}</span>
       </span>
       <span className={`text-[10px] font-medium px-3 py-1 rounded-full uppercase tracking-wide ${isDarkMode ? "bg-white/10 text-white/80" : "bg-slate-100 text-slate-600"}`}>
         {a.status}
@@ -17,19 +20,22 @@ const AssignmentRecord = ({ a, isDarkMode }) => (
     <div className="flex justify-between items-center">
       <div className="flex flex-col gap-1">
         <span className={`text-[15px] font-medium ${isDarkMode ? "text-white/90" : "text-slate-900"}`}>{a.disaster}</span>
-        <span className={`text-[13px] ${isDarkMode ? "text-white/50" : "text-slate-500"}`}>Task: {a.task}</span>
+        <span className={`text-[13px] ${isDarkMode ? "text-white/50" : "text-slate-500"}`}>{t("adminDashboard.task")}: {a.task}</span>
       </div>
     </div>
   </div>
-);
+  );
+};
 
 // Extracted Component for Emergency Alert Records
-const AlertRecord = ({ alert, isDarkMode }) => (
+const AlertRecord = ({ alert, isDarkMode }) => {
+  const { t } = useTranslation();
+  return (
   <div className={`flex flex-col py-4 px-2 sm:px-4 border-b last:border-0 ${isDarkMode ? "border-white/10" : "border-slate-200"}`}>
     {/* Top Header */}
     <div className="flex justify-between items-center pb-2">
       <span className={`text-xs ${isDarkMode ? "text-white/60" : "text-slate-500"}`}>
-        Priority: <span className={`text-sm font-medium ${isDarkMode ? "text-white/90" : "text-slate-800"}`}>{alert.priority.toUpperCase()}</span>
+        {t("adminDashboard.priority")}: <span className={`text-sm font-medium ${isDarkMode ? "text-white/90" : "text-slate-800"}`}>{alert.priority.toUpperCase()}</span>
       </span>
       <span className={`text-[10px] font-medium px-3 py-1 rounded-full tracking-wide ${isDarkMode ? "bg-white/10 text-white/80" : "bg-slate-100 text-slate-600"}`}>
         {alert.time}
@@ -40,9 +46,11 @@ const AlertRecord = ({ alert, isDarkMode }) => (
       <p className={`text-[13px] leading-relaxed ${isDarkMode ? "text-white/90" : "text-slate-700"}`}>{alert.message}</p>
     </div>
   </div>
-);
+  );
+};
 
 export default function Dashboard({ volunteers, assignments, alerts, onTabChange, isDarkMode }) {
+  const { t } = useTranslation();
   const totalVolunteers = volunteers.length;
   const availableVolunteers = volunteers.filter((v) => v.isAvailable).length;
   const activeAssignments = assignments.filter((a) => a.status !== "completed").length;
@@ -88,10 +96,10 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
       {/* Title */}
       <div className="flex flex-col gap-1 text-center">
         <h1 className={`font-semibold text-3xl tracking-tight transition-colors ${headingColor}`}>
-          System Overview
+          {t("adminDashboard.title")}
         </h1>
         <p className={`text-base transition-colors ${textColorMuted}`}>
-          Monitor platform stats, alerts, and volunteer coordination
+          {t("adminDashboard.subtitle")}
         </p>
       </div>
 
@@ -103,7 +111,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
           </div>
           <div className="flex flex-col min-w-0 flex-1">
             <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{totalVolunteers}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>Total Volunteers</span>
+            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>{t("adminDashboard.totalVolunteers")}</span>
           </div>
         </div>
 
@@ -113,7 +121,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
           </div>
           <div className="flex flex-col min-w-0 flex-1">
             <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{availableVolunteers}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>Available Now</span>
+            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>{t("adminDashboard.availableNow")}</span>
           </div>
         </div>
 
@@ -123,7 +131,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
           </div>
           <div className="flex flex-col min-w-0 flex-1">
             <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{activeAssignments}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>Active Tasks</span>
+            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>{t("adminDashboard.activeTasks")}</span>
           </div>
         </div>
 
@@ -133,7 +141,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
           </div>
           <div className="flex flex-col min-w-0 flex-1">
             <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{totalAlerts}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>Active Alerts</span>
+            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>{t("adminDashboard.activeAlerts")}</span>
           </div>
         </div>
       </div>
@@ -141,9 +149,9 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
       {/* Overview Analytics Chart */}
       <div className="flex flex-col gap-2 w-full max-w-[900px]">
         <div className="flex flex-col px-1">
-          <h3 className={`font-semibold text-lg tracking-tight ${headingColor}`}>Operational Dispatch Trend</h3>
+          <h3 className={`font-semibold text-lg tracking-tight ${headingColor}`}>{t("adminDashboard.trendTitle")}</h3>
           <p className={`text-xs ${textColorMuted}`}>
-            Daily volume of volunteer dispatches and emergency assignments
+            {t("adminDashboard.trendSubtitle")}
           </p>
         </div>
         <div className={`border rounded-lg p-5 md:p-6 shadow-sm flex flex-col transition-colors duration-200 ${
@@ -161,7 +169,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
               <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#334155" : "#e2e8f0"} />
               <XAxis dataKey="date" stroke={isDarkMode ? "#94a3b8" : "#64748b"} fontSize={11}>
                 <Label
-                  value="Date"
+                  value={t("adminDashboard.date")}
                   offset={-5}
                   position="insideBottom"
                   style={{
@@ -173,7 +181,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
               </XAxis>
               <YAxis stroke={isDarkMode ? "#94a3b8" : "#64748b"} fontSize={11}>
                 <Label
-                  value="Dispatches"
+                  value={t("adminDashboard.dispatches")}
                   angle={-90}
                   position="insideLeft"
                   offset={0}
@@ -204,12 +212,12 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
         {/* Recent Assignments */}
         <div className="flex-1 min-w-[350px] max-w-[500px] flex flex-col gap-2">
           <div className="flex justify-between items-end px-1">
-            <h3 className={`font-semibold text-lg tracking-tight ${headingColor}`}>Recent Assignments</h3>
+            <h3 className={`font-semibold text-lg tracking-tight ${headingColor}`}>{t("adminDashboard.recentAssignments")}</h3>
             <button
               onClick={() => onTabChange("assignments")}
               className="text-emerald-700 dark:text-emerald-400 font-semibold text-sm hover:underline cursor-pointer"
             >
-              Manage &rarr;
+              {t("adminDashboard.manage")}
             </button>
           </div>
           <div className={`border rounded-2xl p-6 md:p-8 shadow-xl flex flex-col transition-colors duration-200 backdrop-blur-xl ${
@@ -218,7 +226,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
             <div className="flex-1 overflow-y-auto flex flex-col gap-3">
             {assignments.length === 0 ? (
               <div className={`flex-1 flex items-center justify-center text-sm ${textColorMuted}`}>
-                No assignments logged
+                {t("adminDashboard.noAssignments")}
               </div>
             ) : (
               assignments.slice(0, 5).map((a) => (
@@ -232,12 +240,12 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
       {/* Recent Broadcasts */}
         <div className="flex-1 min-w-[350px] max-w-[500px] flex flex-col gap-2">
           <div className="flex justify-between items-end px-1">
-            <h3 className={`font-semibold text-lg tracking-tight ${headingColor}`}>Emergency Alerts</h3>
+            <h3 className={`font-semibold text-lg tracking-tight ${headingColor}`}>{t("adminDashboard.emergencyAlerts")}</h3>
             <button
               onClick={() => onTabChange("alerts")}
               className="text-emerald-700 dark:text-emerald-400 font-semibold text-sm hover:underline cursor-pointer"
             >
-              Broadcast &rarr;
+              {t("adminDashboard.broadcast")}
             </button>
           </div>
           <div className={`border rounded-2xl p-6 md:p-8 shadow-xl flex flex-col transition-colors duration-200 backdrop-blur-xl ${
@@ -246,7 +254,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
             <div className="flex-1 overflow-y-auto flex flex-col gap-3">
             {alerts.length === 0 ? (
               <div className={`flex-1 flex items-center justify-center text-sm ${textColorMuted}`}>
-                No active emergency alerts
+                {t("adminDashboard.noAlerts")}
               </div>
             ) : (
               alerts.slice(0, 4).map((alert) => (
