@@ -1,5 +1,6 @@
 // frontend/src/pages/citizen/Profile.jsx
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     Mail, Phone, MapPin, Shield, Calendar, Edit2,
     Check, X, Camera, LogOut, FileText, Bell, Star,
@@ -41,7 +42,8 @@ const SEV_COLOR = { HIGH: '#e53e3e', MODERATE: '#d69e2e', LOW: '#38a169', CRITIC
 
 /* ── Profile ── */
 const Profile = () => {
-    const { user, logout, refreshUser } = useAuth();
+    const { user, refreshUser, logout } = useAuth();
+    const { t } = useTranslation();
     const [editing, setEditing]       = useState(false);
     const [saving, setSaving]         = useState(false);
     const [msg, setMsg]               = useState({ text: '', type: 'success' });

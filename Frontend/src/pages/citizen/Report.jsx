@@ -1,6 +1,7 @@
 // frontend/src/pages/citizen/Report.jsx
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     MapPin, Send, AlertCircle, CheckCircle2, Phone,
     ShieldAlert, Radio, Image as ImageIcon, X, ChevronRight,
@@ -200,8 +201,8 @@ const Report = () => {
             <div style={s.successWrap}>
                 <div style={s.successCard} className="card">
                     <div style={s.successIcon}><CheckCircle2 size={48} color="#38a169" /></div>
-                    <h2 style={s.successTitle}>Report Submitted</h2>
-                    <p style={s.successSub}>Your report has been received by the emergency response team.</p>
+                    <h2 style={s.successTitle}>{t('citizen.reportSuccess', 'Report Submitted')}</h2>
+                    <p style={s.successSub}>{t('citizen.reportSuccessDesc', 'Your report has been received by the emergency response team.')}</p>
                     <div style={s.reportIdBox}>
                         <span style={s.reportIdLabel}>Report ID</span>
                         <span style={s.reportIdVal}>{submitted}</span>
@@ -240,8 +241,8 @@ const Report = () => {
 
                     {/* Header */}
                     <div style={s.header}>
-                        <h1 style={s.title}>Submit Disaster Report</h1>
-                        <p style={s.sub}>Provide incident details so responders can act quickly and effectively.</p>
+                        <h1 style={s.title}>{t('citizen.reportDisasterTitle', 'Submit Disaster Report')}</h1>
+                        <p style={s.sub}>{t('citizen.reportDisasterSubtitle', 'Provide incident details so responders can act quickly and effectively.')}</p>
                     </div>
 
                     {/* Step progress */}
