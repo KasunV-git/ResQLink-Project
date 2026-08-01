@@ -78,6 +78,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('resqlink_user');
     localStorage.removeItem('resqlink_volunteer_user');
     delete axios.defaults.headers.common['Authorization'];
+    window.location.href = '/';
   };
 
   const updateUser = (updatedData) => {

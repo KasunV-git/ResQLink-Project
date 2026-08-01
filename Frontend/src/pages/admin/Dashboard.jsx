@@ -1,7 +1,56 @@
 import { ClipboardList, Users, ShieldAlert, CheckCircle } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label } from "recharts";
+import { useTranslation } from "react-i18next";
+
+// Extracted Component for Assignment Records
+const AssignmentRecord = ({ a, isDarkMode }) => {
+  const { t } = useTranslation();
+  return (
+  <div className={`flex flex-col py-4 px-2 sm:px-4 border-b last:border-0 ${isDarkMode ? "border-white/10" : "border-slate-200"}`}>
+    {/* Top Header */}
+    <div className="flex justify-between items-center pb-2">
+      <span className={`text-xs ${isDarkMode ? "text-white/60" : "text-slate-500"}`}>
+        {t("adminDashboard.volunteer")}: <span className={`text-sm font-medium ${isDarkMode ? "text-white/90" : "text-slate-800"}`}>{a.volunteerName}</span>
+      </span>
+      <span className={`text-[10px] font-medium px-3 py-1 rounded-full uppercase tracking-wide ${isDarkMode ? "bg-white/10 text-white/80" : "bg-slate-100 text-slate-600"}`}>
+        {a.status}
+      </span>
+    </div>
+    {/* Bottom Content */}
+    <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-1">
+        <span className={`text-[15px] font-medium ${isDarkMode ? "text-white/90" : "text-slate-900"}`}>{a.disaster}</span>
+        <span className={`text-[13px] ${isDarkMode ? "text-white/50" : "text-slate-500"}`}>{t("adminDashboard.task")}: {a.task}</span>
+      </div>
+    </div>
+  </div>
+  );
+};
+
+// Extracted Component for Emergency Alert Records
+const AlertRecord = ({ alert, isDarkMode }) => {
+  const { t } = useTranslation();
+  return (
+  <div className={`flex flex-col py-4 px-2 sm:px-4 border-b last:border-0 ${isDarkMode ? "border-white/10" : "border-slate-200"}`}>
+    {/* Top Header */}
+    <div className="flex justify-between items-center pb-2">
+      <span className={`text-xs ${isDarkMode ? "text-white/60" : "text-slate-500"}`}>
+        {t("adminDashboard.priority")}: <span className={`text-sm font-medium ${isDarkMode ? "text-white/90" : "text-slate-800"}`}>{alert.priority.toUpperCase()}</span>
+      </span>
+      <span className={`text-[10px] font-medium px-3 py-1 rounded-full tracking-wide ${isDarkMode ? "bg-white/10 text-white/80" : "bg-slate-100 text-slate-600"}`}>
+        {alert.time}
+      </span>
+    </div>
+    {/* Bottom Content */}
+    <div className="flex flex-col">
+      <p className={`text-[13px] leading-relaxed ${isDarkMode ? "text-white/90" : "text-slate-700"}`}>{alert.message}</p>
+    </div>
+  </div>
+  );
+};
 
 export default function Dashboard({ volunteers, assignments, alerts, onTabChange, isDarkMode }) {
+  const { t } = useTranslation();
   const totalVolunteers = volunteers.length;
   const availableVolunteers = volunteers.filter((v) => v.isAvailable).length;
   const activeAssignments = assignments.filter((a) => a.status !== "completed").length;
@@ -33,7 +82,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
     { date: "6/05", Dispatches: assignments.length || 5 },
   ];
 
-  const cardClass = `border rounded-xl p-5 shadow-sm flex items-center gap-4 transition-colors duration-200 ${
+  const cardClass = `border rounded-lg p-5 shadow-sm flex items-center gap-4 transition-colors duration-200 ${
     isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-900"
   }`;
 
@@ -43,71 +92,72 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
   const bgList = isDarkMode ? "bg-slate-950 border-slate-800" : "bg-slate-50 border-slate-100";
 
   return (
-    <div className="w-full flex flex-col gap-6" data-name="AdminDashboard">
+    <div className="w-full max-w-[1000px] flex flex-col gap-8 items-center" data-name="AdminDashboard">
       {/* Title */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 text-center">
         <h1 className={`font-semibold text-3xl tracking-tight transition-colors ${headingColor}`}>
-          System Overview
+          {t("adminDashboard.title")}
         </h1>
         <p className={`text-base transition-colors ${textColorMuted}`}>
-          Monitor platform stats, alerts, and volunteer coordination
+          {t("adminDashboard.subtitle")}
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className={cardClass}>
+      <div className="flex flex-wrap justify-center gap-6 w-full">
+        <div className={`w-[220px] ${cardClass}`}>
           <div className={`rounded-lg p-3 ${isDarkMode ? "bg-emerald-950/40 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>
             <Users className="w-6 h-6" />
           </div>
-          <div className="flex flex-col">
-            <span className={`font-bold text-2xl ${isDarkMode ? "text-white" : "text-slate-900"}`}>{totalVolunteers}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider ${textColorMuted}`}>Total Volunteers</span>
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{totalVolunteers}</span>
+            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>{t("adminDashboard.totalVolunteers")}</span>
           </div>
         </div>
 
-        <div className={cardClass}>
+        <div className={`w-[220px] ${cardClass}`}>
           <div className={`rounded-lg p-3 ${isDarkMode ? "bg-blue-950/40 text-blue-400" : "bg-blue-50 text-blue-600"}`}>
             <CheckCircle className="w-6 h-6" />
           </div>
-          <div className="flex flex-col">
-            <span className={`font-bold text-2xl ${isDarkMode ? "text-white" : "text-slate-900"}`}>{availableVolunteers}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider ${textColorMuted}`}>Available Now</span>
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{availableVolunteers}</span>
+            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>{t("adminDashboard.availableNow")}</span>
           </div>
         </div>
 
-        <div className={cardClass}>
+        <div className={`w-[220px] ${cardClass}`}>
           <div className={`rounded-lg p-3 ${isDarkMode ? "bg-amber-950/40 text-amber-400" : "bg-amber-50 text-amber-600"}`}>
             <ClipboardList className="w-6 h-6" />
           </div>
-          <div className="flex flex-col">
-            <span className={`font-bold text-2xl ${isDarkMode ? "text-white" : "text-slate-900"}`}>{activeAssignments}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider ${textColorMuted}`}>Active Tasks</span>
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{activeAssignments}</span>
+            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>{t("adminDashboard.activeTasks")}</span>
           </div>
         </div>
 
-        <div className={cardClass}>
+        <div className={`w-[220px] ${cardClass}`}>
           <div className={`rounded-lg p-3 ${isDarkMode ? "bg-red-950/40 text-red-400" : "bg-red-50 text-red-600"}`}>
             <ShieldAlert className="w-6 h-6" />
           </div>
-          <div className="flex flex-col">
-            <span className={`font-bold text-2xl ${isDarkMode ? "text-white" : "text-slate-900"}`}>{totalAlerts}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider ${textColorMuted}`}>Active Alerts</span>
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{totalAlerts}</span>
+            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>{t("adminDashboard.activeAlerts")}</span>
           </div>
         </div>
       </div>
 
       {/* Overview Analytics Chart */}
-      <div className={`border rounded-xl p-6 shadow-sm h-[320px] flex flex-col transition-colors duration-200 ${
-        isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-900"
-      }`}>
-        <div className="mb-4">
-          <h3 className="font-semibold text-base">Operational Dispatch Trend</h3>
+      <div className="flex flex-col gap-2 w-full max-w-[900px]">
+        <div className="flex flex-col px-1">
+          <h3 className={`font-semibold text-lg tracking-tight ${headingColor}`}>{t("adminDashboard.trendTitle")}</h3>
           <p className={`text-xs ${textColorMuted}`}>
-            Daily volume of volunteer dispatches and emergency assignments
+            {t("adminDashboard.trendSubtitle")}
           </p>
         </div>
-        <div className="flex-1 w-full h-full min-h-[180px]">
+        <div className={`border rounded-lg p-5 md:p-6 shadow-sm flex flex-col transition-colors duration-200 ${
+          isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-900"
+        }`}>
+          <div className="flex-1 w-full h-full min-h-[180px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 15, bottom: 20 }}>
               <defs>
@@ -119,7 +169,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
               <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#334155" : "#e2e8f0"} />
               <XAxis dataKey="date" stroke={isDarkMode ? "#94a3b8" : "#64748b"} fontSize={11}>
                 <Label
-                  value="Date"
+                  value={t("adminDashboard.date")}
                   offset={-5}
                   position="insideBottom"
                   style={{
@@ -131,7 +181,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
               </XAxis>
               <YAxis stroke={isDarkMode ? "#94a3b8" : "#64748b"} fontSize={11}>
                 <Label
-                  value="Dispatches"
+                  value={t("adminDashboard.dispatches")}
                   angle={-90}
                   position="insideLeft"
                   offset={0}
@@ -155,90 +205,65 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
           </ResponsiveContainer>
         </div>
       </div>
+      </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="flex flex-wrap justify-center gap-8 w-full max-w-[1000px]">
         {/* Recent Assignments */}
-        <div className={`border rounded-xl p-6 shadow-sm flex flex-col h-[400px] transition-colors duration-200 ${
-          isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-900"
-        }`}>
-          <div className={`flex justify-between items-center pb-4 border-b ${borderMuted} mb-4`}>
-            <h3 className="font-semibold text-base">Recent Assignments</h3>
+        <div className="flex-1 min-w-[350px] max-w-[500px] flex flex-col gap-2">
+          <div className="flex justify-between items-end px-1">
+            <h3 className={`font-semibold text-lg tracking-tight ${headingColor}`}>{t("adminDashboard.recentAssignments")}</h3>
             <button
               onClick={() => onTabChange("assignments")}
               className="text-emerald-700 dark:text-emerald-400 font-semibold text-sm hover:underline cursor-pointer"
             >
-              Manage &rarr;
+              {t("adminDashboard.manage")}
             </button>
           </div>
-
-          <div className="flex-1 overflow-y-auto flex flex-col gap-3">
+          <div className={`border rounded-2xl p-6 md:p-8 shadow-xl flex flex-col transition-colors duration-200 backdrop-blur-xl ${
+            isDarkMode ? "bg-[#333333]/70 border-white/10" : "bg-white/60 border-slate-200/50"
+          }`}>
+            <div className="flex-1 overflow-y-auto flex flex-col gap-3">
             {assignments.length === 0 ? (
               <div className={`flex-1 flex items-center justify-center text-sm ${textColorMuted}`}>
-                No assignments logged
+                {t("adminDashboard.noAssignments")}
               </div>
             ) : (
               assignments.slice(0, 5).map((a) => (
-                <div key={a.id} className={`border rounded-lg p-3 flex justify-between items-center ${bgList}`}>
-                  <div className="flex flex-col gap-1">
-                    <span className={`font-semibold text-sm ${isDarkMode ? "text-slate-100" : "text-slate-900"}`}>{a.volunteerName}</span>
-                    <span className={`text-xs ${textColorMuted}`}>{a.disaster} &bull; {a.task}</span>
-                  </div>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                    a.status === "completed"
-                      ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                      : a.status === "in-progress"
-                      ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                      : "bg-sky-500/10 text-sky-500 border border-sky-500/20"
-                  }`}>
-                    {a.status}
-                  </span>
-                </div>
+                <AssignmentRecord key={a.id} a={a} isDarkMode={isDarkMode} />
               ))
             )}
           </div>
         </div>
+      </div>
 
-        {/* Recent Broadcasts */}
-        <div className={`border rounded-xl p-6 shadow-sm flex flex-col h-[400px] transition-colors duration-200 ${
-          isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-900"
-        }`}>
-          <div className={`flex justify-between items-center pb-4 border-b ${borderMuted} mb-4`}>
-            <h3 className="font-semibold text-base">Emergency Alerts</h3>
+      {/* Recent Broadcasts */}
+        <div className="flex-1 min-w-[350px] max-w-[500px] flex flex-col gap-2">
+          <div className="flex justify-between items-end px-1">
+            <h3 className={`font-semibold text-lg tracking-tight ${headingColor}`}>{t("adminDashboard.emergencyAlerts")}</h3>
             <button
               onClick={() => onTabChange("alerts")}
               className="text-emerald-700 dark:text-emerald-400 font-semibold text-sm hover:underline cursor-pointer"
             >
-              Broadcast &rarr;
+              {t("adminDashboard.broadcast")}
             </button>
           </div>
-
-          <div className="flex-1 overflow-y-auto flex flex-col gap-3">
+          <div className={`border rounded-2xl p-6 md:p-8 shadow-xl flex flex-col transition-colors duration-200 backdrop-blur-xl ${
+            isDarkMode ? "bg-[#333333]/70 border-white/10" : "bg-white/60 border-slate-200/50"
+          }`}>
+            <div className="flex-1 overflow-y-auto flex flex-col gap-3">
             {alerts.length === 0 ? (
               <div className={`flex-1 flex items-center justify-center text-sm ${textColorMuted}`}>
-                No active emergency alerts
+                {t("adminDashboard.noAlerts")}
               </div>
             ) : (
               alerts.slice(0, 4).map((alert) => (
-                <div key={alert.id} className={`border rounded-lg p-3 flex flex-col gap-1.5 ${bgList}`}>
-                  <div className="flex justify-between items-center text-[10px]">
-                    <span className={`font-bold px-1.5 py-0.5 rounded uppercase ${
-                      alert.priority === "high"
-                        ? "bg-red-500/10 text-red-500 border border-red-500/20"
-                        : alert.priority === "medium"
-                        ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                        : "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                    }`}>
-                      {alert.priority}
-                    </span>
-                    <span className={textColorMuted}>{alert.time}</span>
-                  </div>
-                  <p className={`text-xs font-medium leading-relaxed ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}>{alert.message}</p>
-                </div>
+                <AlertRecord key={alert.id} alert={alert} isDarkMode={isDarkMode} />
               ))
             )}
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

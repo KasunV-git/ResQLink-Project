@@ -1,34 +1,36 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export default function PerformanceSummary({ isDarkMode }) {
+  const { t } = useTranslation();
   const metrics = [
     {
-      label: "Response Efficiency",
+      label: t("adminAIPerformance.label1"),
       value: 94.2,
       color: "bg-purple-500",
       trackColor: "bg-purple-100 dark:bg-purple-950/40",
-      description: "Average dispatch latency and transit matching accuracy",
+      description: t("adminAIPerformance.desc1"),
     },
     {
-      label: "Resource Allocation Performance",
+      label: t("adminAIPerformance.label2"),
       value: 88.5,
       color: "bg-blue-500",
       trackColor: "bg-blue-100 dark:bg-blue-950/40",
-      description: "Asset utilization versus emergency demands",
+      description: t("adminAIPerformance.desc2"),
     },
     {
-      label: "Volunteer Engagement Rate",
+      label: t("adminAIPerformance.label3"),
       value: 76.1,
       color: "bg-emerald-500",
       trackColor: "bg-emerald-100 dark:bg-emerald-950/40",
-      description: "Active status participation and mission completion",
+      description: t("adminAIPerformance.desc3"),
     },
     {
-      label: "System Activity Metrics",
+      label: t("adminAIPerformance.label4"),
       value: 91.8,
       color: "bg-amber-500",
       trackColor: "bg-amber-100 dark:bg-amber-950/40",
-      description: "Service uptime and API message processing sync",
+      description: t("adminAIPerformance.desc4"),
     },
   ];
 
@@ -41,9 +43,9 @@ export default function PerformanceSummary({ isDarkMode }) {
       }`}
     >
       <div className="mb-6">
-        <h3 className="font-semibold text-base">Performance KPI Summary</h3>
+        <h3 className="font-semibold text-base">{t("adminAIPerformance.title")}</h3>
         <p className={`text-xs ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
-          Real-time service indicators matching operational SLA targets
+          {t("adminAIPerformance.subtitle")}
         </p>
       </div>
 

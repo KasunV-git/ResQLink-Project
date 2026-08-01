@@ -24,6 +24,26 @@ CREATE TABLE IF NOT EXISTS users (
   INDEX idx_users_avail (is_available)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── disasters ────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS disasters (
+  disaster_id           INT            NOT NULL AUTO_INCREMENT,
+  type                  VARCHAR(255)   NOT NULL,
+  location              VARCHAR(255)   NOT NULL,
+  lat                   DECIMAL(10, 7) DEFAULT NULL,
+  lng                   DECIMAL(10, 7) DEFAULT NULL,
+  description           TEXT           DEFAULT NULL,
+  status                ENUM('active', 'resolved', 'pending') DEFAULT 'pending',
+  severity_score        DECIMAL(5, 2)  DEFAULT 0.00,
+  predictor_risk_level  ENUM('low', 'medium', 'high', 'critical') DEFAULT 'low',
+  reported_by           INT            DEFAULT NULL,
+  media_url             VARCHAR(500)   DEFAULT NULL,
+  verification_status   ENUM('pending', 'verified', 'rejected') DEFAULT 'pending',
+  created_at            TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at            TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (disaster_id),
+  CONSTRAINT fk_disasters_user FOREIGN KEY (reported_by) REFERENCES users(id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ── skills ───────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS skills (
   id         INT           NOT NULL AUTO_INCREMENT,

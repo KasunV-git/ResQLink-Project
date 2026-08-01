@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import * as Icons from "lucide-react";
 import "leaflet/dist/leaflet.css";
+import { useTranslation } from "react-i18next";
 
 import { useAIAnalysis } from "../../hooks/useAIAnalysis";
 import { getStatusColor, getScoreColor } from "../../utils/helpers";
@@ -33,6 +34,7 @@ const disasterIcon = createMarkerIcon("#ef4444"); // Red
 const resourceIcon = createMarkerIcon("#3b82f6"); // Blue
 
 export default function AIAnalysis({ isDarkMode }) {
+  const { t } = useTranslation();
   const {
     loading,
     search,
@@ -95,14 +97,14 @@ export default function AIAnalysis({ isDarkMode }) {
         {/* Page Header */}
         <motion.div
           variants={itemVariants}
-          className="flex justify-between items-center pb-4 border-b border-solid border-slate-200 dark:border-slate-800"
+          className="flex justify-center items-center pb-4 border-b border-solid border-slate-200 dark:border-slate-800"
         >
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 text-center">
             <h1 className="font-bold text-3xl tracking-tight text-purple-600 dark:text-purple-400">
-              Intelligence Center
+              {t("adminAI.title")}
             </h1>
             <p className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
-              Monitor operational insights, resource trends, and AI-predicted disaster response metrics.
+              {t("adminAI.subtitle")}
             </p>
           </div>
         </motion.div>
@@ -112,7 +114,7 @@ export default function AIAnalysis({ isDarkMode }) {
           {statistics.map((stat) => (
             <StatsCard
               key={stat.id}
-              label={stat.label}
+              label={t(`adminAIStats.${stat.label.replace(/ /g, "")}`)}
               value={stat.value}
               trend={stat.trend}
               trendDirection={stat.trendDirection}
@@ -146,9 +148,9 @@ export default function AIAnalysis({ isDarkMode }) {
           <div className="lg:col-span-2 flex flex-col gap-6">
             <motion.div variants={itemVariants} className="flex flex-col gap-4">
               <div className="flex justify-between items-center">
-                <h2 className="font-semibold text-lg">AI Recommendations & Analysis</h2>
+                <h2 className="font-semibold text-lg">{t("adminAI.insightsTitle")}</h2>
                 <span className={`text-xs px-2 py-0.5 rounded-full border ${isDarkMode ? "border-slate-800 bg-slate-900/60" : "border-slate-200 bg-white"}`}>
-                  Showing {insights.length} insight{insights.length !== 1 && "s"}
+                  {t("adminAI.showingInsights", { count: insights.length })}
                 </span>
               </div>
 
@@ -159,7 +161,7 @@ export default function AIAnalysis({ isDarkMode }) {
               ) : insights.length === 0 ? (
                 <div className={`text-center py-16 border border-dashed rounded-xl ${isDarkMode ? "border-slate-800 text-slate-500" : "border-slate-200 text-slate-400"}`}>
                   <Icons.Search className="w-10 h-10 mx-auto mb-2 text-slate-300 dark:text-slate-700" />
-                  <p className="text-sm font-medium">No operational insights match your filters.</p>
+                  <p className="text-sm font-medium">{t("adminAI.noInsights")}</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-6">
@@ -186,10 +188,10 @@ export default function AIAnalysis({ isDarkMode }) {
                               <h3 className="font-semibold text-base tracking-tight">{insight.title}</h3>
                               <div className="flex items-center gap-2 mt-0.5">
                                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase ${getStatusColor(insight.status)}`}>
-                                  {insight.status} Priority
+                                  {insight.status} {t("adminAI.prioritySuffix")}
                                 </span>
                                 <span className={`text-xs font-semibold ${getScoreColor(insight.score)}`}>
-                                  {insight.score}% Confidence Score
+                                  {insight.score}{t("adminAI.confidenceScore")}
                                 </span>
                               </div>
                             </div>
@@ -204,7 +206,7 @@ export default function AIAnalysis({ isDarkMode }) {
                         {/* Findings Recommendations List */}
                         <div className="flex flex-col gap-2.5">
                           <h4 className={`text-xs font-bold uppercase tracking-wider ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
-                            Recommendations & Observations
+                            {t("adminAI.recommendations")}
                           </h4>
                           <div className="flex flex-col gap-2">
                             {insight.findings.map((finding, idx) => (
@@ -229,7 +231,7 @@ export default function AIAnalysis({ isDarkMode }) {
                         {/* Footer Area */}
                         <div className="flex flex-wrap justify-between items-center pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
                           <span className={isDarkMode ? "text-slate-400" : "text-slate-500"}>
-                            Last Analyzed: <strong className="font-semibold">{insight.updatedAt}</strong>
+                            {t("adminAI.lastAnalyzed")}: <strong className="font-semibold">{insight.updatedAt}</strong>
                           </span>
                           <div className="flex gap-2">
                             <span className={`px-2 py-0.5 rounded border ${isDarkMode ? "bg-slate-950 border-slate-800 text-slate-400" : "bg-slate-100 border-slate-200 text-slate-600"}`}>
@@ -251,7 +253,7 @@ export default function AIAnalysis({ isDarkMode }) {
           {/* Right Column: Live Map (1 col on large screen) */}
           <div className="flex flex-col gap-6">
             <motion.div variants={itemVariants} className="flex flex-col gap-4">
-              <h2 className="font-semibold text-lg">AI Operations Mapping</h2>
+              <h2 className="font-semibold text-lg">{t("adminAI.mapTitle")}</h2>
               
               <div
                 className={`border rounded-xl overflow-hidden shadow-sm h-[400px] lg:h-[580px] flex flex-col transition-colors duration-200 ${
@@ -262,17 +264,17 @@ export default function AIAnalysis({ isDarkMode }) {
               >
                 <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                   <div className="flex flex-col">
-                    <span className="font-semibold text-sm">Disaster & Resource Overlay</span>
+                    <span className="font-semibold text-sm">{t("adminAI.mapOverlay")}</span>
                     <span className={`text-[10px] ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
-                      Live telemetry map centered at incident coordinates
+                      {t("adminAI.mapTelemetry")}
                     </span>
                   </div>
                   <div className="flex gap-3 text-[10px] font-semibold">
                     <span className="flex items-center gap-1">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></span> Disaster
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></span> {t("adminAI.mapDisaster")}
                     </span>
                     <span className="flex items-center gap-1">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#3b82f6]"></span> Resource
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#3b82f6]"></span> {t("adminAI.mapResource")}
                     </span>
                   </div>
                 </div>

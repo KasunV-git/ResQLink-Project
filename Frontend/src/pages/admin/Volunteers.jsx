@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { UserCheck, UserX, Clipboard, MapPin } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Volunteers({ volunteers, alerts = [], onToggleAvailability, onAssign, isDarkMode }) {
+  const { t } = useTranslation();
   const [selectedVolunteer, setSelectedVolunteer] = useState(null);
   const [disaster, setDisaster] = useState("");
   const [task, setTask] = useState("");
@@ -22,7 +24,7 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
         task: task.trim(),
         location: location.trim()
       });
-      setMsg("Task assigned successfully!");
+      setMsg(t("adminVolunteers.successMsg"));
       setDisaster("");
       setTask("");
       setLocation("");
@@ -32,7 +34,7 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
       }, 1500);
     } catch (error) {
       console.error("Assignment submission error:", error);
-      const serverMsg = error.response?.data?.message || error.message || "Failed to assign task. Try again.";
+      const serverMsg = error.response?.data?.message || error.message || t("adminVolunteers.errorMsg");
       setMsg(serverMsg);
     } finally {
       setAssignLoading(false);
@@ -59,11 +61,9 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
   return (
     <div className="w-full flex flex-col gap-6" data-name="AdminVolunteers">
       {/* Title */}
-      <div className="flex justify-between items-center">
-        <div className="flex flex-col gap-1">
-          <h1 className={`font-semibold text-3xl tracking-tight transition-colors ${textHeading}`}>Volunteers Portal</h1>
-          <p className={`text-base transition-colors ${textMuted}`}>Monitor availability, verify volunteer skills, and dispatch personnel</p>
-        </div>
+      <div className="flex flex-col gap-1 text-center">
+        <h1 className={`font-semibold text-3xl tracking-tight transition-colors ${textHeading}`}>{t("adminVolunteers.title")}</h1>
+        <p className={`text-base transition-colors ${textMuted}`}>{t("adminVolunteers.subtitle")}</p>
       </div>
 
       {/* Main Layout split if volunteer is selected for assignment */}
@@ -71,25 +71,25 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
         {/* Volunteers Table List */}
         <div className={`flex-1 border rounded-xl shadow-sm overflow-hidden transition-colors ${cardBg}`}>
           <div className={`px-6 py-4 border-b ${borderMuted} ${bgHeader}`}>
-            <h2 className={`font-semibold text-base ${isDarkMode ? "text-slate-200" : "text-slate-800"}`}>Volunteers Directory</h2>
+            <h2 className={`font-semibold text-base ${isDarkMode ? "text-slate-200" : "text-slate-800"}`}>{t("adminVolunteers.directoryTitle")}</h2>
           </div>
           
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className={`border-b ${borderMuted} text-xs font-semibold uppercase tracking-wider ${isDarkMode ? "text-slate-500 bg-slate-950/30" : "text-slate-400 bg-slate-50/20"}`}>
-                  <th className="px-6 py-3">Volunteer</th>
-                  <th className="px-6 py-3">Skills</th>
-                  <th className="px-6 py-3 text-center">Status</th>
-                  <th className="px-6 py-3 text-center">Active Tasks</th>
-                  <th className="px-6 py-3 text-right">Dispatch</th>
+                  <th className="px-6 py-3">{t("adminVolunteers.colVolunteer")}</th>
+                  <th className="px-6 py-3">{t("adminVolunteers.colSkills")}</th>
+                  <th className="px-6 py-3 text-center">{t("adminVolunteers.colStatus")}</th>
+                  <th className="px-6 py-3 text-center">{t("adminVolunteers.colActiveTasks")}</th>
+                  <th className="px-6 py-3 text-right">{t("adminVolunteers.colDispatch")}</th>
                 </tr>
               </thead>
               <tbody className={`divide-y ${divideColor} text-sm font-medium ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}>
                 {volunteers.length === 0 ? (
                   <tr>
                     <td colSpan="5" className="px-6 py-8 text-center text-slate-400 font-normal">
-                      No volunteers registered on the platform.
+                      {t("adminVolunteers.noVolunteers")}
                     </td>
                   </tr>
                 ) : (
@@ -107,7 +107,7 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
                       <td className="px-6 py-4 max-w-[280px]">
                         <div className="flex flex-wrap gap-1.5">
                           {vol.skills.length === 0 ? (
-                            <span className="text-slate-400 text-xs font-normal italic">None specified</span>
+                            <span className="text-slate-400 text-xs font-normal italic">{t("adminVolunteers.noneSpecified")}</span>
                           ) : (
                             vol.skills.map((s) => (
                               <span key={s} className={`text-xs px-2 py-0.5 rounded border ${
@@ -138,12 +138,12 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
                           {vol.isAvailable ? (
                             <>
                               <UserCheck className="w-3.5 h-3.5" />
-                              <span>Available</span>
+                              <span>{t("adminVolunteers.available")}</span>
                             </>
                           ) : (
                             <>
                               <UserX className="w-3.5 h-3.5" />
-                              <span>Unavailable</span>
+                              <span>{t("adminVolunteers.unavailable")}</span>
                             </>
                           )}
                         </button>
@@ -158,7 +158,7 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
                             ? "bg-slate-800 text-slate-500 border border-slate-700"
                             : "bg-slate-100 text-slate-400"
                         }`}>
-                          {vol.activeAssignmentsCount} Active
+                          {vol.activeAssignmentsCount} {t("adminVolunteers.active")}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
@@ -173,7 +173,7 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
                               : "bg-emerald-700 border-emerald-700 text-white hover:bg-emerald-800"
                           }`}
                         >
-                          Assign Task
+                          {t("adminVolunteers.assignTask")}
                         </button>
                       </td>
                     </tr>
@@ -189,8 +189,8 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
           <div className={`w-full xl:w-[380px] border rounded-xl p-6 shadow-sm flex flex-col gap-4 self-start transition-colors ${cardBg}`}>
             <div className={`flex justify-between items-start pb-2 border-b ${borderMuted}`}>
               <div className="flex flex-col">
-                <h3 className={`font-semibold text-base ${isDarkMode ? "text-white" : "text-slate-800"}`}>Dispatch Volunteer</h3>
-                <span className="text-slate-500 text-xs font-medium">To: {selectedVolunteer.name}</span>
+                <h3 className={`font-semibold text-base ${isDarkMode ? "text-white" : "text-slate-800"}`}>{t("adminVolunteers.dispatchVolunteer")}</h3>
+                <span className="text-slate-500 text-xs font-medium">{t("adminVolunteers.to")}: {selectedVolunteer.name}</span>
               </div>
               <button
                 onClick={() => setSelectedVolunteer(null)}
@@ -198,13 +198,13 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
                   isDarkMode ? "text-slate-500 hover:text-slate-300" : "text-slate-400 hover:text-slate-600"
                 }`}
               >
-                Cancel
+                {t("adminVolunteers.cancel")}
               </button>
             </div>
 
             {msg && (
               <div className={`text-xs font-semibold p-2.5 rounded border text-center ${
-                msg.includes("successfully")
+                msg === t("adminVolunteers.successMsg")
                   ? "bg-emerald-50 text-emerald-700 border-emerald-100"
                   : "bg-red-50 text-red-700 border-red-100"
               }`}>
@@ -216,12 +216,12 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
               <div className="flex flex-col gap-1.5">
                 <label className={`text-xs font-bold uppercase tracking-wider ${
                   isDarkMode ? "text-slate-400" : "text-slate-700"
-                }`}>Disaster / Incident</label>
+                }`}>{t("adminVolunteers.disasterLabel")}</label>
                 <div className="relative">
                   <input
                     type="text"
                     list="disaster-suggestions"
-                    placeholder="e.g. Kelani River Flood"
+                    placeholder={t("adminVolunteers.disasterPlaceholder")}
                     value={disaster}
                     onChange={(e) => setDisaster(e.target.value)}
                     className={`w-full text-sm rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-600 ${
@@ -242,13 +242,13 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
               <div className="flex flex-col gap-1.5">
                 <label className={`text-xs font-bold uppercase tracking-wider ${
                   isDarkMode ? "text-slate-400" : "text-slate-700"
-                }`}>Volunteer Task</label>
+                }`}>{t("adminVolunteers.taskLabel")}</label>
                 <div className="relative">
                   <Clipboard className="absolute right-3 top-2.5 w-4 h-4 text-slate-400" />
                   <input
                     type="text"
                     list="task-suggestions"
-                    placeholder="e.g. Distribute relief packets"
+                    placeholder={t("adminVolunteers.taskPlaceholder")}
                     value={task}
                     onChange={(e) => setTask(e.target.value)}
                     className={`w-full text-sm rounded-lg py-2 pl-3 pr-10 focus:outline-none focus:ring-2 focus:ring-emerald-600 ${
@@ -271,13 +271,13 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
               <div className="flex flex-col gap-1.5">
                 <label className={`text-xs font-bold uppercase tracking-wider ${
                   isDarkMode ? "text-slate-400" : "text-slate-700"
-                }`}>Location / Facility</label>
+                }`}>{t("adminVolunteers.locationLabel")}</label>
                 <div className="relative">
                   <MapPin className="absolute right-3 top-2.5 w-4 h-4 text-slate-400" />
                   <input
                     type="text"
                     list="location-suggestions"
-                    placeholder="e.g. Kelaniya Relief Camp"
+                    placeholder={t("adminVolunteers.locationPlaceholder")}
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     className={`w-full text-sm rounded-lg py-2 pl-3 pr-10 focus:outline-none focus:ring-2 focus:ring-emerald-600 ${
@@ -298,10 +298,10 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
               </div>
 
               <div className="flex flex-col gap-1 mt-2">
-                <span className={`text-xs font-semibold ${textMuted}`}>Volunteer Skills Match:</span>
+                <span className={`text-xs font-semibold ${textMuted}`}>{t("adminVolunteers.skillsMatch")}</span>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {selectedVolunteer.skills.length === 0 ? (
-                    <span className="text-slate-400 text-xs italic">No skills listed</span>
+                    <span className="text-slate-400 text-xs italic">{t("adminVolunteers.noSkills")}</span>
                   ) : (
                     selectedVolunteer.skills.map((s) => (
                       <span key={s} className={`border text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
@@ -325,7 +325,7 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
                     : "bg-emerald-700 hover:bg-emerald-800 text-white"
                 }`}
               >
-                {assignLoading ? "Dispatching..." : "Confirm Dispatch"}
+                {assignLoading ? t("adminVolunteers.dispatching") : t("adminVolunteers.confirmDispatch")}
               </button>
             </form>
           </div>

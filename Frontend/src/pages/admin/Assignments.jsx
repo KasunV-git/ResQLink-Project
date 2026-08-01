@@ -1,6 +1,8 @@
 import { Check, X, MapPin, ClipboardList, ClipboardCheck } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Assignments({ assignments, onCancelAssignment, onCompleteAssignment, isDarkMode }) {
+  const { t } = useTranslation();
   const activeAssignments = assignments.filter((a) => a.status !== "completed");
   const completedAssignments = assignments.filter((a) => a.status === "completed");
 
@@ -15,9 +17,9 @@ export default function Assignments({ assignments, onCancelAssignment, onComplet
   return (
     <div className="w-full flex flex-col gap-8" data-name="AdminAssignments">
       {/* Title */}
-      <div className="flex flex-col gap-1">
-        <h1 className={`font-semibold text-3xl tracking-tight transition-colors ${textHeading}`}>Resource Allocation Log</h1>
-        <p className={`text-base transition-colors ${textMuted}`}>View and manage all volunteer dispatches and incident reports</p>
+      <div className="flex flex-col gap-1 text-center">
+        <h1 className={`font-semibold text-3xl tracking-tight transition-colors ${textHeading}`}>{t("adminAssignments.title")}</h1>
+        <p className={`text-base transition-colors ${textMuted}`}>{t("adminAssignments.subtitle")}</p>
       </div>
 
       {/* Active Assignments */}
@@ -25,26 +27,26 @@ export default function Assignments({ assignments, onCancelAssignment, onComplet
         <div className={`flex items-center gap-2.5 px-6 py-4 border-b ${borderMuted} ${bgHeader}`}>
           <ClipboardList className="w-5 h-5 text-amber-500" />
           <h2 className={`font-semibold text-base ${isDarkMode ? "text-slate-200" : "text-slate-800"}`}>
-            Active Dispatches ({activeAssignments.length})
+            {t("adminAssignments.activeDispatches", { count: activeAssignments.length })}
           </h2>
         </div>
 
         {activeAssignments.length === 0 ? (
           <div className="p-8 text-center text-slate-400 font-normal">
-            No active dispatches at this time.
+            {t("adminAssignments.noActive")}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className={`border-b ${borderMuted} text-xs font-semibold uppercase tracking-wider ${isDarkMode ? "text-slate-500 bg-slate-950/30" : "text-slate-400 bg-slate-50/20"}`}>
-                  <th className="px-6 py-3">Volunteer</th>
-                  <th className="px-6 py-3">Disaster / Incident</th>
-                  <th className="px-6 py-3">Task Details</th>
-                  <th className="px-6 py-3">Location</th>
-                  <th className="px-6 py-3 text-center">Status</th>
-                  <th className="px-6 py-3 text-center">Assigned Date</th>
-                  <th className="px-6 py-3 text-right">Actions</th>
+                  <th className="px-6 py-3">{t("adminAssignments.colVolunteer")}</th>
+                  <th className="px-6 py-3">{t("adminAssignments.colDisaster")}</th>
+                  <th className="px-6 py-3">{t("adminAssignments.colTask")}</th>
+                  <th className="px-6 py-3">{t("adminAssignments.colLocation")}</th>
+                  <th className="px-6 py-3 text-center">{t("adminAssignments.colStatus")}</th>
+                  <th className="px-6 py-3 text-center">{t("adminAssignments.colAssignedDate")}</th>
+                  <th className="px-6 py-3 text-right">{t("adminAssignments.colActions")}</th>
                 </tr>
               </thead>
               <tbody className={`divide-y ${divideColor} text-sm font-medium ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}>
@@ -79,7 +81,7 @@ export default function Assignments({ assignments, onCancelAssignment, onComplet
                           }`}
                         >
                           <Check className="w-3.5 h-3.5" />
-                          <span>Complete</span>
+                          <span>{t("adminAssignments.complete")}</span>
                         </button>
                         <button
                           onClick={() => onCancelAssignment(item.id)}
@@ -91,7 +93,7 @@ export default function Assignments({ assignments, onCancelAssignment, onComplet
                           }`}
                         >
                           <X className="w-3.5 h-3.5" />
-                          <span>Cancel</span>
+                          <span>{t("adminAssignments.cancel")}</span>
                         </button>
                       </div>
                     </td>
@@ -108,25 +110,25 @@ export default function Assignments({ assignments, onCancelAssignment, onComplet
         <div className={`flex items-center gap-2.5 px-6 py-4 border-b ${borderMuted} ${bgHeader}`}>
           <ClipboardCheck className="w-5 h-5 text-emerald-600" />
           <h2 className={`font-semibold text-base ${isDarkMode ? "text-slate-200" : "text-slate-800"}`}>
-            Completed Dispatches ({completedAssignments.length})
+            {t("adminAssignments.completedDispatches", { count: completedAssignments.length })}
           </h2>
         </div>
 
         {completedAssignments.length === 0 ? (
           <div className="p-8 text-center text-slate-400 font-normal">
-            No completed dispatches logged.
+            {t("adminAssignments.noCompleted")}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className={`border-b ${borderMuted} text-xs font-semibold uppercase tracking-wider ${isDarkMode ? "text-slate-500 bg-slate-950/30" : "text-slate-400 bg-slate-50/20"}`}>
-                  <th className="px-6 py-3">Volunteer</th>
-                  <th className="px-6 py-3">Disaster / Incident</th>
-                  <th className="px-6 py-3">Task Details</th>
-                  <th className="px-6 py-3">Location</th>
-                  <th className="px-6 py-3 text-center">Assigned Date</th>
-                  <th className="px-6 py-3 text-center">Completed Date</th>
+                  <th className="px-6 py-3">{t("adminAssignments.colVolunteer")}</th>
+                  <th className="px-6 py-3">{t("adminAssignments.colDisaster")}</th>
+                  <th className="px-6 py-3">{t("adminAssignments.colTask")}</th>
+                  <th className="px-6 py-3">{t("adminAssignments.colLocation")}</th>
+                  <th className="px-6 py-3 text-center">{t("adminAssignments.colAssignedDate")}</th>
+                  <th className="px-6 py-3 text-center">{t("adminAssignments.colCompletedDate")}</th>
                 </tr>
               </thead>
               <tbody className={`divide-y ${divideColor} text-sm font-medium ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}>

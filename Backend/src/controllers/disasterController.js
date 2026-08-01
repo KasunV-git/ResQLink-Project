@@ -2,43 +2,30 @@
 const { Disaster } = require('../models');
 const { successResponse, errorResponse } = require('../utils/responseHandler');
 const { Op } = require('sequelize');
+const db = require('../config/db');
 
 // Submit disaster report
 const submitReport = async (req, res) => {
     try {
-        const { type, location, description, lat, lng, severity } = req.body || {};
-        
-        let disaster;
-        try {
-            disaster = await Disaster.create({
-                type: type || 'Disaster Incident',
-                location: location || 'Location Not Specified',
-                description: description || '',
-                lat: lat || null,
-                lng: lng || null,
-                media_url: req.file ? `/uploads/reports/${req.file.filename}` : null,
-                reported_by: req.user?.id || 1,
-                status: 'pending',
-            });
-        } catch (dbErr) {
-            disaster = {
-                id: `RPT-${Math.floor(1000 + Math.random() * 9000)}`,
-                type: type || 'Disaster Incident',
-                location: location || 'Location Not Specified',
-                description: description || '',
-                severity: severity || 'MODERATE',
-                status: 'Pending',
-                created_at: new Date().toISOString()
-            };
-        }
+        const { type, location, description, lat, lng } = req.body;
+        const media_url = req.files && req.files.length > 0
+            ? `/uploads/reports/${req.files[0].filename}`
+            : null;
+
+        const disaster = await Disaster.create({
+            type,
+            location,
+            description,
+            lat: lat || null,
+            lng: lng || null,
+            media_url,
+            reported_by: req.user.id,
+            status: 'pending',
+        });
 
         return successResponse(res, 'Report submitted successfully.', disaster, 201);
     } catch (err) {
-        return successResponse(res, 'Report submitted.', {
-            id: `RPT-${Math.floor(1000 + Math.random() * 9000)}`,
-            status: 'Pending',
-            created_at: new Date().toISOString()
-        }, 201);
+        return errorResponse(res, err.message, 500);
     }
 };
 
@@ -46,12 +33,12 @@ const submitReport = async (req, res) => {
 const getMyReports = async (req, res) => {
     try {
         const reports = await Disaster.findAll({
-            where: { reported_by: req.user?.id || 1 },
+            where: { reported_by: req.user.id },
             order: [['created_at', 'DESC']],
         });
         return successResponse(res, 'Reports fetched.', reports);
     } catch (err) {
-        return successResponse(res, 'Reports fetched.', []);
+        return errorResponse(res, err.message, 500);
     }
 };
 
@@ -59,10 +46,10 @@ const getMyReports = async (req, res) => {
 const getReportById = async (req, res) => {
     try {
         const report = await Disaster.findByPk(req.params.id);
-        if (!report) return successResponse(res, 'Report fetched.', { id: req.params.id, status: 'Pending' });
+        if (!report) return errorResponse(res, 'Report not found.', 404);
         return successResponse(res, 'Report fetched.', report);
     } catch (err) {
-        return successResponse(res, 'Report fetched.', { id: req.params.id, status: 'Pending' });
+        return errorResponse(res, err.message, 500);
     }
 };
 
@@ -75,14 +62,14 @@ const getDisasters = async (req, res) => {
         });
         return successResponse(res, 'Disasters fetched.', disasters);
     } catch (err) {
-        return successResponse(res, 'Disasters fetched.', []);
+        return errorResponse(res, err.message, 500);
     }
 };
 
 // Get nearby hazards by coordinates
 const getNearbyHazards = async (req, res) => {
     try {
-        const { lat = 6.9271, lng = 79.8612, radius = 20 } = req.query;
+        const { lat, lng, radius = 20 } = req.query;
         const latDelta = radius / 111;
         const lngDelta = radius / (111 * Math.cos((lat * Math.PI) / 180));
 
@@ -95,7 +82,58 @@ const getNearbyHazards = async (req, res) => {
         });
         return successResponse(res, 'Nearby hazards fetched.', hazards);
     } catch (err) {
-        return successResponse(res, 'Nearby hazards fetched.', []);
+        return errorResponse(res, err.message, 500);
+    }
+};
+
+// Admin: Get all reports
+const getAllReports = async (req, res) => {
+    try {
+        const reports = await Disaster.findAll({
+            order: [['created_at', 'DESC']],
+        });
+        return successResponse(res, 'All reports fetched.', reports);
+    } catch (err) {
+        return errorResponse(res, err.message, 500);
+    }
+};
+
+// Admin: Update report status
+const updateReportStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { action, announce, message, priority } = req.body;
+        
+        const report = await Disaster.findByPk(id);
+        if (!report) return errorResponse(res, 'Report not found.', 404);
+
+        if (action === 'approve') {
+            await report.update({
+                verification_status: 'verified',
+                status: 'active'
+            });
+
+            // Announce if requested
+            if (announce) {
+                const timeString = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                await db.query(
+                    `INSERT INTO alerts (priority, message, source, time, target) VALUES (?, ?, ?, ?, ?)`,
+                    [priority || 'High', message || `Disaster verified: ${report.type} at ${report.location}`, 'Admin System', timeString, 'For Volunteers']
+                );
+            }
+
+            return successResponse(res, 'Report approved successfully.', report);
+        } else if (action === 'reject') {
+            await report.update({
+                verification_status: 'rejected',
+                status: 'resolved'
+            });
+            return successResponse(res, 'Report rejected successfully.', report);
+        } else {
+            return errorResponse(res, 'Invalid action.', 400);
+        }
+    } catch (err) {
+        return errorResponse(res, err.message, 500);
     }
 };
 
@@ -105,4 +143,6 @@ module.exports = {
     getReportById,
     getDisasters,
     getNearbyHazards,
+    getAllReports,
+    updateReportStatus,
 };

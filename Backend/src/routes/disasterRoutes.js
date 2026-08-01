@@ -6,7 +6,10 @@ const {
   getReportById,
   getDisasters,
   getNearbyHazards,
+  getAllReports,
+  updateReportStatus,
 } = require('../controllers/disasterController');
+const { uploadReport } = require('../config/multer');
 
 // Optional protect middleware helper
 const protect = (req, res, next) => {
@@ -28,10 +31,14 @@ const protect = (req, res, next) => {
   }
 };
 
-router.post('/report', protect, submitReport);
+router.post('/report', protect, uploadReport.array('media', 3), submitReport);
 router.get('/my-reports', protect, getMyReports);
 router.get('/report/:id', protect, getReportById);
 router.get('/nearby', getNearbyHazards);
 router.get('/', getDisasters);
+
+// Admin Routes
+router.get('/admin/reports', protect, getAllReports);
+router.put('/admin/report/:id/status', protect, updateReportStatus);
 
 module.exports = router;

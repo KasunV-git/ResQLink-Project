@@ -9,20 +9,25 @@ import Assignments from "./Assignments";
 import Alerts from "./Alerts";
 import Profile from "../volunteer/Profile"; // We can reuse the profile page since it takes user, onUpdateProfile, and onLogout
 import AIAnalysis from "./AIAnalysis";
+import DisasterReports from "./DisasterReports";
+import { useTheme } from "../../context/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 // Custom Admin Sidebar
 function AdminSidebar({ activeTab, onTabChange, isDarkMode, isMobile, onClose }) {
+  const { t } = useTranslation();
   const menuItems = [
-    { id: "dashboard", label: "Overview", icon: "📊" },
-    { id: "volunteers", label: "Volunteer Assignments", icon: "👥" },
-    { id: "assignments", label: "Resource Allocations", icon: "📋" },
-    { id: "alerts", label: "Alert Management", icon: "🔔" },
-    { id: "ai-analysis", label: "AI Insights", icon: "🧠" },
-    { id: "profile", label: "Profile", icon: "👤" },
+    { id: "dashboard", label: t("admin.overview"), icon: "📊" },
+    { id: "volunteers", label: t("admin.volunteerAssignments"), icon: "👥" },
+    { id: "assignments", label: t("admin.resourceAllocations"), icon: "📋" },
+    { id: "alerts", label: t("admin.alertManagement"), icon: "🔔" },
+    { id: "reports", label: t("admin.reports"), icon: "📄" },
+    { id: "ai-analysis", label: t("admin.aiInsights"), icon: "🧠" },
+    { id: "profile", label: t("admin.profile"), icon: "👤" },
   ];
 
   return (
-    <div className={`border-r-[0.8px] border-solid w-[256px] h-full shrink-0 flex flex-col pt-4 px-4 gap-1 shadow-sm transition-colors duration-200 ${
+    <div className={`border-r-[0.8px] border-solid w-[256px] h-full shrink-0 flex flex-col pt-6 px-5 gap-2 shadow-sm transition-colors duration-200 ${
       isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-[#e5e7eb] text-slate-900"
     }`}>
       {/* Mobile Drawer Close Button */}
@@ -42,7 +47,7 @@ function AdminSidebar({ activeTab, onTabChange, isDarkMode, isMobile, onClose })
       <div className={`px-3 py-2 text-xs font-bold uppercase tracking-wider ${
         isDarkMode ? "text-slate-500" : "text-slate-400"
       }`}>
-        Admin Controls
+        {t("admin.adminControls")}
       </div>
       {menuItems.map((item) => {
         const isActive = activeTab === item.id;
@@ -70,20 +75,25 @@ function AdminSidebar({ activeTab, onTabChange, isDarkMode, isMobile, onClose })
 }
 
 export default function AdminApp({ user, onLogout, onUpdateUser }) {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const saved = localStorage.getItem("resqlink_admin_theme");
-    return saved ? JSON.parse(saved) : true;
-  });
+  const { t } = useTranslation();
+  const { isDark: isDarkMode } = useTheme();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
   const [volunteers, setVolunteers] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    localStorage.setItem("resqlink_admin_theme", JSON.stringify(isDarkMode));
-  }, [isDarkMode]);
+
+
+  const handleToggleSidebar = () => {
+    if (window.innerWidth >= 1024) {
+      setDesktopSidebarOpen(!desktopSidebarOpen);
+    } else {
+      setSidebarOpen(!sidebarOpen);
+    }
+  };
 
   const fetchAdminData = async () => {
     setLoading(true);
@@ -189,10 +199,10 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
     }
   };
 
-  const handleUpdateProfile = async ({ name, phone }) => {
+  const handleUpdateProfile = async (profileData) => {
     try {
-      const response = await axios.put(`/api/auth/profile/${user.id}`, { name, phone });
-      onUpdateUser(response.data);
+      const response = await axios.put(`/api/auth/profile/${user.id}`, profileData);
+      onUpdateUser(response.data.user || response.data);
     } catch (error) {
       console.error("Failed to update admin profile:", error);
       throw error;
@@ -207,7 +217,7 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
         <div className="flex-1 flex items-center justify-center text-slate-500 font-medium">
           <div className="flex flex-col items-center gap-3">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
-            <span>Loading admin console...</span>
+            <span>{t("admin.loading")}</span>
           </div>
         </div>
       );
@@ -252,6 +262,8 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
             isDarkMode={isDarkMode}
           />
         );
+      case "reports":
+        return <DisasterReports isDarkMode={isDarkMode} />;
       case "profile":
         return (
           <Profile
@@ -281,12 +293,11 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
         alertsCount={highAlertCount}
         onTabChange={setActiveTab}
         isDarkMode={isDarkMode}
-        onToggleTheme={() => setIsDarkMode(!isDarkMode)}
-        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        onToggleSidebar={handleToggleSidebar}
       />
       <div className="flex flex-1 overflow-hidden relative">
         {/* Desktop Sidebar */}
-        <div className="hidden lg:block">
+        <div className={`hidden lg:block transition-all duration-300 ${desktopSidebarOpen ? "w-[256px]" : "w-0 overflow-hidden"}`}>
           <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} isDarkMode={isDarkMode} />
         </div>
 
@@ -325,9 +336,21 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
           )}
         </AnimatePresence>
 
-        <div className="flex-1 overflow-y-auto p-4 md:p-8">
-          <div className="max-w-[1100px] mx-auto pb-12">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 lg:p-10 min-w-0 flex justify-center">
+          <div className="max-w-[1100px] w-full pb-12 flex flex-col items-center">
             {renderContent()}
+            
+            {/* Global Footer */}
+            <footer style={{marginTop: '100px'}}className={`w-full pt-8 border-t flex flex-col sm:flex-row justify-between items-center gap-4 text-sm transition-colors duration-200 ${
+              isDarkMode ? "border-slate-800 text-slate-500" : "border-slate-200 text-slate-500"
+            }`}>
+              <p>{t("admin.copyright", { year: new Date().getFullYear() })}</p>
+              <div className="flex gap-6 font-medium">
+                <a href="#" className={`transition-colors ${isDarkMode ? "hover:text-slate-300" : "hover:text-slate-800"}`}>{t("admin.privacy")}</a>
+                <a href="#" className={`transition-colors ${isDarkMode ? "hover:text-slate-300" : "hover:text-slate-800"}`}>{t("admin.terms")}</a>
+                <a href="#" className={`transition-colors ${isDarkMode ? "hover:text-slate-300" : "hover:text-slate-800"}`}>{t("admin.support")}</a>
+              </div>
+            </footer>
           </div>
         </div>
       </div>
