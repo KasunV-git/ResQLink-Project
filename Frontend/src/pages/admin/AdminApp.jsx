@@ -9,6 +9,7 @@ import Assignments from "./Assignments";
 import Alerts from "./Alerts";
 import Profile from "../volunteer/Profile"; // We can reuse the profile page since it takes user, onUpdateProfile, and onLogout
 import AIAnalysis from "./AIAnalysis";
+import { useTheme } from "../../context/ThemeContext";
 
 // Custom Admin Sidebar
 function AdminSidebar({ activeTab, onTabChange, isDarkMode, isMobile, onClose }) {
@@ -70,10 +71,7 @@ function AdminSidebar({ activeTab, onTabChange, isDarkMode, isMobile, onClose })
 }
 
 export default function AdminApp({ user, onLogout, onUpdateUser }) {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const saved = localStorage.getItem("resqlink_admin_theme");
-    return saved ? JSON.parse(saved) : true;
-  });
+  const { isDark: isDarkMode } = useTheme();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
@@ -82,15 +80,7 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    localStorage.setItem("resqlink_admin_theme", JSON.stringify(isDarkMode));
-    // Apply dark mode class to html element for Tailwind's dark: modifiers
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
+
 
   const handleToggleSidebar = () => {
     if (window.innerWidth >= 1024) {
@@ -204,10 +194,10 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
     }
   };
 
-  const handleUpdateProfile = async ({ name, phone }) => {
+  const handleUpdateProfile = async (profileData) => {
     try {
-      const response = await axios.put(`/api/auth/profile/${user.id}`, { name, phone });
-      onUpdateUser(response.data);
+      const response = await axios.put(`/api/auth/profile/${user.id}`, profileData);
+      onUpdateUser(response.data.user || response.data);
     } catch (error) {
       console.error("Failed to update admin profile:", error);
       throw error;
@@ -295,7 +285,6 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
         alertsCount={highAlertCount}
         onTabChange={setActiveTab}
         isDarkMode={isDarkMode}
-        onToggleTheme={() => setIsDarkMode(!isDarkMode)}
         onToggleSidebar={handleToggleSidebar}
       />
       <div className="flex flex-1 overflow-hidden relative">
