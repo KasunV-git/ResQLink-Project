@@ -21,7 +21,7 @@ const Disaster = sequelize.define('Disaster', {
         allowNull: true,
     },
     people_affected: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: true,
     },
     lat: {

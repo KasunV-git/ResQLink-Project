@@ -16,7 +16,7 @@ const submitReport = async (req, res) => {
             type,
             location,
             landmark: landmark || null,
-            people_affected: peopleAffected ? parseInt(peopleAffected, 10) : null,
+            people_affected: peopleAffected || null,
             description,
             lat: lat || null,
             lng: lng || null,
