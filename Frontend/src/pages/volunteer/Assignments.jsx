@@ -1,10 +1,11 @@
 import React, { useState, useCallback, useMemo } from "react";
 import {
   Check, MapPin, CheckCircle2, Play,
-  Loader2, AlertCircle, ChevronRight,
+  Loader2, AlertCircle, ChevronRight, ChevronDown, ChevronUp,
   ClipboardList, Zap, Trophy, Filter, X, ClipboardCheck
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
 import LocationPicker from "../../components/LocationPicker";
 import { SL_DISTRICTS } from "../../data/sriLankaLocations";
 
@@ -133,6 +134,7 @@ function DistrictBadge({ location }) {
 
 function TaskRow({ item, section, isLoading, errorMsg, onStart, onComplete }) {
   const { t } = useTranslation();
+  const [isExpanded, setIsExpanded] = useState(false);
   const date = item[section.dateField];
 
   return (
@@ -141,9 +143,17 @@ function TaskRow({ item, section, isLoading, errorMsg, onStart, onComplete }) {
         section.status === "completed" ? "opacity-65" : ""
       }`}>
         <td className="px-5 py-3.5 font-semibold text-slate-900 dark:text-white">
-          <span className="block max-w-[150px] truncate" title={item.disaster}>
-            {item.disaster}
-          </span>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            >
+              {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
+            </button>
+            <span className="block max-w-[130px] truncate" title={item.disaster}>
+              {item.disaster}
+            </span>
+          </div>
         </td>
         <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400 font-normal">
           <span className="block max-w-[200px] truncate" title={item.task}>
@@ -179,6 +189,34 @@ function TaskRow({ item, section, isLoading, errorMsg, onStart, onComplete }) {
           />
         </td>
       </tr>
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <tr className="bg-slate-50 dark:bg-slate-800/40">
+            <td colSpan={5} className="p-0 border-b border-slate-100 dark:border-slate-800">
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                style={{ overflow: "hidden" }}
+              >
+                <div className="px-5 py-4 text-sm text-slate-700 dark:text-slate-300">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-8">
+                    <div>
+                      <strong className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Disaster / Incident</strong>
+                      <p className="whitespace-normal leading-relaxed text-slate-800 dark:text-slate-200 font-medium">{item.disaster}</p>
+                    </div>
+                    <div>
+                      <strong className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Assigned Task Details</strong>
+                      <p className="whitespace-normal leading-relaxed text-slate-600 dark:text-slate-300">{item.task}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </td>
+          </tr>
+        )}
+      </AnimatePresence>
       {errorMsg && (
         <tr className="bg-red-50 dark:bg-red-950/40">
           <td colSpan={5} className="px-5 py-2">

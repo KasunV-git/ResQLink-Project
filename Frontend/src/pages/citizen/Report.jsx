@@ -277,7 +277,8 @@ const Report = () => {
                                     {DISASTER_TYPES.map(({ value, label, icon: Icon, color, bg }) => (
                                         <button
                                             key={value}
-                                            onClick={() => set('type', value)}
+                                            type="button"
+                                            onClick={() => set('type', form.type === value ? '' : value)}
                                             style={{
                                                 ...s.typeCard,
                                                 ...(form.type === value ? { ...s.typeCardActive, borderColor: color } : {}),
@@ -306,7 +307,8 @@ const Report = () => {
                                     {SEVERITIES.map(({ value, label, desc, color, bg, border }) => (
                                         <button
                                             key={value}
-                                            onClick={() => set('severity', value)}
+                                            type="button"
+                                            onClick={() => set('severity', form.severity === value ? '' : value)}
                                             style={{
                                                 ...s.sevCard,
                                                 background: form.severity === value ? bg : 'var(--bg-card)',
@@ -337,6 +339,36 @@ const Report = () => {
                     {step === 2 && (
                         <div style={s.stepContent} className="card">
                             <h3 style={s.stepTitle}>Where and what happened?</h3>
+
+                            {/* Summary Badges */}
+                            <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap' }}>
+                                <span style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    padding: '4px 12px',
+                                    borderRadius: '16px',
+                                    fontSize: '12px',
+                                    fontWeight: '600',
+                                    background: DISASTER_TYPES.find(d => d.value === form.type)?.bg || 'var(--bg-hover)',
+                                    color: DISASTER_TYPES.find(d => d.value === form.type)?.color || 'var(--text-dark)',
+                                    border: `1px solid ${DISASTER_TYPES.find(d => d.value === form.type)?.color}40` || '1px solid var(--border)'
+                                }}>
+                                    {form.type}
+                                </span>
+                                <span style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    padding: '4px 12px',
+                                    borderRadius: '16px',
+                                    fontSize: '12px',
+                                    fontWeight: '600',
+                                    background: SEVERITIES.find(sev => sev.value === form.severity)?.bg || '#fff5f5',
+                                    color: SEVERITIES.find(sev => sev.value === form.severity)?.color || '#e53e3e',
+                                    border: `1px solid ${SEVERITIES.find(sev => sev.value === form.severity)?.border || '#fed7d7'}`
+                                }}>
+                                    Severity: {SEVERITIES.find(sev => sev.value === form.severity)?.label || form.severity}
+                                </span>
+                            </div>
 
                             {/* Location */}
                             <div className="form-group">
@@ -612,14 +644,14 @@ const s = {
 
     /* Type grid */
     typeGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 },
-    typeCard: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '14px 8px', border: '1.5px solid var(--border)', borderRadius: 12, background: 'var(--bg-card)', cursor: 'pointer', transition: 'all .15s ease' },
+    typeCard: { outline: 'none', WebkitTapHighlightColor: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '14px 8px', border: '1.5px solid var(--border)', borderRadius: 12, background: 'var(--bg-card)', cursor: 'pointer', transition: 'all .15s ease' },
     typeCardActive: { background: 'var(--bg-hover)' },
     typeIcon: { width: 44, height: 44, borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' },
     typeLabel: { fontSize: 12, textAlign: 'center' },
 
     /* Severity */
     sevGrid: { display: 'flex', flexDirection: 'column', gap: 8 },
-    sevCard: { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 10, cursor: 'pointer', transition: 'all .15s ease', textAlign: 'left' },
+    sevCard: { outline: 'none', WebkitTapHighlightColor: 'transparent', display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 10, cursor: 'pointer', transition: 'all .15s ease', textAlign: 'left' },
     sevDot: { width: 10, height: 10, borderRadius: '50%', flexShrink: 0 },
     sevLabel: { fontSize: 14, fontWeight: 600, marginBottom: 2 },
     sevDesc: { fontSize: 12, color: 'var(--text-muted)' },
@@ -692,18 +724,18 @@ const s = {
     /* Success screen */
     successWrap: { display: 'flex', justifyContent: 'center', padding: '20px 0' },
     successCard: { width: '100%', maxWidth: 480, padding: 36, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, textAlign: 'center' },
-    successIcon: { width: 80, height: 80, borderRadius: '50%', background: '#f0fff4', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+    successIcon: { width: 80, height: 80, borderRadius: '50%', background: 'rgba(56, 161, 105, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' },
     successTitle: { fontSize: 24, fontWeight: 800, color: 'var(--text-dark)', margin: 0 },
     successSub: { fontSize: 14, color: 'var(--text-muted)', margin: 0 },
     reportIdBox: { display: 'flex', flexDirection: 'column', gap: 4, background: 'var(--bg-hover)', border: '1px solid var(--border)', borderRadius: 12, padding: '12px 24px', width: '100%' },
     reportIdLabel: { fontSize: 11, fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '.5px' },
-    reportIdVal: { fontSize: 22, fontWeight: 800, color: '#1a2456', fontFamily: 'monospace' },
+    reportIdVal: { fontSize: 22, fontWeight: 800, color: 'var(--text-dark)', fontFamily: 'monospace' },
     successSteps: { display: 'flex', flexDirection: 'column', gap: 10, width: '100%' },
-    successStep: { display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: '#f0fff4', borderRadius: 10, border: '1px solid #c6f6d5', textAlign: 'left' },
-    successStepIcon: { width: 32, height: 32, borderRadius: 8, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-    successStepText: { fontSize: 13, fontWeight: 500, color: 'var(--text-dark)' },
+    successStep: { display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'rgba(56, 161, 105, 0.08)', borderRadius: 10, border: '1px solid rgba(56, 161, 105, 0.2)', textAlign: 'left' },
+    successStepIcon: { width: 32, height: 32, borderRadius: 8, background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+    successStepText: { fontSize: 13, fontWeight: 600, color: 'var(--text-dark)' },
     successBtns: { display: 'flex', gap: 12, width: '100%', flexWrap: 'wrap' },
-    submitAnotherBtn: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 0', background: '#1a2456', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer' },
+    submitAnotherBtn: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 0', background: 'linear-gradient(135deg,#1a9e7a,#147a5f)', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(26,158,122,.2)' },
     viewAlertsBtn: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 0', background: 'var(--bg-hover)', color: 'var(--text-dark)', border: '1.5px solid var(--border)', borderRadius: 10, fontSize: 14, fontWeight: 600, textDecoration: 'none' },
 };
 

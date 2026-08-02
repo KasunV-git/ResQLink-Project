@@ -16,6 +16,14 @@ const Disaster = sequelize.define('Disaster', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    landmark: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    people_affected: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
     lat: {
         type: DataTypes.DECIMAL(10, 7),
         allowNull: true,

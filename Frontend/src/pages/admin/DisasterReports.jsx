@@ -1,10 +1,98 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import { CheckCircle, XCircle, AlertTriangle, Megaphone, Loader2 } from "lucide-react";
+import { CheckCircle, XCircle, AlertTriangle, Megaphone, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function DisasterReports({ isDarkMode }) {
+function ReportRow({ report, isDarkMode, getStatusBadge, handleActionClick, processingId, t }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  return (
+    <>
+      <tr className={`hover:${isDarkMode ? "bg-slate-800/50" : "bg-slate-50"}`}>
+        <td className="px-6 py-4">
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            >
+              {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
+            </button>
+            <div>
+              <div className="font-medium">{report.type}</div>
+              <div className={`text-xs mt-1 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
+                {new Date(report.created_at).toLocaleString()}
+              </div>
+            </div>
+          </div>
+        </td>
+        <td className="px-6 py-4">{report.location}</td>
+        <td className="px-6 py-4 max-w-xs truncate">{report.description}</td>
+        <td className="px-6 py-4">
+          {getStatusBadge(report.verification_status)}
+        </td>
+        <td className="px-6 py-4 text-right">
+          {report.verification_status === "pending" && (
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => handleActionClick(report, "approve")}
+                disabled={processingId === report.disaster_id}
+                className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+              >
+                {processingId === report.disaster_id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
+                {t("adminDisasterReports.approveBtn")}
+              </button>
+              <button
+                onClick={() => handleActionClick(report, "reject")}
+                disabled={processingId === report.disaster_id}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors disabled:opacity-50 flex items-center gap-1.5 ${
+                  isDarkMode ? "border-slate-700 hover:bg-slate-800 text-slate-300" : "border-slate-200 hover:bg-slate-100 text-slate-700"
+                }`}
+              >
+                <XCircle className="w-3.5 h-3.5 text-red-500" />
+                {t("adminDisasterReports.rejectBtn")}
+              </button>
+            </div>
+          )}
+        </td>
+      </tr>
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <tr className="bg-slate-50 dark:bg-slate-800/40">
+            <td colSpan={5} className="p-0 border-b border-slate-100 dark:border-slate-800">
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                style={{ overflow: "hidden" }}
+              >
+                <div className="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">
+                  <div className="pl-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="md:col-span-2">
+                      <strong className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Full Description</strong>
+                      <p className="whitespace-pre-wrap leading-relaxed text-slate-800 dark:text-slate-200 font-medium">{report.description || 'Not Mentioned'}</p>
+                    </div>
+                    <div>
+                      <strong className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Nearest Landmark</strong>
+                      <p className="whitespace-pre-wrap leading-relaxed text-slate-800 dark:text-slate-200 font-medium">{report.landmark || 'Not Mentioned'}</p>
+                    </div>
+                    <div>
+                      <strong className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Estimated People Affected</strong>
+                      <p className="whitespace-pre-wrap leading-relaxed text-slate-800 dark:text-slate-200 font-medium">{report.people_affected || 'Not Mentioned'}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </td>
+          </tr>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
+export default function DisasterReports({ isDarkMode, onReportsUpdated }) {
   const { t } = useTranslation();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -69,14 +157,10 @@ export default function DisasterReports({ isDarkMode }) {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      alert(
-        action === "approve" 
-          ? t("adminDisasterReports.approveSuccess") 
-          : t("adminDisasterReports.rejectSuccess")
-      );
-      
+
       setShowAnnounceModal(false);
       fetchReports();
+      if (onReportsUpdated) onReportsUpdated();
     } catch (err) {
       console.error(err);
       alert(t("adminDisasterReports.errorMsg"));
@@ -137,43 +221,15 @@ export default function DisasterReports({ isDarkMode }) {
                   </thead>
                   <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                     {reports.map((report) => (
-                      <tr key={report.disaster_id} className={`hover:${isDarkMode ? "bg-slate-800/50" : "bg-slate-50"}`}>
-                        <td className="px-6 py-4">
-                          <div className="font-medium">{report.type}</div>
-                          <div className={`text-xs mt-1 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
-                            {new Date(report.created_at).toLocaleString()}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">{report.location}</td>
-                        <td className="px-6 py-4 max-w-xs truncate">{report.description}</td>
-                        <td className="px-6 py-4">
-                          {getStatusBadge(report.verification_status)}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {report.verification_status === "pending" && (
-                            <div className="flex justify-end gap-2">
-                              <button
-                                onClick={() => handleActionClick(report, "approve")}
-                                disabled={processingId === report.disaster_id}
-                                className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors disabled:opacity-50 flex items-center gap-1.5"
-                              >
-                                {processingId === report.disaster_id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
-                                {t("adminDisasterReports.approveBtn")}
-                              </button>
-                              <button
-                                onClick={() => handleActionClick(report, "reject")}
-                                disabled={processingId === report.disaster_id}
-                                className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors disabled:opacity-50 flex items-center gap-1.5 ${
-                                  isDarkMode ? "border-slate-700 hover:bg-slate-800 text-slate-300" : "border-slate-200 hover:bg-slate-100 text-slate-700"
-                                }`}
-                              >
-                                <XCircle className="w-3.5 h-3.5 text-red-500" />
-                                {t("adminDisasterReports.rejectBtn")}
-                              </button>
-                            </div>
-                          )}
-                        </td>
-                      </tr>
+                      <ReportRow 
+                        key={report.disaster_id} 
+                        report={report} 
+                        isDarkMode={isDarkMode} 
+                        getStatusBadge={getStatusBadge} 
+                        handleActionClick={handleActionClick} 
+                        processingId={processingId} 
+                        t={t} 
+                      />
                     ))}
                   </tbody>
                 </table>
@@ -205,6 +261,21 @@ export default function DisasterReports({ isDarkMode }) {
               <p className={`mb-5 text-sm ${isDarkMode ? "text-slate-300" : "text-slate-600"}`}>
                 You are about to verify the <strong>{selectedReport.type}</strong> report at {selectedReport.location}.
               </p>
+
+              {selectedReport.media_url && (
+                <div className="mb-5">
+                  <label className={`block text-xs font-semibold mb-2 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
+                    Attached Evidence
+                  </label>
+                  <div className="flex gap-2 flex-wrap">
+                    {selectedReport.media_url.split(',').map((url, idx) => (
+                      <a key={idx} href={`http://localhost:5000${url}`} target="_blank" rel="noopener noreferrer">
+                        <img src={`http://localhost:5000${url}`} alt={`Evidence ${idx+1}`} className="w-20 h-20 object-cover rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80 transition-opacity shadow-sm" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <label className="flex items-start gap-3 mb-5 cursor-pointer">
                 <input

@@ -1,11 +1,12 @@
 import React, { useState, useRef } from "react";
-import { User, Mail, Phone, Shield, LogOut, Check, Upload, Trash2, Loader2, AlertCircle } from "lucide-react";
+import { User, Mail, Phone, Shield, LogOut, Check, Upload, Trash2, Loader2, AlertCircle, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SL_PHONE_PLACEHOLDER } from "../../data/sriLankaLocations";
 import ProfileAvatar from "../../components/ProfileAvatar";
 
 export default function Profile({ user, onUpdateProfile, onLogout, isDarkMode }) {
   const { t } = useTranslation();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const fileInputRef = useRef(null);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -349,13 +350,30 @@ export default function Profile({ user, onUpdateProfile, onLogout, isDarkMode })
           <p className="text-slate-500 dark:text-slate-400 text-sm">{t("profile.signOutDesc") || "Sign out of your ResQLink account"}</p>
         </div>
         <button
-          onClick={onLogout}
+          onClick={() => setShowLogoutConfirm(true)}
           className="btn-anim inline-flex items-center gap-2 border border-red-400 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-950/40 text-red-600 dark:text-red-400 text-sm font-semibold py-2 px-4 rounded-xl shadow-xs transition-all"
         >
           <LogOut className="w-4 h-4" />
           {t("profile.logout") || "Logout"}
         </button>
       </div>
+
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 w-full max-w-sm shadow-xl anim-fade-in-up">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{t("common.confirmLogoutTitle", "Sign Out")}</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{t("common.confirmLogout", "Are you sure you want to sign out of your account?")}</p>
+            <div className="flex items-center justify-end gap-3">
+              <button onClick={() => setShowLogoutConfirm(false)} className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer border border-slate-200 dark:border-slate-700">
+                {t("common.cancel", "Cancel")}
+              </button>
+              <button onClick={onLogout} className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors cursor-pointer border-none">
+                {t("profile.logout", "Logout")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

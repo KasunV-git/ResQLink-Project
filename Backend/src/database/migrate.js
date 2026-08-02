@@ -304,6 +304,24 @@ async function step18_alerts_ensure_time(conn) {
   console.log(`  ✅ ${name}`);
 }
 
+async function step19_disasters_add_landmark_people(conn) {
+  const name = '19_disasters_add_landmark_people';
+  if (await migrationDone(conn, name)) return console.log(`  ⏭  ${name}`);
+
+  if (!(await columnExists(conn, 'disasters', 'landmark'))) {
+    await conn.query(
+      `ALTER TABLE disasters ADD COLUMN landmark VARCHAR(255) DEFAULT NULL AFTER location`
+    );
+  }
+  if (!(await columnExists(conn, 'disasters', 'people_affected'))) {
+    await conn.query(
+      `ALTER TABLE disasters ADD COLUMN people_affected INT DEFAULT NULL AFTER landmark`
+    );
+  }
+  await recordMigration(conn, name);
+  console.log(`  ✅ ${name}`);
+}
+
 // ── runner ────────────────────────────────────────────────────────────────────
 
 async function runMigrations() {
@@ -338,6 +356,7 @@ async function runMigrations() {
       step16_users_avatar_url,
       step17_users_ensure_name,
       step18_alerts_ensure_time,
+      step19_disasters_add_landmark_people,
     ];
 
     for (const step of steps) {
