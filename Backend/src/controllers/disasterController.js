@@ -7,14 +7,16 @@ const db = require('../config/db');
 // Submit disaster report
 const submitReport = async (req, res) => {
     try {
-        const { type, location, description, lat, lng } = req.body;
+        const { type, location, description, lat, lng, landmark, peopleAffected } = req.body;
         const media_url = req.files && req.files.length > 0
-            ? `/uploads/reports/${req.files[0].filename}`
+            ? req.files.map(f => `/uploads/reports/${f.filename}`).join(',')
             : null;
 
         const disaster = await Disaster.create({
             type,
             location,
+            landmark: landmark || null,
+            people_affected: peopleAffected ? parseInt(peopleAffected, 10) : null,
             description,
             lat: lat || null,
             lng: lng || null,

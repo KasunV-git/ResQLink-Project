@@ -1,4 +1,4 @@
-// frontend/src/components/common/Sidebar.jsx
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,7 @@ import LanguageSwitcher from '../LanguageSwitcher';
 const Sidebar = ({ open, onClose }) => {
     const { user, logout } = useAuth();
     const { t } = useTranslation();
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
     const navItems = [
         { to: '/citizen/dashboard', icon: LayoutDashboard, label: t('sidebar.dashboard', 'Dashboard') },
@@ -67,12 +68,24 @@ const Sidebar = ({ open, onClose }) => {
                         <HelpCircle size={18} />
                         <span>{t('footer.support', 'Support')}</span>
                     </NavLink>
-                    <button onClick={logout} className="sidebar-logout-btn">
+                    <button onClick={() => setShowLogoutConfirm(true)} className="sidebar-logout-btn">
                         <LogOut size={18} />
                         <span>{t('sidebar.signOut', 'Sign Out')}</span>
                     </button>
                 </div>
             </aside>
+            {showLogoutConfirm && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ background: 'var(--bg-card, #fff)', padding: '24px', borderRadius: '12px', width: '90%', maxWidth: '320px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)', color: 'var(--text-dark, #1a202c)' }}>
+                        <h3 style={{ margin: '0 0 12px 0', fontSize: '18px', fontWeight: 'bold' }}>{t('common.confirmLogoutTitle', 'Sign Out')}</h3>
+                        <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: 'var(--text-muted, #4a5568)' }}>{t('common.confirmLogout', 'Are you sure you want to sign out?')}</p>
+                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                            <button onClick={() => setShowLogoutConfirm(false)} style={{ padding: '8px 16px', border: '1px solid var(--border, #e2e8f0)', background: 'transparent', borderRadius: '8px', cursor: 'pointer', color: 'var(--text-dark, #1a202c)', fontWeight: '600' }}>{t('common.cancel', 'Cancel')}</button>
+                            <button onClick={logout} style={{ padding: '8px 16px', border: 'none', background: '#e53e3e', color: '#fff', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}>{t('sidebar.signOut', 'Sign Out')}</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 };

@@ -263,7 +263,7 @@ export default function AdminApp({ user, onLogout, onUpdateUser }) {
           />
         );
       case "reports":
-        return <DisasterReports isDarkMode={isDarkMode} />;
+        return <DisasterReports isDarkMode={isDarkMode} onReportsUpdated={fetchAdminData} />;
       case "profile":
         return (
           <Profile

@@ -177,6 +177,7 @@ const Alerts = () => {
         .filter(a => sevFilter === 'ALL' || a.severity === sevFilter)
         .filter(a => !search || a.message.toLowerCase().includes(search.toLowerCase()) || a.location?.toLowerCase().includes(search.toLowerCase()))
         .sort((a, b) => {
+            if (a.acknowledged !== b.acknowledged) return a.acknowledged ? 1 : -1;
             if (sort === 'newest')   return new Date(b.sent_at) - new Date(a.sent_at);
             if (sort === 'oldest')   return new Date(a.sent_at) - new Date(b.sent_at);
             if (sort === 'severity') return getSev(a.severity).priority - getSev(b.severity).priority;
