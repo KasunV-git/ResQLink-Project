@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS disasters (
   type                  VARCHAR(255)   NOT NULL,
   location              VARCHAR(255)   NOT NULL,
   landmark              VARCHAR(255)   DEFAULT NULL,
-  people_affected       INT            DEFAULT NULL,
+  people_affected       VARCHAR(255)   DEFAULT NULL,
   lat                   DECIMAL(10, 7) DEFAULT NULL,
   lng                   DECIMAL(10, 7) DEFAULT NULL,
   description           TEXT           DEFAULT NULL,

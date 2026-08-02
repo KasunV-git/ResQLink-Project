@@ -315,7 +315,21 @@ async function step19_disasters_add_landmark_people(conn) {
   }
   if (!(await columnExists(conn, 'disasters', 'people_affected'))) {
     await conn.query(
-      `ALTER TABLE disasters ADD COLUMN people_affected INT DEFAULT NULL AFTER landmark`
+      `ALTER TABLE disasters ADD COLUMN people_affected VARCHAR(255) DEFAULT NULL AFTER landmark`
+    );
+  }
+  await recordMigration(conn, name);
+  console.log(`  ✅ ${name}`);
+}
+
+async function step20_disasters_change_people_affected_type(conn) {
+  const name = '20_disasters_change_people_affected_type';
+  if (await migrationDone(conn, name)) return console.log(`  ⏭  ${name}`);
+
+  const colType = await columnType(conn, 'disasters', 'people_affected');
+  if (colType && colType.includes('int')) {
+    await conn.query(
+      `ALTER TABLE disasters MODIFY COLUMN people_affected VARCHAR(255) DEFAULT NULL`
     );
   }
   await recordMigration(conn, name);
@@ -357,6 +371,7 @@ async function runMigrations() {
       step17_users_ensure_name,
       step18_alerts_ensure_time,
       step19_disasters_add_landmark_people,
+      step20_disasters_change_people_affected_type,
     ];
 
     for (const step of steps) {

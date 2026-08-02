@@ -49,14 +49,16 @@ export default function Volunteers({ volunteers, alerts = [], onToggleAvailabili
   const bgRowHover = isDarkMode ? "hover:bg-slate-950/40" : "hover:bg-slate-50/40";
   const divideColor = isDarkMode ? "divide-slate-800" : "divide-slate-100";
 
-  // Pre-populated incident suggestions from active alerts or defaults
-  const incidentSuggestions = Array.from(new Set([
-    "Kelani River Flood – Kelaniya",
-    "Kegalle Landslide – Aranayake",
-    "Badulla Landslide Warning",
-    "Ratnapura Flash Flood",
-    ...(alerts || []).map(a => a.message.length > 40 ? a.message.slice(0, 37) + "..." : a.message)
-  ]));
+  // Incident suggestions from active alerts only (filtering for actual disasters)
+  const incidentSuggestions = Array.from(new Set(
+    (alerts || [])
+      .filter(a => a.message.startsWith("Verified Disaster:") || a.message.startsWith("External Disaster:"))
+      .map(a => {
+        // Clean up the name for the dropdown
+        let msg = a.message.replace("Verified Disaster:", "").replace("External Disaster:", "").trim();
+        return msg.length > 50 ? msg.slice(0, 47) + "..." : msg;
+      })
+  ));
 
   return (
     <div className="w-full flex flex-col gap-6" data-name="AdminVolunteers">

@@ -436,11 +436,10 @@ const Report = () => {
                                 <div style={{ position: 'relative', maxWidth: 200 }}>
                                     <Users size={15} color="#a0aec0" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
                                     <input
-                                        type="number"
-                                        min="0"
+                                        type="text"
                                         value={form.peopleAffected}
                                         onChange={e => set('peopleAffected', e.target.value)}
-                                        placeholder="e.g. 50"
+                                        placeholder="e.g. 50 or 100+"
                                         style={{ ...s.input, paddingLeft: 36 }}
                                     />
                                 </div>
