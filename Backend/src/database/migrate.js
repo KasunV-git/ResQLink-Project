@@ -341,12 +341,17 @@ async function step20_disasters_change_people_affected_type(conn) {
 async function runMigrations() {
   console.log('\n🔄 ResQLink — running database migrations…\n');
 
+  const DB_HOST = process.env.DB_HOST || 'localhost';
+  const isTiDB = DB_HOST.includes('tidbcloud');
+  const sslConfig = isTiDB ? { minVersion: 'TLSv1.2', rejectUnauthorized: true } : undefined;
+
   const conn = await mysql.createConnection({
-    host:     process.env.DB_HOST     || 'localhost',
+    host:     DB_HOST,
     user:     process.env.DB_USER     || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME     || 'resqlink',
     multipleStatements: false,
+    ssl:      sslConfig,
   });
 
   try {
