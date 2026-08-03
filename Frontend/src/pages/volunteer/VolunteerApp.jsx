@@ -10,6 +10,7 @@ import Assignments from "./Assignments";
 import Skills from "./Skills";
 import Alerts from "./Alerts";
 import Profile from "./Profile";
+import Report from "../citizen/Report";
 
 export default function VolunteerApp({ user: initialUser, startOnRegister = false, onLogout, onGoHome, onUpdateUser }) {
   const { t } = useTranslation();
@@ -221,6 +222,12 @@ export default function VolunteerApp({ user: initialUser, startOnRegister = fals
     }
 
     switch (activeTab) {
+      case "report":
+        return (
+          <div className="citizen-portal" style={{ flex: 1, width: '100%' }}>
+            <Report />
+          </div>
+        );
       case "dashboard":
         return (
           <Dashboard

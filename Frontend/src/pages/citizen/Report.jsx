@@ -86,9 +86,9 @@ const Report = () => {
         getMyReports()
             .then(res => {
                 const data = res.data?.data ?? res.data;
-                setMyReports(Array.isArray(data) && data.length ? data : DEMO_REPORTS);
+                setMyReports(Array.isArray(data) ? data : []);
             })
-            .catch(() => setMyReports(DEMO_REPORTS))
+            .catch(() => setMyReports([]))
             .finally(() => setReportsLoading(false));
     }, []);
 
@@ -580,7 +580,7 @@ const Report = () => {
                             <p>No reports submitted yet.</p>
                         </div>
                     ) : (
-                        <div style={s.historyList}>
+                        <div style={s.historyList} className="history-scroll">
                             {myReports.map((r, i) => {
                                 const st = STATUS_STYLE[r.status] ?? STATUS_STYLE['Pending'];
                                 const sc = SEV_COLOR[r.severity] ?? '#718096';
@@ -596,7 +596,7 @@ const Report = () => {
                                         <div style={s.historyLoc}>📍 {r.location}</div>
                                         <div style={s.historyMeta}>
                                             <span style={{ color: sc, fontSize: 11, fontWeight: 700 }}>{r.severity}</span>
-                                            <span style={s.historyTime}><Clock size={10} /> {relTime(r.submitted_at)}</span>
+                                            <span style={s.historyTime}><Clock size={10} /> {relTime(r.submitted_at || r.created_at || r.createdAt)}</span>
                                         </div>
                                     </div>
                                 );
@@ -613,7 +613,13 @@ const Report = () => {
                 </div>
             </div>
 
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            <style>{`
+                @keyframes spin { to { transform: rotate(360deg); } }
+                .history-scroll::-webkit-scrollbar { width: 6px; }
+                .history-scroll::-webkit-scrollbar-track { background: transparent; }
+                .history-scroll::-webkit-scrollbar-thumb { background: rgba(160, 174, 192, 0.3); border-radius: 10px; }
+                .history-scroll::-webkit-scrollbar-thumb:hover { background: rgba(160, 174, 192, 0.5); }
+            `}</style>
         </div>
     );
 };
@@ -702,7 +708,7 @@ const s = {
     historyHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
     historyTitle: { fontSize: 15, fontWeight: 700, color: 'var(--text-dark)', margin: 0 },
     historyCount: { fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', background: 'var(--bg-hover)', padding: '2px 8px', borderRadius: 99, border: '1px solid var(--border)' },
-    historyList: { display: 'flex', flexDirection: 'column', gap: 10 },
+    historyList: { display: 'flex', flexDirection: 'column', gap: 10, overflowY: 'auto', maxHeight: 'calc(100vh - 220px)', paddingRight: 6 },
     historyCard: { padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 5 },
     historyTop: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
     historyId: { fontSize: 11, fontWeight: 700, color: 'var(--text-light)', fontFamily: 'monospace' },

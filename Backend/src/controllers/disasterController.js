@@ -1,5 +1,5 @@
 // backend/src/controllers/disasterController.js
-const { Disaster } = require('../models');
+const { Disaster, User } = require('../models');
 const { successResponse, errorResponse } = require('../utils/responseHandler');
 const { Op } = require('sequelize');
 const db = require('../config/db');
@@ -92,6 +92,7 @@ const getNearbyHazards = async (req, res) => {
 const getAllReports = async (req, res) => {
     try {
         const reports = await Disaster.findAll({
+            include: [{ model: User, as: 'reporter', attributes: ['name', 'role'] }],
             order: [['created_at', 'DESC']],
         });
         return successResponse(res, 'All reports fetched.', reports);
@@ -115,6 +116,14 @@ const updateReportStatus = async (req, res) => {
                 status: 'active'
             });
 
+            if (report.reported_by) {
+                const user = await User.findByPk(report.reported_by);
+                if (user) {
+                    const newScore = Math.min(100, (user.trust_score || 30) + 15);
+                    await user.update({ trust_score: newScore });
+                }
+            }
+
             // Announce if requested
             if (announce) {
                 const timeString = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -130,6 +139,14 @@ const updateReportStatus = async (req, res) => {
                 verification_status: 'rejected',
                 status: 'resolved'
             });
+            
+            if (report.reported_by) {
+                const user = await User.findByPk(report.reported_by);
+                if (user) {
+                    const newScore = Math.max(0, (user.trust_score || 30) - 20);
+                    await user.update({ trust_score: newScore });
+                }
+            }
             return successResponse(res, 'Report rejected successfully.', report);
         } else {
             return errorResponse(res, 'Invalid action.', 400);

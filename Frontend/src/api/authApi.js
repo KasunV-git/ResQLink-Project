@@ -9,3 +9,8 @@ export const uploadAvatar = (form) => api.post('/auth/avatar', form, {
     headers: { 'Content-Type': 'multipart/form-data' },
 });
 export const logoutUser = () => api.post('/auth/logout');
+
+export const getZones = () => api.get('/auth/zones');
+export const addZone = (data) => api.post('/auth/zones', data);
+export const toggleZoneStatus = (id, active) => api.put(`/auth/zones/${id}`, { active });
+export const removeZone = (id) => api.delete(`/auth/zones/${id}`);

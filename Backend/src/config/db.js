@@ -11,6 +11,9 @@ const DB_PASSWORD = process.env.DB_PASSWORD || '';
 const DB_HOST     = process.env.DB_HOST     || 'localhost';
 const DB_PORT     = process.env.DB_PORT     || 3306;
 
+const isProduction = process.env.NODE_ENV === 'production';
+const sslConfig = isProduction ? { rejectUnauthorized: true } : undefined;
+
 // 1. MySQL2 Pool for raw queries
 const pool = mysql.createPool({
   host:               DB_HOST,
@@ -22,6 +25,7 @@ const pool = mysql.createPool({
   connectionLimit:    10,
   queueLimit:         0,
   timezone:           'local',
+  ssl:                sslConfig,
 });
 
 // 2. Sequelize ORM instance for models
@@ -34,6 +38,9 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
     timestamps: true,
     underscored: true,
   },
+  dialectOptions: {
+    ssl: sslConfig
+  }
 });
 
 // Test connection on startup

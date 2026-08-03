@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
+import axios from "../../api/axios";
 import { CheckCircle, XCircle, AlertTriangle, Megaphone, Loader2, ChevronDown, ChevronUp, MapPin, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
@@ -21,21 +21,16 @@ function ReportRow({ report, isDarkMode, getStatusBadge, handleActionClick, proc
   
   return (
     <>
-      <tr className={`hover:${isDarkMode ? "bg-slate-800/50" : "bg-slate-50"}`}>
+      <tr 
+        className={`hover:${isDarkMode ? "bg-slate-800/50" : "bg-slate-50"} cursor-pointer transition-colors`}
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
         <td className="px-6 py-4">
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-            >
-              {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
-            </button>
-            <div>
-              <div className="font-medium">{report.type}</div>
-              <div className={`text-xs mt-1 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
-                {new Date(report.created_at).toLocaleString()}
-              </div>
-            </div>
+          <div className="flex flex-col">
+            <span className="font-medium text-sm">{report.type}</span>
+            <span className={`text-xs mt-0.5 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
+              {new Date(report.created_at).toLocaleString()}
+            </span>
           </div>
         </td>
         <td className="px-6 py-4">
@@ -43,7 +38,7 @@ function ReportRow({ report, isDarkMode, getStatusBadge, handleActionClick, proc
             <span className="truncate max-w-[200px] block" title={report.location}>{report.location}</span>
             {report.lat && report.lng && (
               <button 
-                onClick={() => onViewMap(report)} 
+                onClick={(e) => { e.stopPropagation(); onViewMap(report); }} 
                 className={`p-1.5 rounded-md transition-colors cursor-pointer flex-shrink-0 ${isDarkMode ? "hover:bg-slate-700 text-blue-400" : "hover:bg-slate-200 text-blue-600"}`}
                 title="View Exact Location"
               >
@@ -52,33 +47,45 @@ function ReportRow({ report, isDarkMode, getStatusBadge, handleActionClick, proc
             )}
           </div>
         </td>
-        <td className="px-6 py-4 max-w-xs truncate">{report.description}</td>
+        <td className="px-6 py-4">
+          <div className="flex flex-col">
+            <span className="font-medium text-sm">{report.reporter?.name || 'Unknown'}</span>
+            <span className={`text-xs mt-0.5 capitalize ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
+              {report.reporter?.role || 'Citizen'}
+            </span>
+          </div>
+        </td>
         <td className="px-6 py-4">
           {getStatusBadge(report.verification_status)}
         </td>
         <td className="px-6 py-4 text-right">
-          {report.verification_status === "pending" && (
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => handleActionClick(report, "approve")}
-                disabled={processingId === report.disaster_id}
-                className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors disabled:opacity-50 flex items-center gap-1.5"
-              >
-                {processingId === report.disaster_id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
-                {t("adminDisasterReports.approveBtn")}
-              </button>
-              <button
-                onClick={() => handleActionClick(report, "reject")}
-                disabled={processingId === report.disaster_id}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors disabled:opacity-50 flex items-center gap-1.5 ${
-                  isDarkMode ? "border-slate-700 hover:bg-slate-800 text-slate-300" : "border-slate-200 hover:bg-slate-100 text-slate-700"
-                }`}
-              >
-                <XCircle className="w-3.5 h-3.5 text-red-500" />
-                {t("adminDisasterReports.rejectBtn")}
-              </button>
+          <div className="flex items-center justify-end gap-4">
+            {report.verification_status === "pending" && (
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleActionClick(report, "approve"); }}
+                  disabled={processingId === report.disaster_id}
+                  className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+                >
+                  {processingId === report.disaster_id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
+                  {t("adminDisasterReports.approveBtn")}
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleActionClick(report, "reject"); }}
+                  disabled={processingId === report.disaster_id}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer ${
+                    isDarkMode ? "border-slate-700 hover:bg-slate-800 text-slate-300" : "border-slate-200 hover:bg-slate-100 text-slate-700"
+                  }`}
+                >
+                  <XCircle className="w-3.5 h-3.5 text-red-500" />
+                  {t("adminDisasterReports.rejectBtn")}
+                </button>
+              </div>
+            )}
+            <div className={`p-1 rounded-md transition-colors ${isDarkMode ? "bg-slate-800 text-slate-400" : "bg-slate-100 text-slate-500"}`}>
+              {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </div>
-          )}
+          </div>
         </td>
       </tr>
       <AnimatePresence initial={false}>
@@ -135,6 +142,7 @@ export default function DisasterReports({ isDarkMode, onReportsUpdated }) {
   // Filters state
   const [statusFilter, setStatusFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
 
   // Map modal state
   const [selectedMapReport, setSelectedMapReport] = useState(null);
@@ -142,10 +150,7 @@ export default function DisasterReports({ isDarkMode, onReportsUpdated }) {
   const fetchReports = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/disasters/admin/reports", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await axios.get("/disasters/admin/reports");
       setReports(res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -185,9 +190,7 @@ export default function DisasterReports({ isDarkMode, onReportsUpdated }) {
         payload.priority = announceData.priority;
       }
 
-      await axios.put(`http://localhost:5000/api/disasters/admin/report/${id}/status`, payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.put(`/disasters/admin/report/${id}/status`, payload);
 
 
       setShowAnnounceModal(false);
@@ -217,28 +220,34 @@ export default function DisasterReports({ isDarkMode, onReportsUpdated }) {
   const filteredReports = reports.filter(report => {
     const matchStatus = statusFilter ? report.verification_status?.toLowerCase() === statusFilter.toLowerCase() : true;
     const matchType = typeFilter ? report.type === typeFilter : true;
-    return matchStatus && matchType;
+    const matchRole = roleFilter ? report.reporter?.role?.toLowerCase() === roleFilter.toLowerCase() : true;
+    return matchStatus && matchType && matchRole;
   });
 
   // Extract unique disaster types for filter dropdown
   const uniqueTypes = Array.from(new Set(reports.map(r => r.type))).filter(Boolean);
 
   return (
-    <div className={`flex flex-col h-full ${isDarkMode ? "bg-slate-900 text-white" : "bg-slate-50 text-slate-900"}`}>
+    <div className="w-full flex flex-col gap-8 h-full" data-name="AdminDisasterReports">
       {/* Header */}
-      <div className={`p-6 border-b ${isDarkMode ? "border-slate-800" : "border-slate-200"} bg-white dark:bg-slate-900`}>
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-2xl font-bold">{t("adminDisasterReports.title")}</h1>
-          <p className={`mt-1 text-sm ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
-            {t("adminDisasterReports.subtitle")}
-          </p>
-        </div>
+      <div className="flex flex-col gap-1 text-center">
+        <h1 className={`font-semibold text-3xl tracking-tight transition-colors ${isDarkMode ? "text-white" : "text-slate-900"}`}>{t("adminDisasterReports.title")}</h1>
+        <p className={`text-base transition-colors ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
+          {t("adminDisasterReports.subtitle")}
+        </p>
       </div>
 
-      {/* Filters */}
-      <div className={`px-6 py-4 border-b ${isDarkMode ? "border-slate-800 bg-slate-900" : "border-slate-200 bg-white"}`}>
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row gap-4">
-          <div className="flex flex-col">
+      {/* Main Container Card */}
+      <div className={`border rounded-xl shadow-sm overflow-hidden flex flex-col max-h-[calc(100vh-230px)] transition-colors ${isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-900"}`}>
+        
+        {/* Reports Count Header */}
+        <div className={`px-6 py-4 border-b flex items-center gap-3 ${isDarkMode ? "border-slate-800 bg-slate-950/50" : "border-slate-100 bg-slate-50"}`}>
+          <h2 className="text-base font-semibold tracking-tight">Total Arrived Reports: <span className="text-blue-500">{reports.length}</span></h2>
+        </div>
+
+        {/* Filters */}
+        <div className={`px-6 py-4 border-b flex flex-col sm:flex-row gap-4 ${isDarkMode ? "border-slate-800 bg-slate-950/30" : "border-slate-100 bg-slate-50/30"}`}>
+          <div className="flex flex-col w-full sm:w-48">
             <label className={`text-[10px] font-bold mb-1.5 uppercase tracking-wider ${isDarkMode ? "text-slate-500" : "text-slate-500"}`}>Filter by Status</label>
             <select
               value={statusFilter}
@@ -256,7 +265,7 @@ export default function DisasterReports({ isDarkMode, onReportsUpdated }) {
             </select>
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col w-full sm:w-48">
             <label className={`text-[10px] font-bold mb-1.5 uppercase tracking-wider ${isDarkMode ? "text-slate-500" : "text-slate-500"}`}>Filter by Type</label>
             <select
               value={typeFilter}
@@ -273,12 +282,27 @@ export default function DisasterReports({ isDarkMode, onReportsUpdated }) {
               ))}
             </select>
           </div>
-        </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-auto p-6">
-        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col w-full sm:w-48">
+            <label className={`text-[10px] font-bold mb-1.5 uppercase tracking-wider ${isDarkMode ? "text-slate-500" : "text-slate-500"}`}>Filter by Role</label>
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className={`px-3 py-2 rounded-lg text-sm border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                isDarkMode 
+                  ? "bg-slate-800 border-slate-700 text-slate-200" 
+                  : "bg-white border-slate-300 text-slate-700"
+              }`}
+            >
+              <option value="">All Roles</option>
+              <option value="citizen">Citizen</option>
+              <option value="volunteer">Volunteer</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col min-h-0 overflow-auto">
           {loading ? (
             <div className="flex justify-center items-center h-64">
               <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
@@ -289,14 +313,14 @@ export default function DisasterReports({ isDarkMode, onReportsUpdated }) {
               <p className="text-slate-500">{t("adminDisasterReports.noReports")}</p>
             </div>
           ) : (
-            <div className={`rounded-xl border overflow-hidden ${isDarkMode ? "border-slate-800 bg-slate-900" : "border-slate-200 bg-white"}`}>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                  <thead className={`text-xs uppercase ${isDarkMode ? "bg-slate-800 text-slate-400" : "bg-slate-50 text-slate-600"}`}>
+            <div className="flex-1 flex flex-col min-h-0">
+              <div className="flex-1 overflow-auto">
+                <table className="w-full text-sm text-left relative">
+                  <thead className={`text-xs uppercase sticky top-0 z-10 shadow-sm ${isDarkMode ? "bg-slate-800 text-slate-400" : "bg-slate-50 text-slate-600"}`}>
                     <tr>
                       <th className="px-6 py-4 font-semibold">{t("adminDisasterReports.tableType")}</th>
                       <th className="px-6 py-4 font-semibold">{t("adminDisasterReports.tableLocation")}</th>
-                      <th className="px-6 py-4 font-semibold">{t("adminDisasterReports.tableDesc")}</th>
+                      <th className="px-6 py-4 font-semibold">Sender</th>
                       <th className="px-6 py-4 font-semibold">{t("adminDisasterReports.tableStatus")}</th>
                       <th className="px-6 py-4 font-semibold text-right">{t("adminDisasterReports.tableActions")}</th>
                     </tr>
@@ -358,11 +382,15 @@ export default function DisasterReports({ isDarkMode, onReportsUpdated }) {
                     Attached Evidence
                   </label>
                   <div className="flex gap-2 flex-wrap">
-                    {selectedReport.media_url.split(',').map((url, idx) => (
-                      <a key={idx} href={`http://localhost:5000${url}`} target="_blank" rel="noopener noreferrer">
-                        <img src={`http://localhost:5000${url}`} alt={`Evidence ${idx+1}`} className="w-20 h-20 object-cover rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80 transition-opacity shadow-sm" />
-                      </a>
-                    ))}
+                    {selectedReport.media_url.split(',').map((url, idx) => {
+                      const baseUrl = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/api$/, "");
+                      const fullUrl = `${baseUrl}${url.startsWith("/") ? "" : "/"}${url}`;
+                      return (
+                        <a key={idx} href={fullUrl} target="_blank" rel="noopener noreferrer">
+                          <img src={fullUrl} alt={`Evidence ${idx+1}`} className="w-20 h-20 object-cover rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80 transition-opacity shadow-sm" />
+                        </a>
+                      );
+                    })}
                   </div>
                 </div>
               )}

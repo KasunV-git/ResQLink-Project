@@ -4,10 +4,12 @@ import axios from 'axios';
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(() => localStorage.getItem('resqlink_token') || localStorage.getItem('token') || null);
+  const [token, setToken] = useState(() => {
+    return sessionStorage.getItem('resqlink_token') || sessionStorage.getItem('token') || localStorage.getItem('resqlink_token') || localStorage.getItem('token') || null;
+  });
   const [user, setUser]   = useState(() => {
     try {
-      const saved = localStorage.getItem('resqlink_user') || localStorage.getItem('resqlink_volunteer_user');
+      const saved = sessionStorage.getItem('resqlink_user') || sessionStorage.getItem('resqlink_volunteer_user') || localStorage.getItem('resqlink_user') || localStorage.getItem('resqlink_volunteer_user');
       return saved ? JSON.parse(saved) : null;
     } catch (e) {
       console.error('Failed to parse saved user:', e);
@@ -29,7 +31,7 @@ export const AuthProvider = ({ children }) => {
   // On initial mount: verify existing session with /api/auth/me if token exists
   useEffect(() => {
     const verifyToken = async () => {
-      const savedToken = localStorage.getItem('resqlink_token') || localStorage.getItem('token');
+      const savedToken = sessionStorage.getItem('resqlink_token') || sessionStorage.getItem('token') || localStorage.getItem('resqlink_token') || localStorage.getItem('token');
       if (!savedToken) return;
 
       setLoading(true);
@@ -39,8 +41,10 @@ export const AuthProvider = ({ children }) => {
         });
         if (response.data?.success && response.data?.user) {
           setUser(response.data.user);
-          localStorage.setItem('resqlink_user', JSON.stringify(response.data.user));
-          localStorage.setItem('resqlink_volunteer_user', JSON.stringify(response.data.user));
+          const isAdmin = response.data.user?.role?.toLowerCase() === 'admin' || response.data.user?.role?.toLowerCase() === 'administrator';
+          const storage = isAdmin ? sessionStorage : localStorage;
+          storage.setItem('resqlink_user', JSON.stringify(response.data.user));
+          storage.setItem('resqlink_volunteer_user', JSON.stringify(response.data.user));
         }
       } catch (err) {
         console.warn('Session verification failed:', err.message);
@@ -55,15 +59,28 @@ export const AuthProvider = ({ children }) => {
   const login = (data) => {
     const userObj = data?.user ? data.user : data;
     const jwtToken = data?.token || null;
+    const isAdmin = userObj?.role?.toLowerCase() === 'admin' || userObj?.role?.toLowerCase() === 'administrator';
+
+    // Clear both to prevent crossover issues
+    localStorage.removeItem('resqlink_token');
+    localStorage.removeItem('token');
+    localStorage.removeItem('resqlink_user');
+    localStorage.removeItem('resqlink_volunteer_user');
+    sessionStorage.removeItem('resqlink_token');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('resqlink_user');
+    sessionStorage.removeItem('resqlink_volunteer_user');
+
+    const storage = isAdmin ? sessionStorage : localStorage;
 
     setUser(userObj);
     if (jwtToken) {
       setToken(jwtToken);
-      localStorage.setItem('resqlink_token', jwtToken);
-      localStorage.setItem('token', jwtToken);
+      storage.setItem('resqlink_token', jwtToken);
+      storage.setItem('token', jwtToken);
     }
-    localStorage.setItem('resqlink_user', JSON.stringify(userObj));
-    localStorage.setItem('resqlink_volunteer_user', JSON.stringify(userObj));
+    storage.setItem('resqlink_user', JSON.stringify(userObj));
+    storage.setItem('resqlink_volunteer_user', JSON.stringify(userObj));
   };
 
   const logout = async () => {
@@ -77,6 +94,10 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('resqlink_user');
     localStorage.removeItem('resqlink_volunteer_user');
+    sessionStorage.removeItem('resqlink_token');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('resqlink_user');
+    sessionStorage.removeItem('resqlink_volunteer_user');
     delete axios.defaults.headers.common['Authorization'];
     window.location.href = '/';
   };
@@ -84,8 +105,10 @@ export const AuthProvider = ({ children }) => {
   const updateUser = (updatedData) => {
     setUser((prev) => {
       const newObj = { ...prev, ...updatedData };
-      localStorage.setItem('resqlink_user', JSON.stringify(newObj));
-      localStorage.setItem('resqlink_volunteer_user', JSON.stringify(newObj));
+      const isAdmin = newObj?.role?.toLowerCase() === 'admin' || newObj?.role?.toLowerCase() === 'administrator';
+      const storage = isAdmin ? sessionStorage : localStorage;
+      storage.setItem('resqlink_user', JSON.stringify(newObj));
+      storage.setItem('resqlink_volunteer_user', JSON.stringify(newObj));
       return newObj;
     });
   };

@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import {
     ShieldCheck, Siren, Wind, CheckCircle2, ChevronRight,
     FileText, Map, Bell, TriangleAlert, Activity, Users,
-    AlertOctagon, Info, UserCircle,
+    AlertOctagon, Info, UserCircle, Droplets, Flame, MountainSnow,
+    Building2, Stethoscope, FlaskConical, HelpCircle,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getAlerts } from '../../api/alertApi';
@@ -39,24 +40,56 @@ const DEMO_REPORTS = [
 
 /* ── Severity config ── */
 const SEV = {
-    CRITICAL:  { color: '#e53e3e', bg: '#fff5f5',  border: '#fed7d7', dot: '#e53e3e', label: 'Critical',  icon: AlertOctagon },
-    HIGH:      { color: '#dd6b20', bg: '#fffaf0',  border: '#fbd38d', dot: '#dd6b20', label: 'High',      icon: Siren },
-    MODERATE:  { color: '#d69e2e', bg: '#fffff0',  border: '#faf089', dot: '#d69e2e', label: 'Moderate',  icon: Wind },
-    LOW:       { color: '#38a169', bg: '#f0fff4',  border: '#c6f6d5', dot: '#38a169', label: 'Low',       icon: CheckCircle2 },
-    UPDATE:    { color: '#38a169', bg: '#f0fff4',  border: '#c6f6d5', dot: '#38a169', label: 'Update',    icon: CheckCircle2 },
-    DEFAULT:   { color: '#3182ce', bg: '#ebf8ff',  border: '#bee3f8', dot: '#3182ce', label: 'Info',      icon: Info },
+    CRITICAL:  { color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)',  border: '#ef4444', dot: '#ef4444', label: 'Critical',  icon: AlertOctagon },
+    HIGH:      { color: '#f97316', bg: 'rgba(249, 115, 22, 0.15)',  border: '#f97316', dot: '#f97316', label: 'High',      icon: Siren },
+    MODERATE:  { color: '#eab308', bg: 'rgba(234, 179, 8, 0.15)',  border: '#eab308', dot: '#eab308', label: 'Moderate',  icon: Wind },
+    LOW:       { color: '#22c55e', bg: 'rgba(34, 197, 94, 0.15)',  border: '#22c55e', dot: '#22c55e', label: 'Low',       icon: CheckCircle2 },
+    UPDATE:    { color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.15)',  border: '#3b82f6', dot: '#3b82f6', label: 'Update',    icon: CheckCircle2 },
+    DEFAULT:   { color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)',  border: '#8b5cf6', dot: '#8b5cf6', label: 'Info',      icon: Info },
 };
 
 const getSev = (s) => SEV[s?.toUpperCase()] ?? SEV.DEFAULT;
 
-const relTime = (iso) => {
-    const diff = Date.now() - new Date(iso);
+const relTime = (iso, fallbackIso) => {
+    const validIso = iso || fallbackIso;
+    if (!validIso) return 'Just now';
+    const date = new Date(validIso);
+    if (isNaN(date.getTime())) return 'Just now';
+    
+    const diff = Date.now() - date.getTime();
     const m = Math.floor(diff / 60000);
     if (m < 1)   return 'Just now';
     if (m < 60)  return `${m} mins ago`;
     const h = Math.floor(m / 60);
     if (h < 24)  return `${h} hours ago`;
     return `${Math.floor(h / 24)} days ago`;
+};
+
+/* ── Disaster types with icons ── */
+const DISASTER_TYPES = [
+    { value: 'Flash Flood',       icon: Droplets,     color: '#3182ce', bg: '#ebf8ff', defaultSev: 'HIGH' },
+    { value: 'Landslide',         icon: MountainSnow, color: '#dd6b20', bg: '#fffaf0', defaultSev: 'HIGH' },
+    { value: 'Fire',              icon: Flame,        color: '#e53e3e', bg: '#fff5f5', defaultSev: 'CRITICAL' },
+    { value: 'Cyclone / Winds',   icon: Wind,         color: '#805ad5', bg: '#faf5ff', defaultSev: 'HIGH' },
+    { value: 'Building Collapse', icon: Building2,    color: '#744210', bg: '#fefcbf', defaultSev: 'CRITICAL' },
+    { value: 'Medical Emergency', icon: Stethoscope,  color: '#319795', bg: '#e6fffa', defaultSev: 'HIGH' },
+    { value: 'Chemical Spill',    icon: FlaskConical, color: '#2d3748', bg: '#edf2f7', defaultSev: 'CRITICAL' },
+    { value: 'Earthquake',        icon: TriangleAlert,color: '#c05621', bg: '#fffaf0', defaultSev: 'CRITICAL' },
+    { value: 'Other',             icon: HelpCircle,   color: '#718096', bg: '#f7fafc', defaultSev: 'MODERATE' },
+];
+
+const getDisasterType = (message) => {
+    if (!message) return DISASTER_TYPES.find(d => d.value === 'Other');
+    const lowerMsg = message.toLowerCase();
+    if (lowerMsg.includes('flash flood') || lowerMsg.includes('flood')) return DISASTER_TYPES.find(d => d.value === 'Flash Flood');
+    if (lowerMsg.includes('landslide')) return DISASTER_TYPES.find(d => d.value === 'Landslide');
+    if (lowerMsg.includes('fire')) return DISASTER_TYPES.find(d => d.value === 'Fire');
+    if (lowerMsg.includes('cyclone') || lowerMsg.includes('wind')) return DISASTER_TYPES.find(d => d.value === 'Cyclone / Winds');
+    if (lowerMsg.includes('collapse')) return DISASTER_TYPES.find(d => d.value === 'Building Collapse');
+    if (lowerMsg.includes('medical')) return DISASTER_TYPES.find(d => d.value === 'Medical Emergency');
+    if (lowerMsg.includes('chemical')) return DISASTER_TYPES.find(d => d.value === 'Chemical Spill');
+    if (lowerMsg.includes('earthquake')) return DISASTER_TYPES.find(d => d.value === 'Earthquake');
+    return DISASTER_TYPES.find(d => d.value === 'Other');
 };
 
 /* ── Overall area status derived from alerts ── */
@@ -77,6 +110,13 @@ const Dashboard = () => {
     const [alerts, setAlerts] = useState([]);
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [nowTick, setNowTick] = useState(Date.now());
+
+    // Live ticker for relative times
+    useEffect(() => {
+        const timer = setInterval(() => setNowTick(Date.now()), 60000);
+        return () => clearInterval(timer);
+    }, []);
 
     useEffect(() => {
         const load = async () => {
@@ -158,9 +198,9 @@ const Dashboard = () => {
                         color: '#3182ce', bg: '#ebf8ff', to: '/citizen/report',
                     },
                     {
-                        icon: ShieldCheck, label: t('citizen.trustScore', 'Trust Score'), value: user?.trust_score ?? 84,
+                        icon: ShieldCheck, label: t('citizen.trustScore', 'Trust Score'), value: user?.trust_score ?? 30,
                         color: '#1a9e7a', bg: '#f0fff4', to: '/citizen/profile',
-                    },
+                    }
                 ].map(({ icon: Icon, label, value, color, bg, to }) => (
                     <Link key={label} to={to} style={{ ...s.statCard, textDecoration: 'none' }} className="card">
                         <div style={{ ...s.statIcon, background: bg }}>
@@ -196,8 +236,15 @@ const Dashboard = () => {
                             </div>
                         ) : (
                             alerts.slice(0, 4).map((alert) => {
-                                const cfg = getSev(alert.severity);
-                                const Icon = cfg.icon;
+                                const disCfg = getDisasterType(alert.message);
+                                
+                                // Determine severity: Use backend severity if valid, otherwise fallback to disaster type's default
+                                const backendSevStr = (alert.severity || alert.priority || '').toUpperCase();
+                                const isValidSev = SEV[backendSevStr] && backendSevStr !== 'DEFAULT';
+                                const finalSevStr = isValidSev ? backendSevStr : disCfg.defaultSev;
+                                const cfg = getSev(finalSevStr);
+                                
+                                const Icon = disCfg.icon;
                                 return (
                                     <div
                                         key={alert.alert_id}
@@ -208,15 +255,15 @@ const Dashboard = () => {
                                         }}
                                         className="card"
                                     >
-                                        <div style={{ ...s.alertIconWrap, background: cfg.bg }}>
-                                            <Icon size={18} color={cfg.color} />
+                                        <div style={{ ...s.alertIconWrap, background: disCfg.bg }}>
+                                            <Icon size={18} color={disCfg.color} />
                                         </div>
                                         <div style={{ flex: 1, minWidth: 0 }}>
                                             <div style={s.alertTop}>
                                                 <span style={{ ...s.sevBadge, color: cfg.color, background: cfg.bg, border: `1px solid ${cfg.border}` }}>
                                                     {cfg.label}
                                                 </span>
-                                                <span style={s.alertTime}>{relTime(alert.sent_at)}</span>
+                                                <span style={s.alertTime}>{relTime(alert.time, alert.sent_at || alert.created_at || alert.timestamp)}</span>
                                             </div>
                                             <p style={s.alertMsg}>{alert.message}</p>
                                         </div>
@@ -326,22 +373,7 @@ const Dashboard = () => {
                         </div>
                     </section>
 
-                    {/* Identity card */}
-                    <section style={s.identityCard} className="card">
-                        <div style={s.identityIcon}>
-                            <ShieldCheck size={22} color="#1a2456" />
-                        </div>
-                        <div style={{ flex: 1 }}>
-                            <div style={s.identityLabel}>Verified Citizen</div>
-                            <div style={s.identityName}>{user?.name ?? 'Citizen User'}</div>
-                            <div style={s.trustBarWrap}>
-                                <div style={{ ...s.trustBarFill, width: `${user?.trust_score ?? 84}%` }} />
-                            </div>
-                            <div style={s.trustLabel}>
-                                Trust Score: {user?.trust_score ?? 84}
-                            </div>
-                        </div>
-                    </section>
+                    {/* Identity card removed as requested */}
 
                 </div>
             </div>

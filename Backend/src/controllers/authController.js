@@ -1,6 +1,6 @@
 // backend/src/controllers/authController.js
 const bcrypt = require('bcryptjs');
-const { User } = require('../models');
+const { User, Disaster, Alert } = require('../models');
 const generateToken = require('../utils/generateToken');
 const { successResponse, errorResponse } = require('../utils/responseHandler');
 
@@ -67,6 +67,9 @@ const login = async (req, res) => {
             role: user.role,
         });
 
+        const reports_count = await Disaster.count({ where: { reported_by: user.user_id } });
+        const active_alerts = await Alert.count(); // Assuming all alerts in DB are currently active/relevant for this dashboard
+
         return successResponse(res, 'Login successful.', {
             token,
             user: {
@@ -80,6 +83,8 @@ const login = async (req, res) => {
                 primary_region: user.primary_region,
                 phone_number: user.phone_number,
                 created_at: user.created_at,
+                reports_count,
+                active_alerts
             },
         });
     } catch (err) {
@@ -94,7 +99,15 @@ const getProfile = async (req, res) => {
             attributes: { exclude: ['password_hash'] },
         });
         if (!user) return errorResponse(res, 'User not found.', 404);
-        return successResponse(res, 'Profile fetched.', user);
+
+        const reports_count = await Disaster.count({ where: { reported_by: user.user_id } });
+        const active_alerts = await Alert.count();
+        
+        const userObj = user.toJSON();
+        userObj.reports_count = reports_count;
+        userObj.active_alerts = active_alerts;
+
+        return successResponse(res, 'Profile fetched.', userObj);
     } catch (err) {
         return errorResponse(res, err.message, 500);
     }
