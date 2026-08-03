@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
+import axios from "../../api/axios";
 import { CheckCircle, XCircle, AlertTriangle, Megaphone, Loader2, ChevronDown, ChevronUp, MapPin, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
@@ -150,10 +150,7 @@ export default function DisasterReports({ isDarkMode, onReportsUpdated }) {
   const fetchReports = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/disasters/admin/reports", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await axios.get("/disasters/admin/reports");
       setReports(res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -193,9 +190,7 @@ export default function DisasterReports({ isDarkMode, onReportsUpdated }) {
         payload.priority = announceData.priority;
       }
 
-      await axios.put(`http://localhost:5000/api/disasters/admin/report/${id}/status`, payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.put(`/disasters/admin/report/${id}/status`, payload);
 
 
       setShowAnnounceModal(false);
@@ -387,11 +382,15 @@ export default function DisasterReports({ isDarkMode, onReportsUpdated }) {
                     Attached Evidence
                   </label>
                   <div className="flex gap-2 flex-wrap">
-                    {selectedReport.media_url.split(',').map((url, idx) => (
-                      <a key={idx} href={`http://localhost:5000${url}`} target="_blank" rel="noopener noreferrer">
-                        <img src={`http://localhost:5000${url}`} alt={`Evidence ${idx+1}`} className="w-20 h-20 object-cover rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80 transition-opacity shadow-sm" />
-                      </a>
-                    ))}
+                    {selectedReport.media_url.split(',').map((url, idx) => {
+                      const baseUrl = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/api$/, "");
+                      const fullUrl = `${baseUrl}${url.startsWith("/") ? "" : "/"}${url}`;
+                      return (
+                        <a key={idx} href={fullUrl} target="_blank" rel="noopener noreferrer">
+                          <img src={fullUrl} alt={`Evidence ${idx+1}`} className="w-20 h-20 object-cover rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:opacity-80 transition-opacity shadow-sm" />
+                        </a>
+                      );
+                    })}
                   </div>
                 </div>
               )}

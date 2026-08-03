@@ -34,7 +34,8 @@ export default function ProfileAvatar({
       return rawUrl;
     }
     // Relative path from Express backend
-    return `http://localhost:5000${rawUrl.startsWith("/") ? "" : "/"}${rawUrl}`;
+    const baseUrl = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/api$/, "");
+    return `${baseUrl}${rawUrl.startsWith("/") ? "" : "/"}${rawUrl}`;
   })();
 
   // Compute initials (e.g. "Kamal Perera" -> "KP")
