@@ -94,13 +94,15 @@ router.put('/:userId', async (req, res) => {
   }
 
   const rawSkills = Array.isArray(req.body.skills) ? req.body.skills : [];
-  const skillsList = [
-    ...new Set(
-      rawSkills
-        .map(s => String(s || '').trim())
-        .filter(s => s.length > 0 && s.length <= 100)
-    )
-  ];
+  // Deduplicate skills case-insensitively
+  const uniqueSkillsMap = new Map();
+  rawSkills.forEach(s => {
+    const cleaned = String(s || '').trim();
+    if (cleaned.length > 0 && cleaned.length <= 100) {
+      uniqueSkillsMap.set(cleaned.toLowerCase(), cleaned);
+    }
+  });
+  const skillsList = Array.from(uniqueSkillsMap.values());
 
   try {
     const skillIds = [];
@@ -143,7 +145,7 @@ router.put('/:userId', async (req, res) => {
     });
   } catch (error) {
     console.error('Save skills error:', error.message);
-    return res.status(500).json({ message: 'Failed to save skills.' });
+    return res.status(500).json({ message: 'Failed to save skills.', error: error.message, stack: error.stack });
   }
 });
 

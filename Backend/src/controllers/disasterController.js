@@ -7,7 +7,7 @@ const db = require('../config/db');
 // Submit disaster report
 const submitReport = async (req, res) => {
     try {
-        const { type, location, description, lat, lng, landmark, peopleAffected } = req.body;
+        const { type, location, description, lat, lng, landmark, peopleAffected, severity } = req.body;
         const media_url = req.files && req.files.length > 0
             ? req.files.map(f => `/uploads/reports/${f.filename}`).join(',')
             : null;
@@ -23,6 +23,7 @@ const submitReport = async (req, res) => {
             media_url,
             reported_by: req.user.id,
             status: 'pending',
+            predictor_risk_level: severity ? severity.toLowerCase() : 'low',
         });
 
         return successResponse(res, 'Report submitted successfully.', disaster, 201);

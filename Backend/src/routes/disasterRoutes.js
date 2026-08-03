@@ -15,9 +15,7 @@ const { uploadReport } = require('../config/multer');
 const protect = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    // If unauthenticated for testing, set fallback dummy user
-    req.user = { id: 1, role: 'Citizen' };
-    return next();
+    return res.status(401).json({ success: false, message: 'No authentication token provided.' });
   }
   try {
     const jwt = require('jsonwebtoken');
@@ -26,8 +24,7 @@ const protect = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (err) {
-    req.user = { id: 1, role: 'Citizen' };
-    next();
+    return res.status(401).json({ success: false, message: 'Invalid or expired token.' });
   }
 };
 

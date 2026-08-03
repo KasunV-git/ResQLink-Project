@@ -26,6 +26,8 @@ const pool = mysql.createPool({
   queueLimit:         0,
   timezone:           'local',
   ssl:                sslConfig,
+  enableKeepAlive:    true,
+  keepAliveInitialDelay: 0,
 });
 
 // 2. Sequelize ORM instance for models

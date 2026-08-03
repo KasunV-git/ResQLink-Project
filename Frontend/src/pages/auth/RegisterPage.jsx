@@ -74,7 +74,10 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
     setLoading(true);
     setError("");
     try {
-      const response = await axios.post("/api/auth/google", { token: credentialResponse.credential });
+      const response = await axios.post("/api/auth/google", { 
+        token: credentialResponse.credential,
+        role: role
+      });
       if (onLoginSuccess) {
         onLoginSuccess(response.data);
       } else if (onBackToLogin) {

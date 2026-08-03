@@ -2,9 +2,7 @@
 import api from './axios';
 
 export const submitReport = (data) => {
-    return api.post('/disasters/report', data, {
-        headers: { 'Content-Type': undefined }
-    });
+    return api.post('/disasters/report', data);
 };
 export const getMyReports = () => api.get('/disasters/my-reports');
 export const getReportById = (id) => api.get(`/disasters/report/${id}`);

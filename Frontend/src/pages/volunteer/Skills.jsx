@@ -31,7 +31,10 @@ export default function Skills({
   const handleAddDraftSkill = (skillName) => {
     const cleaned = skillName.trim();
     if (!cleaned) return;
-    if (!draftSkills.includes(cleaned)) {
+    const isDuplicate = draftSkills.some(
+      (s) => s.toLowerCase() === cleaned.toLowerCase()
+    );
+    if (!isDuplicate) {
       setDraftSkills((prev) => [...prev, cleaned]);
     }
   };

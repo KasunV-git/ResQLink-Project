@@ -86,17 +86,18 @@ const handleSignup = async (req, res) => {
   }
 
   try {
+    const combinedName   = name || `${firstName} ${lastName}`.trim() || username;
+    const emailVal       = inputEmail || (username.includes('@') ? username : `${username.toLowerCase()}@resqlink.com`);
+
     const [existing] = await db.query(
       'SELECT id FROM users WHERE LOWER(username) = ? OR (email IS NOT NULL AND email != "" AND LOWER(email) = ?)',
-      [username.toLowerCase(), username.toLowerCase()]
+      [username.toLowerCase(), emailVal.toLowerCase()]
     );
     if (existing.length > 0) {
       return res.status(409).json({ success: false, message: 'An account with this username already exists.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const combinedName   = name || `${firstName} ${lastName}`.trim() || username;
-    const emailVal       = inputEmail || (username.includes('@') ? username : `${username.toLowerCase()}@resqlink.com`);
 
     const [result] = await db.query(
       'INSERT INTO users (username, name, first_name, last_name, email, phone, role, is_available, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -166,7 +167,7 @@ router.post('/login', async (req, res) => {
 
 /* ══ POST /api/auth/google ══ */
 router.post('/google', async (req, res) => {
-  const { token } = req.body;
+  const { token, role } = req.body;
   if (!token) return res.status(400).json({ success: false, message: 'No Google token provided.' });
 
   try {
@@ -187,13 +188,14 @@ router.post('/google', async (req, res) => {
     if (existing.length > 0) {
       userId = existing[0].id;
     } else {
-      // Create new user, default to Citizen
+      // Create new user with selected role (default to Citizen)
+      const userRole = (role && role.toLowerCase() === 'volunteer') ? 'Volunteer' : 'Citizen';
       const username = email.split('@')[0] + Math.floor(Math.random() * 1000);
       const hashedPassword = await bcrypt.hash(Math.random().toString(36).slice(-8), 10);
       
       const [result] = await db.query(
         'INSERT INTO users (username, name, first_name, last_name, email, role, is_available, password, avatar_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [username, name, given_name || name.split(' ')[0], family_name || '', email, 'Citizen', 1, hashedPassword, picture]
+        [username, name || '', given_name || (name ? name.split(' ')[0] : ''), family_name || '', email, userRole, 1, hashedPassword, picture]
       );
       userId = result.insertId;
     }
