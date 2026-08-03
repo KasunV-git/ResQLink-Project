@@ -108,7 +108,7 @@ export default function Dashboard({ user, onToggleAvailability, activeAssignment
               {t("dashboard.viewAll") || "View All →"}
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto flex flex-col gap-2.5">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col gap-2.5">
             {alerts.length === 0 ? (
               <div className="flex-1 flex items-center justify-center text-slate-400 dark:text-slate-500 text-sm py-8">{t("dashboard.noActiveAlerts") || "No active alerts"}</div>
             ) : alerts.slice(0, 3).map(alert => {

@@ -1,8 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Bell, X, Filter } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import LocationPicker from "../../components/LocationPicker";
-import { SL_DISTRICTS } from "../../data/sriLankaLocations";
 
 const DISASTER_TYPES = [
   { key: "all",       labelKey: "alerts.types.all",       fallback: "All Disasters" },
@@ -79,8 +77,7 @@ const PRIORITY_STYLE = {
 export default function Alerts({ alerts = [] }) {
   const { t } = useTranslation();
   const [typeFilter,      setTypeFilter]      = useState("all");
-  const [filterProvince,  setFilterProvince]  = useState("");
-  const [filterDistrict,  setFilterDistrict]  = useState("");
+  const [severityFilter,  setSeverityFilter]  = useState("all");
 
   const typeCounts = useMemo(() => {
     const map = {};
@@ -90,25 +87,25 @@ export default function Alerts({ alerts = [] }) {
     return map;
   }, [alerts]);
 
+  const topDisasterTypes = useMemo(() => {
+    const types = DISASTER_TYPES.slice(1);
+    types.sort((a, b) => (typeCounts[b.key] || 0) - (typeCounts[a.key] || 0));
+    return [DISASTER_TYPES[0], ...types.slice(0, 3)];
+  }, [typeCounts]);
+
   const filteredAlerts = useMemo(() => {
     return alerts.filter(a => {
       const typeMatch = typeFilter === "all" || getAlertType(a) === typeFilter;
-      const locMatch  = alertMatchesLocation(a, filterProvince, filterDistrict);
-      return typeMatch && locMatch;
+      const severityMatch = severityFilter === "all" || (a.priority || "low").toLowerCase() === severityFilter;
+      return typeMatch && severityMatch;
     });
-  }, [alerts, typeFilter, filterProvince, filterDistrict]);
+  }, [alerts, typeFilter, severityFilter]);
 
-  const hasActiveFilters = typeFilter !== "all" || filterProvince || filterDistrict;
+  const hasActiveFilters = typeFilter !== "all" || severityFilter !== "all";
 
   function clearFilters() {
     setTypeFilter("all");
-    setFilterProvince("");
-    setFilterDistrict("");
-  }
-
-  function handleProvinceChange(p) {
-    setFilterProvince(p);
-    setFilterDistrict("");
+    setSeverityFilter("all");
   }
 
   return (
@@ -149,7 +146,7 @@ export default function Alerts({ alerts = [] }) {
             {t("alerts.disasterType") || "Disaster Type"}
           </p>
           <div className="flex flex-wrap gap-2">
-            {DISASTER_TYPES.map(type => (
+            {topDisasterTypes.map(type => (
               <TypePill
                 key={type.key}
                 type={type}
@@ -161,19 +158,40 @@ export default function Alerts({ alerts = [] }) {
           </div>
         </div>
 
-        {/* Location filter */}
-        <div>
-          <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">
-            {t("alerts.filterByLocation") || "Filter by Location"}
-          </p>
-          <LocationPicker
-            province={filterProvince}
-            district={filterDistrict}
-            onProvinceChange={handleProvinceChange}
-            onDistrictChange={setFilterDistrict}
-            allowAll
-            compact
-          />
+        {/* Dropdown Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">
+              {t("alerts.disasterType") || "Disaster Type"}
+            </p>
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+            >
+              {DISASTER_TYPES.map(type => (
+                <option key={type.key} value={type.key}>
+                  {t(type.labelKey) || type.fallback} ({type.key === "all" ? alerts.length : (typeCounts[type.key] ?? 0)})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">
+              ALERT SEVERITY LEVEL
+            </p>
+            <select
+              value={severityFilter}
+              onChange={(e) => setSeverityFilter(e.target.value)}
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+            >
+              <option value="all">All severities</option>
+              <option value="critical">Critical</option>
+              <option value="high">High</option>
+              <option value="medium">Moderate</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
         </div>
 
         {/* Active filter summary */}
@@ -199,18 +217,10 @@ export default function Alerts({ alerts = [] }) {
                   </button>
                 </span>
               )}
-              {filterDistrict && (
+              {severityFilter !== "all" && (
                 <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-full">
-                  {filterDistrict}
-                  <button onClick={() => setFilterDistrict("")} className="hover:text-red-500 transition-colors">
-                    <X className="w-2.5 h-2.5" />
-                  </button>
-                </span>
-              )}
-              {filterProvince && !filterDistrict && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-full">
-                  {filterProvince}
-                  <button onClick={() => { setFilterProvince(""); setFilterDistrict(""); }} className="hover:text-red-500 transition-colors">
+                  {severityFilter.toUpperCase()}
+                  <button onClick={() => setSeverityFilter("all")} className="hover:text-red-500 transition-colors">
                     <X className="w-2.5 h-2.5" />
                   </button>
                 </span>

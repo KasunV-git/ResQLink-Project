@@ -86,17 +86,18 @@ const handleSignup = async (req, res) => {
   }
 
   try {
+    const combinedName   = name || `${firstName} ${lastName}`.trim() || username;
+    const emailVal       = inputEmail || (username.includes('@') ? username : `${username.toLowerCase()}@resqlink.com`);
+
     const [existing] = await db.query(
       'SELECT id FROM users WHERE LOWER(username) = ? OR (email IS NOT NULL AND email != "" AND LOWER(email) = ?)',
-      [username.toLowerCase(), username.toLowerCase()]
+      [username.toLowerCase(), emailVal.toLowerCase()]
     );
     if (existing.length > 0) {
       return res.status(409).json({ success: false, message: 'An account with this username already exists.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const combinedName   = name || `${firstName} ${lastName}`.trim() || username;
-    const emailVal       = inputEmail || (username.includes('@') ? username : `${username.toLowerCase()}@resqlink.com`);
 
     const [result] = await db.query(
       'INSERT INTO users (username, name, first_name, last_name, email, phone, role, is_available, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
