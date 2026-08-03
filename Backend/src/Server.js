@@ -41,6 +41,10 @@ app.use('/api/assignments', assignmentsRouter);
 app.use('/api/disasters',   disasterRouter);
 
 // ── Health check ──
+app.get('/', (req, res) => {
+  res.json({ message: 'ResQLink Backend API is running successfully!', status: 'online' });
+});
+
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', service: 'ResQLink API', timestamp: new Date().toISOString() });
 });
