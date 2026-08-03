@@ -5,19 +5,20 @@ import {
     Siren, Wind, CheckCircle2, Info, Search, BellOff,
     Check, RefreshCw, ChevronDown, ChevronUp, Copy,
     AlertOctagon, Clock, Radio, Mail, Smartphone, Bell,
-    CheckCheck, SlidersHorizontal,
+    CheckCheck, SlidersHorizontal, Droplets, Flame, MountainSnow,
+    Building2, Stethoscope, FlaskConical, HelpCircle, TriangleAlert,
 } from 'lucide-react';
 import { getAlerts, acknowledgeAlert } from '../../api/alertApi';
 import Loader from '../../components/common/Loader';
 
 /* ── Severity config ── */
 const SEV = {
-    CRITICAL: { label: 'Critical', color: '#e53e3e', bg: '#fff5f5', border: '#fed7d7', icon: AlertOctagon,  priority: 1 },
-    HIGH:     { label: 'High',     color: '#dd6b20', bg: '#fffaf0', border: '#fbd38d', icon: Siren,         priority: 2 },
-    MODERATE: { label: 'Moderate', color: '#d69e2e', bg: '#fffff0', border: '#faf089', icon: Wind,          priority: 3 },
-    LOW:      { label: 'Low',      color: '#38a169', bg: '#f0fff4', border: '#c6f6d5', icon: CheckCircle2,  priority: 4 },
-    UPDATE:   { label: 'Update',   color: '#38a169', bg: '#f0fff4', border: '#c6f6d5', icon: CheckCircle2,  priority: 5 },
-    DEFAULT:  { label: 'Info',     color: '#3182ce', bg: '#ebf8ff', border: '#bee3f8', icon: Info,          priority: 6 },
+    CRITICAL: { label: 'Critical', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)', border: '#ef4444', icon: AlertOctagon,  priority: 1 },
+    HIGH:     { label: 'High',     color: '#f97316', bg: 'rgba(249, 115, 22, 0.15)', border: '#f97316', icon: Siren,         priority: 2 },
+    MODERATE: { label: 'Moderate', color: '#eab308', bg: 'rgba(234, 179, 8, 0.15)', border: '#eab308', icon: Wind,          priority: 3 },
+    LOW:      { label: 'Low',      color: '#22c55e', bg: 'rgba(34, 197, 94, 0.15)', border: '#22c55e', icon: CheckCircle2,  priority: 4 },
+    UPDATE:   { label: 'Update',   color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.15)', border: '#3b82f6', icon: CheckCircle2,  priority: 5 },
+    DEFAULT:  { label: 'Info',     color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)', border: '#8b5cf6', icon: Info,          priority: 6 },
 };
 const getSev = (s) => SEV[s?.toUpperCase()] ?? SEV.DEFAULT;
 
@@ -30,13 +31,45 @@ const ChannelIcon = ({ ch }) => {
 };
 
 /* ── Time helpers ── */
-const relTime = (iso) => {
-    const diff = Date.now() - new Date(iso);
+const relTime = (iso, fallbackIso) => {
+    const validIso = iso || fallbackIso;
+    if (!validIso) return 'Just now';
+    const date = new Date(validIso);
+    if (isNaN(date.getTime())) return 'Just now';
+    
+    const diff = Date.now() - date.getTime();
     const m = Math.floor(diff / 60000);
     if (m < 1)   return 'Just now';
     if (m < 60)  return `${m}m ago`;
     if (m < 1440) return `${Math.floor(m / 60)}h ago`;
     return `${Math.floor(m / 1440)}d ago`;
+};
+
+/* ── Disaster types with icons ── */
+const DISASTER_TYPES = [
+    { value: 'Flash Flood',       icon: Droplets,     color: '#3182ce', bg: '#ebf8ff', defaultSev: 'HIGH' },
+    { value: 'Landslide',         icon: MountainSnow, color: '#dd6b20', bg: '#fffaf0', defaultSev: 'HIGH' },
+    { value: 'Fire',              icon: Flame,        color: '#e53e3e', bg: '#fff5f5', defaultSev: 'CRITICAL' },
+    { value: 'Cyclone / Winds',   icon: Wind,         color: '#805ad5', bg: '#faf5ff', defaultSev: 'HIGH' },
+    { value: 'Building Collapse', icon: Building2,    color: '#744210', bg: '#fefcbf', defaultSev: 'CRITICAL' },
+    { value: 'Medical Emergency', icon: Stethoscope,  color: '#319795', bg: '#e6fffa', defaultSev: 'HIGH' },
+    { value: 'Chemical Spill',    icon: FlaskConical, color: '#2d3748', bg: '#edf2f7', defaultSev: 'CRITICAL' },
+    { value: 'Earthquake',        icon: TriangleAlert,color: '#c05621', bg: '#fffaf0', defaultSev: 'CRITICAL' },
+    { value: 'Other',             icon: HelpCircle,   color: '#718096', bg: '#f7fafc', defaultSev: 'MODERATE' },
+];
+
+const getDisasterType = (message) => {
+    if (!message) return DISASTER_TYPES.find(d => d.value === 'Other');
+    const lowerMsg = message.toLowerCase();
+    if (lowerMsg.includes('flash flood') || lowerMsg.includes('flood')) return DISASTER_TYPES.find(d => d.value === 'Flash Flood');
+    if (lowerMsg.includes('landslide')) return DISASTER_TYPES.find(d => d.value === 'Landslide');
+    if (lowerMsg.includes('fire')) return DISASTER_TYPES.find(d => d.value === 'Fire');
+    if (lowerMsg.includes('cyclone') || lowerMsg.includes('wind')) return DISASTER_TYPES.find(d => d.value === 'Cyclone / Winds');
+    if (lowerMsg.includes('collapse')) return DISASTER_TYPES.find(d => d.value === 'Building Collapse');
+    if (lowerMsg.includes('medical')) return DISASTER_TYPES.find(d => d.value === 'Medical Emergency');
+    if (lowerMsg.includes('chemical')) return DISASTER_TYPES.find(d => d.value === 'Chemical Spill');
+    if (lowerMsg.includes('earthquake')) return DISASTER_TYPES.find(d => d.value === 'Earthquake');
+    return DISASTER_TYPES.find(d => d.value === 'Other');
 };
 
 const fullTime = (iso) =>
@@ -117,6 +150,13 @@ const Alerts = () => {
     const [expanded, setExpanded] = useState(null);        // alert_id
     const [copied, setCopied]     = useState(null);
     const [showSort, setShowSort] = useState(false);
+    const [nowTick, setNowTick]   = useState(Date.now());
+
+    // Live ticker for relative times
+    useEffect(() => {
+        const timer = setInterval(() => setNowTick(Date.now()), 60000);
+        return () => clearInterval(timer);
+    }, []);
 
     const fetchAlerts = useCallback(async (isRefresh = false) => {
         if (isRefresh) setRefreshing(true);
@@ -162,10 +202,17 @@ const Alerts = () => {
     };
 
     /* ── Counts ── */
+    const getAlertFinalSev = (a) => {
+        const disCfg = getDisasterType(a.message);
+        const backendSevStr = (a.severity || a.priority || '').toUpperCase();
+        const isValidSev = SEV[backendSevStr] && backendSevStr !== 'DEFAULT';
+        return isValidSev ? backendSevStr : disCfg.defaultSev;
+    };
+
     const total       = alerts.length;
     const unreadCount = alerts.filter(a => !a.acknowledged).length;
-    const critCount   = alerts.filter(a => a.severity === 'CRITICAL' && !a.acknowledged).length;
-    const highCount   = alerts.filter(a => a.severity === 'HIGH' && !a.acknowledged).length;
+    const critCount   = alerts.filter(a => getAlertFinalSev(a) === 'CRITICAL' && !a.acknowledged).length;
+    const highCount   = alerts.filter(a => getAlertFinalSev(a) === 'HIGH' && !a.acknowledged).length;
 
     /* ── Filter + sort pipeline ── */
     const visible = alerts
@@ -174,13 +221,15 @@ const Alerts = () => {
             if (tab === 'ACKNOWLEDGED')  return  a.acknowledged;
             return true;
         })
-        .filter(a => sevFilter === 'ALL' || a.severity === sevFilter)
+        .filter(a => sevFilter === 'ALL' || getAlertFinalSev(a) === sevFilter)
         .filter(a => !search || a.message.toLowerCase().includes(search.toLowerCase()) || a.location?.toLowerCase().includes(search.toLowerCase()))
         .sort((a, b) => {
             if (a.acknowledged !== b.acknowledged) return a.acknowledged ? 1 : -1;
-            if (sort === 'newest')   return new Date(b.sent_at) - new Date(a.sent_at);
-            if (sort === 'oldest')   return new Date(a.sent_at) - new Date(b.sent_at);
-            if (sort === 'severity') return getSev(a.severity).priority - getSev(b.severity).priority;
+            const timeA = new Date(a.time || a.sent_at || a.created_at || a.timestamp);
+            const timeB = new Date(b.time || b.sent_at || b.created_at || b.timestamp);
+            if (sort === 'newest')   return timeB - timeA;
+            if (sort === 'oldest')   return timeA - timeB;
+            if (sort === 'severity') return getSev(getAlertFinalSev(a)).priority - getSev(getAlertFinalSev(b)).priority;
             return 0;
         });
 
@@ -269,7 +318,7 @@ const Alerts = () => {
 
                 {/* Severity filter pills */}
                 <div style={s.filterRow} className="alerts-filter-row">
-                    {['ALL', 'CRITICAL', 'HIGH', 'MODERATE', 'LOW', 'UPDATE'].map(f => {
+                    {['ALL', 'CRITICAL', 'HIGH', 'MODERATE', 'LOW'].map(f => {
                         const cfg = f !== 'ALL' ? getSev(f) : null;
                         return (
                             <button
@@ -345,8 +394,15 @@ const Alerts = () => {
             ) : (
                 <div style={s.list}>
                     {visible.map((alert) => {
-                        const cfg  = getSev(alert.severity);
-                        const Icon = cfg.icon;
+                        const disCfg = getDisasterType(alert.message);
+                        
+                        // Determine severity: Use backend severity if valid, otherwise fallback to disaster type's default
+                        const backendSevStr = (alert.severity || alert.priority || '').toUpperCase();
+                        const isValidSev = SEV[backendSevStr] && backendSevStr !== 'DEFAULT';
+                        const finalSevStr = isValidSev ? backendSevStr : disCfg.defaultSev;
+                        const cfg = getSev(finalSevStr);
+                        
+                        const Icon = disCfg.icon;
                         const acked   = alert.acknowledged;
                         const isOpen  = expanded === alert.alert_id;
 
@@ -388,7 +444,7 @@ const Alerts = () => {
                                             </span>
                                             <span style={s.timeLabel}>
                                                 <Clock size={11} />
-                                                {relTime(alert.sent_at)}
+                                                {relTime(alert.time, alert.sent_at || alert.created_at || alert.timestamp)}
                                             </span>
                                         </div>
                                         <p style={s.alertMsg}>{alert.message}</p>
@@ -444,7 +500,7 @@ const Alerts = () => {
                                             {/* Full timestamp */}
                                             <div style={s.expandItem}>
                                                 <span style={s.expandLabel}>Issued At</span>
-                                                <span style={s.expandValue}>{fullTime(alert.sent_at)}</span>
+                                                <span style={s.expandValue}>{fullTime(alert.time || alert.sent_at || alert.created_at || alert.timestamp)}</span>
                                             </div>
 
                                             {/* Channel */}

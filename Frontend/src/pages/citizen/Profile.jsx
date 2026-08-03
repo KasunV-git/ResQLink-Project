@@ -10,7 +10,7 @@ import {
     ShieldCheck, Clock, ChevronDown, ChevronUp,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { updateProfile, uploadAvatar } from '../../api/authApi';
+import { updateProfile, uploadAvatar, getZones, addZone as addZoneApi, toggleZoneStatus, removeZone as removeZoneApi } from '../../api/authApi';
 import Loader from '../../components/common/Loader';
 
 /* ── Disaster alert types for subscription toggles ── */
@@ -69,8 +69,15 @@ const Profile = () => {
     const [newContact, setNewContact] = useState({ name: '', phone: '', relationship: 'Spouse' });
 
     /* Alert zones */
-    const [zones, setZones]           = useState(DEMO_ZONES);
+    const [zones, setZones]           = useState([]);
     const [addZone, setAddZone]       = useState('');
+
+    /* Fetch Zones */
+    useEffect(() => {
+        if (user) {
+            getZones().then(res => setZones(res.data.zones || [])).catch(err => console.error(err));
+        }
+    }, [user]);
 
     /* Sync form */
     useEffect(() => {
@@ -140,13 +147,47 @@ const Profile = () => {
     const removeContact = (id) => { setContacts(p => p.filter(c => c.id !== id)); flash('Contact removed.'); };
 
     /* Zones */
-    const toggleZone = (id) => setZones(p => p.map(z => z.id === id ? { ...z, active: !z.active } : z));
-    const removeZone = (id) => setZones(p => p.filter(z => z.id !== id));
-    const addZoneHandler = () => {
+    const toggleZone = async (id) => {
+        const zone = zones.find(z => z.id === id);
+        if (!zone) return;
+        const newActive = !zone.active;
+        setZones(p => p.map(z => z.id === id ? { ...z, active: newActive } : z));
+        try {
+            await toggleZoneStatus(id, newActive);
+        } catch (e) {
+            flash('Failed to update zone status', 'error');
+            setZones(p => p.map(z => z.id === id ? { ...z, active: !newActive } : z));
+        }
+    };
+    
+    const removeZone = async (id) => {
+        try {
+            await removeZoneApi(id);
+            setZones(p => p.filter(z => z.id !== id));
+            flash('Zone removed.');
+        } catch (e) {
+            flash('Failed to remove zone', 'error');
+        }
+    };
+
+    const addZoneHandler = async (e) => {
+        if (e && e.preventDefault) e.preventDefault();
         if (!addZone.trim()) return;
-        setZones(p => [...p, { id: Date.now(), name: addZone.trim(), severity: 'LOW', active: true }]);
-        setAddZone('');
-        flash('Zone added to subscriptions.');
+        try {
+            const res = await addZoneApi({ name: addZone.trim(), severity: 'LOW', active: true });
+            console.log('Add zone response:', res.data);
+            if (res.data && res.data.success && res.data.zone) {
+                setZones(p => [res.data.zone, ...(Array.isArray(p) ? p : [])]);
+                setAddZone('');
+                flash('Zone added to subscriptions.');
+            } else {
+                console.error('Invalid response format', res.data);
+                flash('Failed to add zone (invalid response)', 'error');
+            }
+        } catch (error) {
+            console.error('addZoneHandler error:', error);
+            flash('Failed to add zone', 'error');
+        }
     };
 
     if (!user) return <Loader fullPage />;
@@ -156,9 +197,9 @@ const Profile = () => {
         : 'October 2023';
 
     const stats = [
-        { icon: FileText, label: 'Reports Filed', value: user.reports_count ?? 12, color: '#1a9e7a', bg: '#f0fff4' },
-        { icon: Bell,     label: 'Active Alerts', value: user.active_alerts ?? 3,   color: '#3182ce', bg: '#ebf8ff' },
-        { icon: Star,     label: 'Trust Score',   value: user.trust_score ?? 84,    color: '#d69e2e', bg: '#fffff0' },
+        { icon: FileText, label: 'Reports Filed', value: user.reports_count ?? 0, color: '#1a9e7a', bg: '#f0fff4' },
+        { icon: Bell,     label: 'Active Alerts', value: user.active_alerts ?? 0,   color: '#3182ce', bg: '#ebf8ff' },
+        { icon: Star,     label: 'Trust Score',   value: user.trust_score ?? 30,    color: '#d69e2e', bg: '#fffff0' },
     ];
 
     return (
@@ -314,11 +355,11 @@ const Profile = () => {
                             <span style={s.sectionTitle}>Citizen Trust Score</span>
                         </div>
                         <span style={s.trustNum}>
-                            {user.trust_score ?? 84}<span style={{ fontSize: 14, color: '#a0aec0' }}>/100</span>
+                            {user.trust_score ?? 30}<span style={{ fontSize: 14, color: '#a0aec0' }}>/100</span>
                         </span>
                     </div>
                     <div style={s.trustBarWrap}>
-                        <div style={{ ...s.trustBarFill, width: `${user.trust_score ?? 84}%` }} />
+                        <div style={{ ...s.trustBarFill, width: `${user.trust_score ?? 30}%` }} />
                     </div>
                     <div style={s.trustTiers}>
                         {['Newcomer', 'Active', 'Trusted', 'Elite', 'Master'].map((t, i) => (
@@ -404,11 +445,6 @@ const Profile = () => {
                             <Phone size={16} color="#e53e3e" />
                             <span style={s.sectionTitle}>Emergency Contacts</span>
                         </div>
-                        {contacts.length < 3 && !addingContact && (
-                            <button onClick={() => setAddingContact(true)} style={s.addBtn}>
-                                <Plus size={13} /> Add
-                            </button>
-                        )}
                     </div>
                     <p style={s.cardDesc}>People notified when you submit a critical emergency report.</p>
 
@@ -419,9 +455,6 @@ const Profile = () => {
                                 <div style={s.contactName}>{c.name}</div>
                                 <div style={s.contactMeta}>{c.phone} · {c.relationship}</div>
                             </div>
-                            <button onClick={() => removeContact(c.id)} style={s.removeContactBtn}>
-                                <Trash2 size={13} />
-                            </button>
                         </div>
                     ))}
 
@@ -477,10 +510,10 @@ const Profile = () => {
                             placeholder="Add a zone name or area…"
                             value={addZone}
                             onChange={e => setAddZone(e.target.value)}
-                            onKeyDown={e => e.key === 'Enter' && addZoneHandler()}
+                            onKeyDown={e => e.key === 'Enter' && addZoneHandler(e)}
                             style={{ ...s.miniInput, flex: 1, margin: 0 }}
                         />
-                        <button onClick={addZoneHandler} style={s.addBtn}><Plus size={13} /> Add</button>
+                        <button type="button" onClick={addZoneHandler} style={s.addBtn}><Plus size={13} /> Add</button>
                     </div>
                 </div>
 

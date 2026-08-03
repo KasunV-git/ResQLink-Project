@@ -1,13 +1,14 @@
 import React from "react";
-import { LayoutDashboard, ClipboardList, Award, Bell, User } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Award, Bell, User, FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const ITEMS = [
   { id: "dashboard",   key: "sidebar.dashboard",   fallback: "Dashboard",       Icon: LayoutDashboard },
-  { id: "assignments", key: "sidebar.assignments",  fallback: "My Assignments",  Icon: ClipboardList   },
-  { id: "skills",      key: "sidebar.skills",       fallback: "Skills",          Icon: Award           },
-  { id: "alerts",      key: "sidebar.alerts",       fallback: "Alerts",          Icon: Bell            },
-  { id: "profile",     key: "sidebar.profile",      fallback: "Profile",         Icon: User            },
+  { id: "report",      key: "sidebar.report",      fallback: "Report Incident", Icon: FileText        },
+  { id: "assignments", key: "sidebar.assignments", fallback: "My Assignments",  Icon: ClipboardList   },
+  { id: "skills",      key: "sidebar.skills",      fallback: "Skills",          Icon: Award           },
+  { id: "alerts",      key: "sidebar.alerts",      fallback: "Alerts",          Icon: Bell            },
+  { id: "profile",     key: "sidebar.profile",     fallback: "Profile",         Icon: User            },
 ];
 
 export default function Sidebar({ activeTab, onTabChange }) {

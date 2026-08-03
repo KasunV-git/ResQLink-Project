@@ -114,7 +114,7 @@ export default function AIAnalysis({ isDarkMode }) {
           {statistics.map((stat) => (
             <StatsCard
               key={stat.id}
-              label={t(`adminAIStats.${stat.label.replace(/ /g, "")}`)}
+              label={t(`adminAIStats.${stat.label.replace(/ /g, "")}`, stat.label)}
               value={stat.value}
               trend={stat.trend}
               trendDirection={stat.trendDirection}

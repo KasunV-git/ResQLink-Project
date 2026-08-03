@@ -343,4 +343,66 @@ router.get('/volunteers', async (req, res) => {
   }
 });
 
+// --- ALERT ZONES ROUTES ---
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const token = (authHeader && authHeader.startsWith('Bearer ')) ? authHeader.split(' ')[1] : req.headers['x-access-token'];
+  if (!token) return res.status(401).json({ success: false, message: 'No token provided.' });
+  try {
+    req.user = jwt.verify(token, JWT_SECRET);
+    next();
+  } catch (err) {
+    return res.status(401).json({ success: false, message: 'Invalid token.' });
+  }
+};
+
+router.get('/zones', authenticateToken, async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT * FROM user_alert_zones WHERE user_id = ? ORDER BY id DESC', [req.user.id]);
+    res.json({ success: true, zones: rows });
+  } catch (error) {
+    console.error('Fetch zones error:', error.message);
+    res.status(500).json({ success: false, message: 'Failed to fetch zones' });
+  }
+});
+
+router.post('/zones', authenticateToken, async (req, res) => {
+  const { name, severity = 'LOW', active = true } = req.body;
+  if (!name) return res.status(400).json({ success: false, message: 'Zone name is required.' });
+  try {
+    const [result] = await db.query(
+      'INSERT INTO user_alert_zones (user_id, name, severity, active) VALUES (?, ?, ?, ?)',
+      [req.user.id, name, severity, active]
+    );
+    const [newRows] = await db.query('SELECT * FROM user_alert_zones WHERE id = ?', [result.insertId]);
+    res.json({ success: true, zone: newRows[0] });
+  } catch (error) {
+    console.error('Add zone error:', error.message);
+    res.status(500).json({ success: false, message: 'Failed to add zone' });
+  }
+});
+
+router.put('/zones/:id', authenticateToken, async (req, res) => {
+  const zoneId = parseInt(req.params.id, 10);
+  const { active } = req.body;
+  try {
+    await db.query('UPDATE user_alert_zones SET active = ? WHERE id = ? AND user_id = ?', [active ? 1 : 0, zoneId, req.user.id]);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Update zone error:', error.message);
+    res.status(500).json({ success: false, message: 'Failed to update zone' });
+  }
+});
+
+router.delete('/zones/:id', authenticateToken, async (req, res) => {
+  const zoneId = parseInt(req.params.id, 10);
+  try {
+    await db.query('DELETE FROM user_alert_zones WHERE id = ? AND user_id = ?', [zoneId, req.user.id]);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete zone error:', error.message);
+    res.status(500).json({ success: false, message: 'Failed to delete zone' });
+  }
+});
+
 module.exports = router;

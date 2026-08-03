@@ -28,8 +28,7 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
     return (
       <RegisterPage
         onLoginSuccess={(data) => {
-          const userObj = data.user || data;
-          authLogin(userObj);
+          authLogin(data);
           if (onLoginSuccess) onLoginSuccess(data);
         }}
         onBackToLogin={() => setShowRegister(false)}
@@ -55,9 +54,8 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
     try {
       const response = await axios.post("/api/auth/login", { username, password });
       const data = response.data;
-      const userObj = data.user || data;
 
-      authLogin(userObj);
+      authLogin(data);
 
       if (onLoginSuccess) {
         onLoginSuccess(data);

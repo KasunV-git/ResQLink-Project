@@ -82,7 +82,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
     { date: "6/05", Dispatches: assignments.length || 5 },
   ];
 
-  const cardClass = `border rounded-lg p-5 shadow-sm flex items-center gap-4 transition-colors duration-200 ${
+  const cardClass = `border rounded-xl p-5 shadow-sm flex flex-col gap-3 transition-colors duration-200 ${
     isDarkMode ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-900"
   }`;
 
@@ -104,50 +104,50 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
       </div>
 
       {/* Stats Grid */}
-      <div className="flex flex-wrap justify-center gap-6 w-full">
-        <div className={`w-[220px] ${cardClass}`}>
-          <div className={`rounded-lg p-3 ${isDarkMode ? "bg-emerald-950/40 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+        <div className={cardClass}>
+          <div className={`self-start rounded-xl p-3 ${isDarkMode ? "bg-emerald-950/40 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>
             <Users className="w-6 h-6" />
           </div>
-          <div className="flex flex-col min-w-0 flex-1">
-            <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{totalVolunteers}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>{t("adminDashboard.totalVolunteers")}</span>
+          <div className="flex flex-col mt-1">
+            <span className={`font-bold text-3xl mb-1 ${isDarkMode ? "text-white" : "text-slate-900"}`}>{totalVolunteers}</span>
+            <span className={`text-[11px] font-bold uppercase tracking-wider leading-snug ${textColorMuted}`}>{t("adminDashboard.totalVolunteers", { defaultValue: "Total Volunteers" })}</span>
           </div>
         </div>
 
-        <div className={`w-[220px] ${cardClass}`}>
-          <div className={`rounded-lg p-3 ${isDarkMode ? "bg-blue-950/40 text-blue-400" : "bg-blue-50 text-blue-600"}`}>
+        <div className={cardClass}>
+          <div className={`self-start rounded-xl p-3 ${isDarkMode ? "bg-blue-950/40 text-blue-400" : "bg-blue-50 text-blue-600"}`}>
             <CheckCircle className="w-6 h-6" />
           </div>
-          <div className="flex flex-col min-w-0 flex-1">
-            <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{availableVolunteers}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>{t("adminDashboard.availableNow")}</span>
+          <div className="flex flex-col mt-1">
+            <span className={`font-bold text-3xl mb-1 ${isDarkMode ? "text-white" : "text-slate-900"}`}>{availableVolunteers}</span>
+            <span className={`text-[11px] font-bold uppercase tracking-wider leading-snug ${textColorMuted}`}>{t("adminDashboard.availableNow", { defaultValue: "Available Now" })}</span>
           </div>
         </div>
 
-        <div className={`w-[220px] ${cardClass}`}>
-          <div className={`rounded-lg p-3 ${isDarkMode ? "bg-amber-950/40 text-amber-400" : "bg-amber-50 text-amber-600"}`}>
+        <div className={cardClass}>
+          <div className={`self-start rounded-xl p-3 ${isDarkMode ? "bg-amber-950/40 text-amber-400" : "bg-amber-50 text-amber-600"}`}>
             <ClipboardList className="w-6 h-6" />
           </div>
-          <div className="flex flex-col min-w-0 flex-1">
-            <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{activeAssignments}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>{t("adminDashboard.activeTasks")}</span>
+          <div className="flex flex-col mt-1">
+            <span className={`font-bold text-3xl mb-1 ${isDarkMode ? "text-white" : "text-slate-900"}`}>{activeAssignments}</span>
+            <span className={`text-[11px] font-bold uppercase tracking-wider leading-snug ${textColorMuted}`}>{t("adminDashboard.activeTasks", { defaultValue: "Active Tasks" })}</span>
           </div>
         </div>
 
-        <div className={`w-[220px] ${cardClass}`}>
-          <div className={`rounded-lg p-3 ${isDarkMode ? "bg-red-950/40 text-red-400" : "bg-red-50 text-red-600"}`}>
+        <div className={cardClass}>
+          <div className={`self-start rounded-xl p-3 ${isDarkMode ? "bg-red-950/40 text-red-400" : "bg-red-50 text-red-600"}`}>
             <ShieldAlert className="w-6 h-6" />
           </div>
-          <div className="flex flex-col min-w-0 flex-1">
-            <span className={`font-bold text-2xl truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{totalAlerts}</span>
-            <span className={`text-xs font-semibold uppercase tracking-wider truncate ${textColorMuted}`}>{t("adminDashboard.activeAlerts")}</span>
+          <div className="flex flex-col mt-1">
+            <span className={`font-bold text-3xl mb-1 ${isDarkMode ? "text-white" : "text-slate-900"}`}>{totalAlerts}</span>
+            <span className={`text-[11px] font-bold uppercase tracking-wider leading-snug ${textColorMuted}`}>{t("adminDashboard.activeAlerts", { defaultValue: "Active Alerts" })}</span>
           </div>
         </div>
       </div>
 
       {/* Overview Analytics Chart */}
-      <div className="flex flex-col gap-2 w-full max-w-[900px]">
+      <div className="flex flex-col gap-2 w-full">
         <div className="flex flex-col px-1">
           <h3 className={`font-semibold text-lg tracking-tight ${headingColor}`}>{t("adminDashboard.trendTitle")}</h3>
           <p className={`text-xs ${textColorMuted}`}>
@@ -208,9 +208,9 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
       </div>
 
       {/* Main Grid */}
-      <div className="flex flex-wrap justify-center gap-8 w-full max-w-[1000px]">
+      <div className="flex flex-col lg:flex-row gap-8 w-full">
         {/* Recent Assignments */}
-        <div className="flex-1 min-w-[350px] max-w-[500px] flex flex-col gap-2">
+        <div className="flex-1 flex flex-col gap-2">
           <div className="flex justify-between items-end px-1">
             <h3 className={`font-semibold text-lg tracking-tight ${headingColor}`}>{t("adminDashboard.recentAssignments")}</h3>
             <button
@@ -238,7 +238,7 @@ export default function Dashboard({ volunteers, assignments, alerts, onTabChange
       </div>
 
       {/* Recent Broadcasts */}
-        <div className="flex-1 min-w-[350px] max-w-[500px] flex flex-col gap-2">
+        <div className="flex-1 flex flex-col gap-2">
           <div className="flex justify-between items-end px-1">
             <h3 className={`font-semibold text-lg tracking-tight ${headingColor}`}>{t("adminDashboard.emergencyAlerts")}</h3>
             <button
