@@ -13,10 +13,14 @@ const DB_NAME     = process.env.DB_NAME     || 'resqlink';
 async function initDb() {
   console.log('🔄 Initialising database…');
 
+  const isTiDB = DB_HOST.includes('tidbcloud');
+  const sslConfig = isTiDB ? { minVersion: 'TLSv1.2', rejectUnauthorized: true } : undefined;
+
   const connection = await mysql.createConnection({
     host:     DB_HOST,
     user:     DB_USER,
     password: DB_PASSWORD,
+    ssl:      sslConfig,
   });
 
   try {
