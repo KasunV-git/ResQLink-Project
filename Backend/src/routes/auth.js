@@ -194,7 +194,7 @@ router.post('/google', async (req, res) => {
       
       const [result] = await db.query(
         'INSERT INTO users (username, name, first_name, last_name, email, role, is_available, password, avatar_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [username, name, given_name || name.split(' ')[0], family_name || '', email, userRole, 1, hashedPassword, picture]
+        [username, name || '', given_name || (name ? name.split(' ')[0] : ''), family_name || '', email, userRole, 1, hashedPassword, picture]
       );
       userId = result.insertId;
     }
