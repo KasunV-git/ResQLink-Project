@@ -5,10 +5,12 @@ import { useTranslation } from "react-i18next";
 import logo from "../../assets/Logo & Name Side-cropped.svg";
 import ThemeToggle from "../../components/ThemeToggle";
 import LanguageSwitcher from "../../components/LanguageSwitcher";
+import { GoogleLogin } from '@react-oauth/google';
 
 export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }) {
   const { t } = useTranslation();
   const [username,        setUsername]        = useState("");
+  const [email,           setEmail]           = useState("");
   const [firstName,       setFirstName]       = useState("");
   const [lastName,        setLastName]        = useState("");
   const [phone,           setPhone]           = useState("");
@@ -29,6 +31,10 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
       setError(t("auth.validationNameRequired") || "First and last name are required.");
       return;
     }
+    if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email)) {
+      setError(t("auth.validationEmailRequired") || "A valid email address is required.");
+      return;
+    }
     if (password.length < 6) {
       setError(t("auth.validationPasswordLength") || "Password must be at least 6 characters.");
       return;
@@ -43,6 +49,7 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
     try {
       const response = await axios.post("/api/auth/signup", {
         username,
+        email,
         name: `${firstName} ${lastName}`.trim(),
         firstName,
         lastName,
@@ -58,6 +65,24 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
       }
     } catch (err) {
       setError(err.response?.data?.message || t("auth.registrationFailed") || "Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await axios.post("/api/auth/google", { token: credentialResponse.credential });
+      if (onLoginSuccess) {
+        onLoginSuccess(response.data);
+      } else if (onBackToLogin) {
+        onBackToLogin();
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || "Google sign-up failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -139,6 +164,19 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
               placeholder={t("auth.usernamePlaceholder") || "Enter your username"}
               value={username}
               onChange={e => setUsername(e.target.value)}
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
+              required
+            />
+          </div>
+
+          {/* Email */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t("auth.email") || "Email Address"}</label>
+            <input
+              type="email"
+              placeholder={t("auth.emailPlaceholder") || "Enter your email"}
+              value={email}
+              onChange={e => setEmail(e.target.value)}
               className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:border-[#1e3a8a] dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-colors"
               required
             />
@@ -229,6 +267,24 @@ export default function RegisterPage({ onLoginSuccess, onBackToLogin, onGoHome }
           >
             {loading ? (t("auth.creatingAccount") || "Creating Account...") : (t("auth.createAccount") || "Create Account")}
           </button>
+
+          <div className="flex items-center gap-3 mt-2">
+            <div className="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
+            <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase">OR</span>
+            <div className="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
+          </div>
+
+          <div className="flex justify-center mt-2">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError("Google sign-up failed. Please try again.")}
+              useOneTap
+              theme="outline"
+              size="large"
+              shape="rectangular"
+              text="signup_with"
+            />
+          </div>
         </form>
 
         {/* Back to Login */}

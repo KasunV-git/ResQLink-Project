@@ -5,6 +5,9 @@ const path    = require('path');
 const fs      = require('fs');
 const router  = express.Router();
 const db      = require('../config/db');
+const { OAuth2Client } = require('google-auth-library');
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const JWT_SECRET = process.env.JWT_SECRET || 'resqlink_secret_key_2026';
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -59,7 +62,8 @@ function generateToken(user) {
 
 /* ══ POST /api/auth/signup & /api/auth/register ══ */
 const handleSignup = async (req, res) => {
-  const username        = (req.body.username || req.body.email || req.body.name || '').trim();
+  const username        = (req.body.username || req.body.name || '').trim();
+  const inputEmail      = (req.body.email || '').trim();
   const name            = (req.body.name || username || '').trim();
   const firstName       = (req.body.firstName || (name ? name.split(' ')[0] : '')).trim();
   const lastName        = (req.body.lastName  || (name ? name.split(' ').slice(1).join(' ') : '')).trim();
@@ -92,7 +96,7 @@ const handleSignup = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const combinedName   = name || `${firstName} ${lastName}`.trim() || username;
-    const emailVal       = username.includes('@') ? username : `${username.toLowerCase()}@resqlink.com`;
+    const emailVal       = inputEmail || (username.includes('@') ? username : `${username.toLowerCase()}@resqlink.com`);
 
     const [result] = await db.query(
       'INSERT INTO users (username, name, first_name, last_name, email, phone, role, is_available, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -157,6 +161,55 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Login error:', error.message);
     return res.status(500).json({ success: false, message: 'Login failed. Please try again.' });
+  }
+});
+
+/* ══ POST /api/auth/google ══ */
+router.post('/google', async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).json({ success: false, message: 'No Google token provided.' });
+
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const { email, given_name, family_name, picture, name } = payload;
+
+    // Check if user exists by email
+    const [existing] = await db.query(
+      'SELECT id FROM users WHERE email = ?',
+      [email]
+    );
+
+    let userId;
+    if (existing.length > 0) {
+      userId = existing[0].id;
+    } else {
+      // Create new user, default to Citizen
+      const username = email.split('@')[0] + Math.floor(Math.random() * 1000);
+      const hashedPassword = await bcrypt.hash(Math.random().toString(36).slice(-8), 10);
+      
+      const [result] = await db.query(
+        'INSERT INTO users (username, name, first_name, last_name, email, role, is_available, password, avatar_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [username, name, given_name || name.split(' ')[0], family_name || '', email, 'Citizen', 1, hashedPassword, picture]
+      );
+      userId = result.insertId;
+    }
+
+    const user = await getUserById(userId);
+    const jwtToken = generateToken(user);
+
+    return res.json({
+      success: true,
+      token: jwtToken,
+      user,
+      ...user,
+    });
+  } catch (error) {
+    console.error('Google Auth Error:', error.message);
+    return res.status(401).json({ success: false, message: 'Google authentication failed.' });
   }
 });
 

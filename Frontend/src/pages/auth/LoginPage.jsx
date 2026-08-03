@@ -8,6 +8,7 @@ import logo from "../../assets/Logo & Name Side-cropped.svg";
 import ThemeToggle from "../../components/ThemeToggle";
 import LanguageSwitcher from "../../components/LanguageSwitcher";
 import { useAuth } from "../../context/AuthContext";
+import { GoogleLogin } from '@react-oauth/google';
 
 export default function LoginPage({ onLoginSuccess, initialShowRegister = false, onGoHome }) {
   const { t } = useTranslation();
@@ -63,6 +64,24 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
     } catch (err) {
       console.error("Login error:", err);
       setError(err.response?.data?.message || t("auth.invalidCredentials") || "Invalid username or password.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await axios.post("/api/auth/google", { token: credentialResponse.credential });
+      const data = response.data;
+      authLogin(data);
+      if (onLoginSuccess) {
+        onLoginSuccess(data);
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || "Google sign-in failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -149,6 +168,24 @@ export default function LoginPage({ onLoginSuccess, initialShowRegister = false,
           >
             {loading ? (t("auth.signingIn") || "Signing in…") : (t("auth.signIn") || "Sign In")}
           </button>
+
+          <div className="flex items-center gap-3 mt-2">
+            <div className="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
+            <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase">OR</span>
+            <div className="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
+          </div>
+
+          <div className="flex justify-center mt-2">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError("Google sign-in failed. Please try again.")}
+              useOneTap
+              theme="outline"
+              size="large"
+              shape="rectangular"
+              text="continue_with"
+            />
+          </div>
         </form>
 
         {/* Links */}
