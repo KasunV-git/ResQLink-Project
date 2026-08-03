@@ -11,8 +11,8 @@ const DB_PASSWORD = process.env.DB_PASSWORD || '';
 const DB_HOST     = process.env.DB_HOST     || 'localhost';
 const DB_PORT     = process.env.DB_PORT     || 3306;
 
-const isProduction = process.env.NODE_ENV === 'production';
-const sslConfig = isProduction ? { rejectUnauthorized: true } : undefined;
+const isTiDB = DB_HOST.includes('tidbcloud');
+const sslConfig = isTiDB ? { minVersion: 'TLSv1.2', rejectUnauthorized: true } : undefined;
 
 // 1. MySQL2 Pool for raw queries
 const pool = mysql.createPool({
