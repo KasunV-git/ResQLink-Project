@@ -18,6 +18,7 @@ async function initDb() {
 
   const connection = await mysql.createConnection({
     host:     DB_HOST,
+    port:     process.env.DB_PORT || 3306,
     user:     DB_USER,
     password: DB_PASSWORD,
     ssl:      sslConfig,
