@@ -14,3 +14,8 @@ export const getZones = () => api.get('/auth/zones');
 export const addZone = (data) => api.post('/auth/zones', data);
 export const toggleZoneStatus = (id, active) => api.put(`/auth/zones/${id}`, { active });
 export const removeZone = (id) => api.delete(`/auth/zones/${id}`);
+
+// Password Reset
+export const forgotPassword = (data) => api.post('/auth/forgot-password', data);
+export const verifyResetCode = (data) => api.post('/auth/verify-reset-code', data);
+export const resetPassword = (data) => api.post('/auth/reset-password', data);

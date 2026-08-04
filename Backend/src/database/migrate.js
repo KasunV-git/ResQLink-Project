@@ -336,6 +336,24 @@ async function step20_disasters_change_people_affected_type(conn) {
   console.log(`  ✅ ${name}`);
 }
 
+async function step21_users_reset_password_cols(conn) {
+  const name = '21_users_reset_password_cols';
+  if (await migrationDone(conn, name)) return console.log(`  ⏭  ${name}`);
+
+  if (!(await columnExists(conn, 'users', 'reset_code'))) {
+    await conn.query(
+      `ALTER TABLE users ADD COLUMN reset_code VARCHAR(10) DEFAULT NULL AFTER password`
+    );
+  }
+  if (!(await columnExists(conn, 'users', 'reset_expires'))) {
+    await conn.query(
+      `ALTER TABLE users ADD COLUMN reset_expires DATETIME DEFAULT NULL AFTER reset_code`
+    );
+  }
+  await recordMigration(conn, name);
+  console.log(`  ✅ ${name}`);
+}
+
 // ── runner ────────────────────────────────────────────────────────────────────
 
 async function runMigrations() {
@@ -378,6 +396,7 @@ async function runMigrations() {
       step18_alerts_ensure_time,
       step19_disasters_add_landmark_people,
       step20_disasters_change_people_affected_type,
+      step21_users_reset_password_cols,
     ];
 
     for (const step of steps) {

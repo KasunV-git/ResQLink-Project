@@ -6,6 +6,7 @@ const fs      = require('fs');
 const router  = express.Router();
 const db      = require('../config/db');
 const { OAuth2Client } = require('google-auth-library');
+const { sendPasswordResetEmail } = require('../services/emailService');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -212,6 +213,88 @@ router.post('/google', async (req, res) => {
   } catch (error) {
     console.error('Google Auth Error:', error.message);
     return res.status(401).json({ success: false, message: 'Google authentication failed.' });
+  }
+});
+
+/* ══ POST /api/auth/forgot-password ══ */
+router.post('/forgot-password', async (req, res) => {
+  const email = (req.body.email || '').trim().toLowerCase();
+  if (!email) return res.status(400).json({ success: false, message: 'Email is required.' });
+
+  try {
+    const [rows] = await db.query('SELECT id, name FROM users WHERE LOWER(email) = ?', [email]);
+    if (rows.length === 0) {
+      // Don't leak whether the email exists, just return success
+      return res.json({ success: true, message: 'If the email exists, a reset code has been sent.' });
+    }
+
+    const user = rows[0];
+    const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
+    const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    await db.query('UPDATE users SET reset_code = ?, reset_expires = ? WHERE id = ?', [code, expires, user.id]);
+    
+    // Send email
+    await sendPasswordResetEmail(email, user.name, code);
+    
+    return res.json({ success: true, message: 'If the email exists, a reset code has been sent.' });
+  } catch (error) {
+    console.error('Forgot password error:', error.message);
+    return res.status(500).json({ success: false, message: 'Failed to process request.' });
+  }
+});
+
+/* ══ POST /api/auth/verify-reset-code ══ */
+router.post('/verify-reset-code', async (req, res) => {
+  const email = (req.body.email || '').trim().toLowerCase();
+  const code = (req.body.code || '').trim();
+  
+  if (!email || !code) return res.status(400).json({ success: false, message: 'Email and code are required.' });
+
+  try {
+    const [rows] = await db.query('SELECT id, reset_code, reset_expires FROM users WHERE LOWER(email) = ?', [email]);
+    if (rows.length === 0) return res.status(400).json({ success: false, message: 'Invalid code or email.' });
+
+    const user = rows[0];
+    if (user.reset_code !== code) {
+      return res.status(400).json({ success: false, message: 'Invalid reset code.' });
+    }
+
+    if (new Date(user.reset_expires) < new Date()) {
+      return res.status(400).json({ success: false, message: 'Reset code has expired.' });
+    }
+
+    // Generate a short-lived token specifically for password reset
+    const resetToken = jwt.sign({ id: user.id, reset: true }, JWT_SECRET, { expiresIn: '15m' });
+
+    // Clear the reset code so it can't be reused
+    await db.query('UPDATE users SET reset_code = NULL, reset_expires = NULL WHERE id = ?', [user.id]);
+
+    return res.json({ success: true, resetToken });
+  } catch (error) {
+    console.error('Verify code error:', error.message);
+    return res.status(500).json({ success: false, message: 'Failed to verify code.' });
+  }
+});
+
+/* ══ POST /api/auth/reset-password ══ */
+router.post('/reset-password', async (req, res) => {
+  const { resetToken, newPassword } = req.body;
+  if (!resetToken || !newPassword) return res.status(400).json({ success: false, message: 'Missing token or password.' });
+  
+  if (newPassword.length < 6) return res.status(400).json({ success: false, message: 'Password must be at least 6 characters.' });
+
+  try {
+    const decoded = jwt.verify(resetToken, JWT_SECRET);
+    if (!decoded.reset) return res.status(400).json({ success: false, message: 'Invalid token type.' });
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await db.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, decoded.id]);
+
+    return res.json({ success: true, message: 'Password updated successfully.' });
+  } catch (error) {
+    console.error('Reset password error:', error.message);
+    return res.status(400).json({ success: false, message: 'Invalid or expired token.' });
   }
 });
 
