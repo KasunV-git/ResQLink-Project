@@ -177,7 +177,8 @@ const Report = () => {
             }, ...prev]);
         } catch (err) {
             console.error('Error submitting report:', err);
-            setErrors({ location: 'Failed to submit report. Please try again later.' });
+            const msg = err.response?.data?.message || err.message || 'Failed to submit report. Please try again later.';
+            setErrors({ location: msg });
         } finally {
             setLoading(false);
         }
@@ -528,6 +529,12 @@ const Report = () => {
                             <div style={s.privacyNote}>
                                 🔒 Your report is encrypted and sent directly to emergency services
                             </div>
+                            
+                            {errors.location && (
+                                <div style={{ color: '#e53e3e', fontSize: 14, textAlign: 'center', marginBottom: 16 }}>
+                                    {errors.location}
+                                </div>
+                            )}
 
                             <div style={s.stepNavRow}>
                                 <button onClick={prevStep} style={s.backBtn}>

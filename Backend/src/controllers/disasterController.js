@@ -23,7 +23,7 @@ const submitReport = async (req, res) => {
             media_url,
             reported_by: req.user.id,
             status: 'pending',
-            predictor_risk_level: severity ? severity.toLowerCase() : 'low',
+            predictor_risk_level: severity ? (severity.toLowerCase() === 'moderate' ? 'medium' : severity.toLowerCase()) : 'low',
         });
 
         return successResponse(res, 'Report submitted successfully.', disaster, 201);
@@ -117,14 +117,6 @@ const updateReportStatus = async (req, res) => {
                 status: 'active'
             });
 
-            if (report.reported_by) {
-                const user = await User.findByPk(report.reported_by);
-                if (user) {
-                    const newScore = Math.min(100, (user.trust_score || 30) + 15);
-                    await user.update({ trust_score: newScore });
-                }
-            }
-
             // Announce if requested
             if (announce) {
                 const timeString = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -141,13 +133,6 @@ const updateReportStatus = async (req, res) => {
                 status: 'resolved'
             });
             
-            if (report.reported_by) {
-                const user = await User.findByPk(report.reported_by);
-                if (user) {
-                    const newScore = Math.max(0, (user.trust_score || 30) - 20);
-                    await user.update({ trust_score: newScore });
-                }
-            }
             return successResponse(res, 'Report rejected successfully.', report);
         } else {
             return errorResponse(res, 'Invalid action.', 400);

@@ -22,7 +22,7 @@ const avatarStorage = multer.diskStorage({
 
 // Only allow image files
 const imageFilter = (req, file, cb) => {
-    const allowed = /jpeg|jpg|png|heic|webp|gif/;
+    const allowed = /jpeg|jpg|png|heic|webp|gif|svg/;
     const extName = path.extname(file.originalname).toLowerCase();
     const ext = extName ? allowed.test(extName) : true; // Allow if no extension, rely on mime
     const mime = allowed.test(file.mimetype);

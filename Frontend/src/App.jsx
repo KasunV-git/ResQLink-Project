@@ -87,7 +87,7 @@ export default function App() {
 
   const handleLoginSuccess = (data) => {
     const userObj = data.user || data;
-    login(userObj);
+    // Removed redundant login() call that wiped the token
 
     const normRole = getNormalizedRole(userObj.role);
 

@@ -129,11 +129,11 @@ const Dashboard = () => {
                 let alertData = alertRes.status === 'fulfilled' ? (alertRes.value.data?.data ?? alertRes.value.data) : null;
                 let reportData = reportRes.status === 'fulfilled' ? (reportRes.value.data?.data ?? reportRes.value.data) : null;
 
-                setAlerts(Array.isArray(alertData) && alertData.length > 0 ? alertData : DEMO_ALERTS);
-                setReports(Array.isArray(reportData) && reportData.length > 0 ? reportData : DEMO_REPORTS);
+                setAlerts(Array.isArray(alertData) ? alertData : []);
+                setReports(Array.isArray(reportData) ? reportData : []);
             } catch {
-                setAlerts(DEMO_ALERTS);
-                setReports(DEMO_REPORTS);
+                setAlerts([]);
+                setReports([]);
             } finally {
                 setLoading(false);
             }
