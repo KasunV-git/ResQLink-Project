@@ -247,7 +247,9 @@ router.post('/forgot-password', async (req, res) => {
     await db.query('UPDATE users SET reset_code = ?, reset_expires = ? WHERE id = ?', [code, expires, user.id]);
     
     // Send email
-    await sendPasswordResetEmail(email, user.name, code);
+    console.log(`[Forgot Password] Found user ${user.id} (${email}). Attempting to send email...`);
+    const emailResult = await sendPasswordResetEmail(email, user.name, code);
+    console.log(`[Forgot Password] Email send result: ${emailResult}`);
     
     return res.json({ success: true, message: 'If the email exists, a reset code has been sent.' });
   } catch (error) {
