@@ -2,6 +2,7 @@ import React from "react";
 import { Bell, Menu } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import logo from "../assets/Logo & Name Side-cropped.svg";
+import logoDark from "../assets/dark-logo.png";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeToggle from "./ThemeToggle";
 import ProfileAvatar from "./ProfileAvatar";
@@ -23,10 +24,18 @@ export default function Header({ user, alertsCount, onTabChange, onMenuToggle, o
         >
           <Menu size={20} />
         </button>
+        {/* Light Mode Logo */}
         <img
           src={logo}
           alt="ResQLink"
-          className="h-9 w-auto cursor-pointer brightness-100 dark:brightness-110"
+          className="h-9 w-auto cursor-pointer brightness-100 block dark:hidden"
+          onClick={() => onTabChange("dashboard")}
+        />
+        {/* Dark Mode Logo */}
+        <img
+          src={logoDark}
+          alt="ResQLink"
+          className="h-9 w-auto cursor-pointer hidden dark:block"
           onClick={() => onTabChange("dashboard")}
         />
       </div>

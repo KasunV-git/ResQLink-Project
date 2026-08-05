@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MapPin, Brain, Users, Bell, Clock, Activity, UserCheck, Shield, Menu, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import logo from "../assets/Logo & Name Side-cropped.svg";
+import logoDark from "../assets/dark-logo.png";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import ThemeToggle from "../components/ThemeToggle";
 
@@ -81,7 +82,10 @@ export default function Home({ onLogin, onRegister }) {
       {/* ── NAVBAR ── */}
       <nav className="anim-fade-in-down sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-xs">
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
-          <img src={logo} alt="ResQLink" className="h-9 w-auto flex-shrink-0 brightness-100 dark:brightness-110" />
+          {/* Light Mode Logo */}
+          <img src={logo} alt="ResQLink" className="h-9 w-auto flex-shrink-0 brightness-100 block dark:hidden" />
+          {/* Dark Mode Logo */}
+          <img src={logoDark} alt="ResQLink" className="h-9 w-auto flex-shrink-0 hidden dark:block" />
 
           {/* Desktop links */}
           <div className="hidden md:flex items-center gap-4">
@@ -306,7 +310,10 @@ export default function Home({ onLogin, onRegister }) {
         <div className="max-w-[1200px] mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-start gap-5 mb-5">
             <div>
-              <img src={logo} alt="ResQLink" className="h-8 w-auto mb-2 brightness-100 dark:brightness-110" />
+              {/* Light Mode Logo */}
+              <img src={logo} alt="ResQLink" className="h-8 w-auto mb-2 brightness-100 block dark:hidden" />
+              {/* Dark Mode Logo */}
+              <img src={logoDark} alt="ResQLink" className="h-8 w-auto mb-2 hidden dark:block" />
               <p className="text-[13px] text-slate-400 dark:text-slate-500 m-0">
                 {t("home.footerTagline")}
               </p>

@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import logo from "../assets/Logo & Name Side-cropped.svg";
+import logoDark from "../assets/dark-logo.png";
 
 export default function Footer() {
   const { t } = useTranslation();
@@ -17,7 +18,10 @@ export default function Footer() {
       <div className="flex items-center justify-between flex-wrap gap-2.5">
         {/* Left — logo + tagline */}
         <div className="flex items-center gap-2.5">
-          <img src={logo} alt="ResQLink" className="h-7 w-auto brightness-100 dark:brightness-110" />
+          {/* Light Mode Logo */}
+          <img src={logo} alt="ResQLink" className="h-7 w-auto brightness-100 block dark:hidden" />
+          {/* Dark Mode Logo */}
+          <img src={logoDark} alt="ResQLink" className="h-7 w-auto hidden dark:block" />
           <span className="text-xs text-slate-400 dark:text-slate-500">
             {t("footer.tagline")}
           </span>
