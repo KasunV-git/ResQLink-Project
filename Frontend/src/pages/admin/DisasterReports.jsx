@@ -181,7 +181,9 @@ export default function DisasterReports({ isDarkMode, onReportsUpdated }) {
   const processAction = async (id, action) => {
     try {
       setProcessingId(id);
-      const token = localStorage.getItem("token");
+      // Close the modal instantly to remove the "lagging" feel for the user
+      setShowAnnounceModal(false);
+
       const payload = { action };
       
       if (action === "approve" && announceData.shouldAnnounce) {
@@ -190,15 +192,26 @@ export default function DisasterReports({ isDarkMode, onReportsUpdated }) {
         payload.priority = announceData.priority;
       }
 
+      // Optimistically update the UI so it feels instantaneous
+      setReports((prev) => 
+        prev.map((r) => 
+          r.disaster_id === id 
+            ? { ...r, verification_status: action === "approve" ? "verified" : "rejected" } 
+            : r
+        )
+      );
+
+      // Execute the request in the background
       await axios.put(`/disasters/admin/report/${id}/status`, payload);
 
-
-      setShowAnnounceModal(false);
+      // Refresh quietly in the background to ensure sync
       fetchReports();
       if (onReportsUpdated) onReportsUpdated();
     } catch (err) {
       console.error(err);
       alert(t("adminDisasterReports.errorMsg"));
+      // Revert if failed
+      fetchReports();
     } finally {
       setProcessingId(null);
     }
