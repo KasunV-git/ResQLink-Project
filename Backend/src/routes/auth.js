@@ -192,12 +192,13 @@ router.post('/google', async (req, res) => {
       
       console.log(`[Google Auth] Existing user found: ${email}, currentRole: ${currentRole}, requestedRole: ${role}`);
       
-      // If they registered via the Volunteer tab but are currently a Citizen, upgrade them
-      if (role && role.toLowerCase() === 'volunteer' && (!currentRole || currentRole.toLowerCase() !== 'volunteer')) {
-        console.log(`[Google Auth] Upgrading user ${userId} to Volunteer!`);
-        await db.query('UPDATE users SET role = ? WHERE id = ?', ['Volunteer', userId]);
+      // If they registered via a specific tab and it differs from their current role, switch them!
+      if (role && currentRole && role.toLowerCase() !== currentRole.toLowerCase()) {
+        const newRole = role.toLowerCase() === 'volunteer' ? 'Volunteer' : 'Citizen';
+        console.log(`[Google Auth] Switching user ${userId} to ${newRole}!`);
+        await db.query('UPDATE users SET role = ? WHERE id = ?', [newRole, userId]);
       } else {
-        console.log(`[Google Auth] Not upgrading. condition failed.`);
+        console.log(`[Google Auth] Not switching. role is same or undefined.`);
       }
     } else {
       // Create new user with selected role (default to Citizen)
