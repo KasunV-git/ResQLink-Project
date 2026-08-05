@@ -179,15 +179,26 @@ router.post('/google', async (req, res) => {
     const payload = ticket.getPayload();
     const { email, given_name, family_name, picture, name } = payload;
 
-    // Check if user exists by email
+    // Check if user exists by email and get their current role
     const [existing] = await db.query(
-      'SELECT id FROM users WHERE email = ?',
+      'SELECT id, role FROM users WHERE email = ?',
       [email]
     );
 
     let userId;
     if (existing.length > 0) {
       userId = existing[0].id;
+      const currentRole = existing[0].role;
+      
+      console.log(`[Google Auth] Existing user found: ${email}, currentRole: ${currentRole}, requestedRole: ${role}`);
+      
+      // If they registered via the Volunteer tab but are currently a Citizen, upgrade them
+      if (role && role.toLowerCase() === 'volunteer' && (!currentRole || currentRole.toLowerCase() !== 'volunteer')) {
+        console.log(`[Google Auth] Upgrading user ${userId} to Volunteer!`);
+        await db.query('UPDATE users SET role = ? WHERE id = ?', ['Volunteer', userId]);
+      } else {
+        console.log(`[Google Auth] Not upgrading. condition failed.`);
+      }
     } else {
       // Create new user with selected role (default to Citizen)
       const userRole = (role && role.toLowerCase() === 'volunteer') ? 'Volunteer' : 'Citizen';
