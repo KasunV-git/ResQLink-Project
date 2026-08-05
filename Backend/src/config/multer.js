@@ -1,6 +1,13 @@
 // backend/src/config/multer.js
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+
+// Ensure directories exist
+const reportsDir = 'src/uploads/reports/';
+const avatarsDir = 'src/uploads/profile-images/';
+if (!fs.existsSync(reportsDir)) fs.mkdirSync(reportsDir, { recursive: true });
+if (!fs.existsSync(avatarsDir)) fs.mkdirSync(avatarsDir, { recursive: true });
 
 // Storage for disaster report images
 const reportStorage = multer.diskStorage({
